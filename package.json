@@ -1,0 +1,17 @@
+{
+  "name": "eclectic-array-sales-trainer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
+    "@astrojs/vercel": "^10.0.8",
+    "@elevenlabs/client": "^1.11.0",
+    "astro": "^6.4.6"
+  }
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "agent_id": "agent_1701ktvjvdf1f30s1jda1798yk8w",
+    "label": "The Haggler",
+    "description": "Loves the piece, hates the price. Pushes for a discount from hello and won't buy without one last fight. Practice holding value — and the line on price — without losing the sale."
+  },
+  {
+    "agent_id": "agent_2601ktvjv9r4e3wr0tp9xaqw0n7f",
+    "label": "The Collector",
+    "description": "Knows artisan work and quietly tests whether you do too. Won't be charmed — only earned. Practice telling the true story behind each piece: maker, technique, origin."
+  },
+  {
+    "agent_id": "TODO_ELEVENLABS_AGENT_ID_GOLDMINE",
+    "label": "The Goldmine",
+    "description": "Falls for the whole collection and isn't counting pennies. Practice reading the buying signals and growing the sale — the second piece, the bundle — without ever pushing too hard."
+  },
+  {
+    "agent_id": "TODO_ELEVENLABS_AGENT_ID_MEAN_ADAMANT",
+    "label": "The Hard Case",
+    "description": "Cold, blunt, and slow to thaw — nothing impresses her and she lets you know it. Practice keeping your warmth and your footing when the customer gives you nothing back."
+  }
+]

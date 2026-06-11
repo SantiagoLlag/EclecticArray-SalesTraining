@@ -1,0 +1,53 @@
+[
+  {
+    "id": "chiapas-sandals-dark-magenta",
+    "name": "Chiapas Sandals — Dark Magenta",
+    "price": "$240",
+    "image": "https://eclecticarray.com/cdn/shop/files/5_6eaabc56-a5d8-4278-8171-78e8d3970a3a.png",
+    "description": "Handmade sandals from Chiapas with Eclectic Array's signature woven strap and a light, cork-like insole.",
+    "story": [
+      "Each strap takes up to 8 hours to weave by hand",
+      "Crafted by artisans in Chiapas",
+      "Fair-trade; each purchase supports artisan communities"
+    ],
+    "objections": [
+      "“$240 for sandals?”",
+      "“I saw similar ones at the market for $40”",
+      "“What if they get wet?” — they shouldn't get wet; answer honestly"
+    ]
+  },
+  {
+    "id": "threaded-huichol-skull",
+    "name": "Threaded Huichol Skull",
+    "price": "$1,624",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/Threadedhuicholskull1.png",
+    "description": "A statement art piece threaded by Huichol (Wixárika) artisans of the Sierra Madre Occidental; every symbol represents their culture and the nature around them.",
+    "story": [
+      "Skulls are found in the mountains — no animal is harmed",
+      "Beeswax is applied to fix the thread",
+      "One piece takes about a month to complete"
+    ],
+    "objections": [
+      "“Is this a real skull? Was an animal hurt?”",
+      "“$1,624 is a lot for a decoration”",
+      "“How would I even ship this home safely?”"
+    ]
+  },
+  {
+    "id": "tribal-macrame-earrings",
+    "name": "Tribal Macrame Earrings",
+    "price": "$48",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/Forpictures-website_7.png",
+    "description": "Light, hand-threaded macramé earrings — easy to combine, one of a kind.",
+    "story": [
+      "Hand-threaded by Joanna, a Venezuelan artisan living in Los Cabos",
+      "Her collection supports her family back in Venezuela",
+      "Designs vary slightly — each pair is unique"
+    ],
+    "objections": [
+      "“They look simple for $48”",
+      "“Do you have two exactly alike?” — no; each pair is unique, turn variation into value",
+      "“Will the thread fray?”"
+    ]
+  }
+]

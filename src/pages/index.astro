@@ -1,0 +1,215 @@
+---
+import agents from '../data/agents.json';
+import products from '../data/products.json';
+import '../styles/global.css';
+
+// An agent is usable only when the composer has written a real ElevenLabs id.
+const isConfigured = (id: unknown): boolean =>
+  typeof id === 'string' && id.length >= 10 && !/todo|placeholder|xxx|[<>]/i.test(id);
+
+// Shopify CDN accepts ?width= for resizing; keep hotlinks light.
+const cdn = (url: string, width: number) =>
+  `${url}${url.includes('?') ? '&' : '?'}width=${width}`;
+
+const appData = JSON.stringify({ agents, products }).replace(/</g, '\\u003c');
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#fbf6ef" />
+    <meta
+      name="description"
+      content="Practice selling Eclectic Array pieces against a simulated customer — by voice."
+    />
+    <title>Sales Trainer — Eclectic Array</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:ital@1&display=swap"
+    />
+  </head>
+
+  <body data-view="start">
+    <div class="shell">
+      <header class="topbar">
+        <button class="back" id="btn-back" type="button">&larr; Back</button>
+        <span class="wordmark">Eclectic Array <span>&mdash;</span> Sales Trainer</span>
+      </header>
+
+      <!-- 1 · Start -->
+      <section id="view-start" class="view is-active" aria-label="Start">
+        <div class="hero">
+          <p class="eyebrow">Eclectic Array &mdash; Sales Trainer</p>
+          <h1>Sell it like<br /><span class="serif">it's real.</span></h1>
+          <div class="rule" aria-hidden="true"></div>
+          <p class="tagline">Practice with a customer before the real one walks in.</p>
+          <button class="btn-primary" id="btn-start" type="button">Start Training</button>
+          <p class="footnote">Los Cabos &middot; Nevis</p>
+        </div>
+      </section>
+
+      <!-- 2 · Choose your customer -->
+      <section id="view-agents" class="view" aria-label="Choose your customer">
+        <p class="eyebrow">Step 1 of 2</p>
+        <h1 class="screen-title">Choose your customer</h1>
+        <p class="screen-sub">Each one trains a different muscle. Pick who walks in today.</p>
+
+        <div class="card-list" role="listbox" aria-label="Customer types" id="agent-list">
+          {
+            agents.map((agent, i) => {
+              const ready = isConfigured(agent.agent_id);
+              return (
+                <button
+                  class="card customer-card"
+                  type="button"
+                  role="option"
+                  aria-selected="false"
+                  data-agent-index={i}
+                  disabled={!ready}
+                >
+                  <div class="card-body">
+                    <span class="index">{String(i + 1).padStart(2, '0')}</span>
+                    <h2>{agent.label}</h2>
+                    <p>{agent.description}</p>
+                    {!ready && <span class="badge-unavailable">Not available yet</span>}
+                  </div>
+                </button>
+              );
+            })
+          }
+          {agents.length === 0 && (
+            <p class="screen-sub">No customers available yet — check back soon.</p>
+          )}
+        </div>
+      </section>
+
+      <!-- 3 · Choose the product -->
+      <section id="view-products" class="view" aria-label="Choose the product">
+        <p class="eyebrow">Step 2 of 2</p>
+        <h1 class="screen-title">Choose the product</h1>
+        <p class="screen-sub">This is the piece on the counter. Know it before they ask.</p>
+
+        <div class="card-list products" role="listbox" aria-label="Products" id="product-list">
+          {
+            products.map((product, i) => (
+              <button
+                class="card product-card"
+                type="button"
+                role="option"
+                aria-selected="false"
+                data-product-index={i}
+              >
+                <figure>
+                  <img
+                    src={cdn(product.image, 720)}
+                    alt={product.name}
+                    width="720"
+                    height="720"
+                    loading="lazy"
+                    onerror={`this.onerror=null;this.src='/products/${product.id}.png'`}
+                  />
+                </figure>
+                <div class="card-body">
+                  <h2>{product.name}</h2>
+                  <p class="price">{product.price}</p>
+                  <p>{product.description}</p>
+                </div>
+              </button>
+            ))
+          }
+        </div>
+      </section>
+
+      <!-- 5 · Results -->
+      <section id="view-report" class="view" aria-label="Session results">
+        <p class="eyebrow">Session results</p>
+        <h1 class="screen-title" id="report-outcome"></h1>
+        <p class="report-quote serif" id="report-quote"></p>
+        <p class="report-context" id="report-context"></p>
+
+        <div class="report-grid">
+          <p class="report-summary" id="report-summary"></p>
+
+          <section class="report-card" id="report-criteria-wrap">
+            <h2>Evaluation criteria <span class="score" id="report-criteria-score"></span></h2>
+            <ul class="coverage criteria" id="report-criteria"></ul>
+          </section>
+
+          <section class="report-card">
+            <h2>Know your piece</h2>
+            <ul class="coverage" id="report-story"></ul>
+          </section>
+
+          <section class="report-card">
+            <h2>Objections</h2>
+            <ul class="objections" id="report-objections"></ul>
+          </section>
+
+          <section class="report-card" id="report-best-wrap">
+            <h2>Best moment</h2>
+            <blockquote class="serif" id="report-best"></blockquote>
+          </section>
+
+          <section class="report-card">
+            <h2>Next time</h2>
+            <ol class="improvements" id="report-improvements"></ol>
+          </section>
+
+          <details class="report-transcript">
+            <summary>Full transcript</summary>
+            <div class="transcript-lines" id="report-transcript"></div>
+          </details>
+        </div>
+
+        <div class="report-actions">
+          <button class="btn-primary" id="btn-report-done" type="button">Practice again</button>
+          <button class="btn-ghost" id="btn-download" type="button">Download transcript</button>
+        </div>
+      </section>
+
+      <!-- 4 · Session -->
+      <section id="view-session" class="view" aria-label="Training session">
+        <div class="session-grid">
+          <aside class="crib" aria-label="Your piece">
+            <span class="customer-chip" id="session-customer"></span>
+            <div class="product-row">
+              <img class="thumb" id="session-thumb" src="" alt="" width="72" height="72" />
+              <div>
+                <h2 id="session-product"></h2>
+                <p class="price" id="session-price"></p>
+              </div>
+            </div>
+            <h3>Know your piece</h3>
+            <ul id="session-story"></ul>
+            <details>
+              <summary>Objections to expect</summary>
+              <ul id="session-objections"></ul>
+            </details>
+          </aside>
+
+          <div class="call">
+            <div class="orb is-idle" id="orb" aria-hidden="true"></div>
+            <p class="status-title" id="status-title" role="status" aria-live="polite"></p>
+            <p class="status-sub" id="status-sub"></p>
+            <div class="actions">
+              <button class="btn-primary" id="btn-begin" type="button" hidden>Start Training</button>
+              <button class="btn-end" id="btn-end" type="button" hidden>End session</button>
+              <button class="btn-ghost" id="btn-retry" type="button" hidden>Try again</button>
+              <button class="btn-ghost" id="btn-retry-report" type="button" hidden>Retry analysis</button>
+              <button class="btn-ghost" id="btn-home" type="button" hidden>Back to start</button>
+            </div>
+            <div class="transcript" id="transcript" aria-label="Live transcript"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script type="application/json" id="app-data" set:html={appData} />
+    <script src="../scripts/app.js"></script>
+  </body>
+</html>
