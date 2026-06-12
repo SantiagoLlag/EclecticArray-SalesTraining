@@ -16,11 +16,16 @@ const isConfigured = (id) =>
 const state = {
   agent: null,
   product: null,
+  mystery: false, // random pick, identity masked until the results screen
   conversation: null,
   conversationId: null, // ElevenLabs id of the last call, used to fetch the report
   lastReport: null,
   analyzing: false,
 };
+
+// What the seller sees while the session runs — the real agent stays hidden in
+// mystery mode until the report reveals it.
+const customerLabel = () => (state.mystery ? 'Mystery customer' : state.agent.label);
 
 const $ = (id) => document.getElementById(id);
 
@@ -97,7 +102,14 @@ function bindOptionList(listId, onPick) {
 }
 
 bindOptionList('agent-list', (card) => {
-  state.agent = agents[Number(card.dataset.agentIndex)];
+  if ('mystery' in card.dataset) {
+    const pool = agents.filter((a) => isConfigured(a.agent_id));
+    state.agent = pool[Math.floor(Math.random() * pool.length)];
+    state.mystery = true;
+  } else {
+    state.agent = agents[Number(card.dataset.agentIndex)];
+    state.mystery = false;
+  }
   show('products');
 });
 
@@ -177,7 +189,9 @@ function setStatus(name) {
   const orb = $('orb');
   orb.className = `orb ${s.orb}`;
   $('status-title').textContent =
-    name === 'speaking' ? `${state.agent.label} ${s.title}` : s.title;
+    name === 'speaking'
+      ? `${state.mystery ? 'Your customer' : state.agent.label} ${s.title}`
+      : s.title;
   $('status-sub').textContent = s.sub;
   $('btn-begin').hidden = !s.actions.includes('begin');
   $('btn-end').hidden = !s.actions.includes('end');
@@ -187,8 +201,8 @@ function setStatus(name) {
 }
 
 function renderCrib() {
-  const { agent, product } = state;
-  $('session-customer').textContent = agent.label;
+  const { product } = state;
+  $('session-customer').textContent = customerLabel();
   $('session-product').textContent = product.name;
   $('session-price').textContent = product.price;
 
@@ -220,7 +234,7 @@ function appendTranscript(source, message) {
   line.className = `line ${source === 'ai' ? 'from-agent' : 'from-user'}`;
   const who = document.createElement('span');
   who.className = 'who';
-  who.textContent = source === 'ai' ? state.agent.label : 'You';
+  who.textContent = source === 'ai' ? (state.mystery ? 'Customer' : state.agent.label) : 'You';
   const p = document.createElement('p');
   p.textContent = message;
   line.append(who, p);
@@ -315,6 +329,7 @@ async function endAndGoHome() {
   await teardown();
   state.agent = null;
   state.product = null;
+  state.mystery = false;
   $('transcript').textContent = '';
   show('start');
 }
@@ -403,9 +418,24 @@ function renderReport({ report, criteria = [], transcript, customer, product }) 
 
   $('report-outcome').textContent = OUTCOME_TITLES[report.outcome] ?? 'Session results';
   $('report-quote').textContent = report.outcome_quote || '';
-  $('report-context').textContent = [customer, product?.name, product?.price]
+  // The mystery is over: the report names who walked in.
+  $('report-context').textContent = [
+    state.mystery ? `Mystery revealed: ${customer}` : customer,
+    product?.name,
+    product?.price,
+  ]
     .filter(Boolean)
     .join(' · ');
+
+  const ticket = $('report-ticket');
+  if (report.ticket?.amount) {
+    ticket.hidden = false;
+    $('report-ticket-amount').textContent = report.ticket.amount;
+    $('report-ticket-note').textContent = report.ticket.note || '';
+  } else {
+    ticket.hidden = true;
+  }
+
   $('report-summary').textContent = report.summary;
 
   const story = $('report-story');

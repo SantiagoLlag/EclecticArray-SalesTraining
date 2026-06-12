@@ -21,6 +21,7 @@ const REPORT_SCHEMA = {
   required: [
     'outcome',
     'outcome_quote',
+    'ticket',
     'summary',
     'story_coverage',
     'objection_handling',
@@ -29,6 +30,21 @@ const REPORT_SCHEMA = {
   ],
   properties: {
     outcome: { type: 'string', enum: ['bought', 'deferred', 'walked', 'incomplete'] },
+    ticket: {
+      type: 'object',
+      additionalProperties: false,
+      required: ['amount', 'note'],
+      properties: {
+        amount: {
+          type: 'string',
+          description: "Final sale total as a dollar string, e.g. '$240' or '$45.60'; '$0' if no purchase",
+        },
+        note: {
+          type: 'string',
+          description: "One short clause explaining the math: 'one pair at full price', 'two at 10% off', 'no sale — customer deferred'",
+        },
+      },
+    },
     outcome_quote: {
       type: 'string',
       description: "The customer's closing line, verbatim from the transcript; empty if cut short",
@@ -77,6 +93,7 @@ const SYSTEM_PROMPT = `You are the sales coach for Eclectic Array, a fair-trade 
 What good selling looks like here: a warm, genuine welcome; discovery (understanding who the customer is) before pitching; telling the TRUE story of the piece unprompted — maker, technique, origin; answering objections with substance instead of discounts; total honesty (inventing facts, e.g. claiming a piece can do something the reference story says it cannot, is a serious failure — check every claim against the reference story); holding the price with warmth; and directly asking for the sale.
 
 Rules for your report:
+- ticket: the final sale total in dollars, computed from the transcript — units bought × the product price, minus any discount or extras the seller granted. If the customer did not buy, amount is "$0". The note is one short clause with the math ("two pairs at full price", "one pair with the 5% cash discount", "no sale — customer walked").
 - story_coverage: one entry per bullet in the reference "Know your piece" story. covered = true only if the seller actually said it (a paraphrase counts).
 - objection_handling: one entry per objection the customer actually raised in the transcript — not the reference list. strong = answered with substance and honesty; partial = answered but thin or partly missed; weak = dodged, caved on price, or invented facts.
 - best_moment: the seller's single best line, quoted verbatim.

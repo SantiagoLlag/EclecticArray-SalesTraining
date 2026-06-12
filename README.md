@@ -34,6 +34,8 @@ The composer in the agents repo emits this file; the UI just renders whatever is
 
 If `agent_id` is missing, empty, or a placeholder (contains `TODO`, `placeholder`, `<`, `>`), the card renders disabled with "Not available yet" — the UI never breaks. When the composer publishes a new agent (e.g. Goldmine), its card appears on the next build.
 
+When 2+ agents are configured, a **Mystery Customer** card also appears: it picks a configured agent at random and masks its identity everywhere in the UI (crib chip, status line, live transcript) until the results screen reveals it.
+
 ### `src/data/products.json` — the catalog, edited by hand
 
 ```json
@@ -80,7 +82,7 @@ When a session ends (either side hangs up), the UI posts the ElevenLabs `convers
 1. Fetches the conversation from ElevenLabs (`GET /v1/convai/conversations/:id`), polling-friendly: returns `202` while ElevenLabs is still processing the call.
 2. Verifies the conversation belongs to one of the agents in `agents.json` and reads back the product context from the call's dynamic variables — the client can't inject a fake rubric.
 3. Reads the agent's **evaluation criteria results** (the 5 criteria configured on each agent in ElevenLabs, graded automatically per call) and passes them through verbatim — and to Claude as context.
-4. Sends the transcript to Claude (`claude-opus-4-8`, structured JSON output) with a sales-coaching rubric: outcome, story coverage vs Know-your-piece, objection handling, best moment, and 2-3 improvements.
+4. Sends the transcript to Claude (`claude-opus-4-8`, structured JSON output) with a sales-coaching rubric: outcome, **ticket size** (units × price − concessions, computed from the transcript), story coverage vs Know-your-piece, objection handling, best moment, and 2-3 improvements.
 5. Returns `{ report, criteria, transcript, customer, product }`, which the UI renders on the Results screen (plus a client-side "Download transcript" button).
 
 Configuration: copy `.env.example` to `.env` locally, and set `ELEVENLABS_API_KEY` + `ANTHROPIC_API_KEY` in Vercel project settings. Keys live only server-side.

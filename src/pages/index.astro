@@ -86,6 +86,24 @@ const appData = JSON.stringify({ agents, products }).replace(/</g, '\\u003c');
               );
             })
           }
+          {agents.filter((a) => isConfigured(a.agent_id)).length >= 2 && (
+            <button
+              class="card customer-card mystery-card"
+              type="button"
+              role="option"
+              aria-selected="false"
+              data-mystery
+            >
+              <div class="card-body">
+                <span class="index">?</span>
+                <h2>Mystery Customer</h2>
+                <p>
+                  Whoever walks in, walks in. You won't know who you sold to until your
+                  results — practice reading the customer cold.
+                </p>
+              </div>
+            </button>
+          )}
           {agents.length === 0 && (
             <p class="screen-sub">No customers available yet — check back soon.</p>
           )}
@@ -144,6 +162,11 @@ const appData = JSON.stringify({ agents, products }).replace(/</g, '\\u003c');
         <p class="eyebrow">Session results</p>
         <h1 class="screen-title" id="report-outcome"></h1>
         <p class="report-quote serif" id="report-quote"></p>
+        <p class="report-ticket" id="report-ticket" hidden>
+          <span class="label">Ticket</span>
+          <strong id="report-ticket-amount"></strong>
+          <span class="note" id="report-ticket-note"></span>
+        </p>
         <p class="report-context" id="report-context"></p>
 
         <div class="report-grid">
