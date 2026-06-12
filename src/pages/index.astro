@@ -15,6 +15,11 @@ const cdn = (url: string, width: number) =>
 // it never travels to the agent).
 const categories = [...new Set(products.map((p) => p.category).filter(Boolean))];
 
+// Pieces shown inside the tutorial's animated mini-screens (real catalog data,
+// so the tutorial never drifts from the shop).
+const tutFootwear = products.find((p) => p.category === 'Footwear') ?? products[0];
+const tutJewelry = products.find((p) => p.category === 'Jewelry') ?? products[0];
+
 const appData = JSON.stringify({ agents, products }).replace(/</g, '\\u003c');
 ---
 
@@ -53,6 +58,9 @@ const appData = JSON.stringify({ agents, products }).replace(/</g, '\\u003c');
           <div class="rule" aria-hidden="true"></div>
           <p class="tagline">Practice with a customer before the real one walks in.</p>
           <button class="btn-primary" id="btn-start" type="button">Start Training</button>
+          <button class="btn-tutorial" id="btn-tutorial" type="button">
+            First time? Watch the tutorial
+          </button>
           <p class="footnote">Los Cabos &middot; Nevis</p>
         </div>
       </section>
@@ -244,6 +252,147 @@ const appData = JSON.stringify({ agents, products }).replace(/</g, '\\u003c');
           </div>
         </div>
       </section>
+    </div>
+
+    <!-- Tutorial: a guided, animated walkthrough of the screens the seller will see -->
+    <div class="tutorial" id="tutorial" role="dialog" aria-modal="true" aria-label="Tutorial" hidden>
+      <div class="tut-frame">
+        <header class="tut-top">
+          <span class="tut-brand">Tutorial</span>
+          <button class="tut-close" id="tut-close" type="button" aria-label="Close tutorial">&times;</button>
+        </header>
+
+        <!-- 1 · What is this -->
+        <section class="tut-step" data-step="0">
+          <div class="tut-stage tut-intro">
+            <div class="mini-path">
+              <div class="mini-frame f1"><span class="mini-num">1</span>Customer</div>
+              <span class="mini-arrow a1" aria-hidden="true">&rarr;</span>
+              <div class="mini-frame f2"><span class="mini-num">2</span>Piece</div>
+              <span class="mini-arrow a2" aria-hidden="true">&rarr;</span>
+              <div class="mini-frame f3"><span class="mini-num">3</span>Talk</div>
+            </div>
+          </div>
+          <h2>A practice floor</h2>
+          <p>
+            You'll sell — out loud, by voice — to a simulated customer who walks into the
+            boutique. Three taps and the conversation starts; every session ends with a
+            coaching report.
+          </p>
+        </section>
+
+        <!-- 2 · Choose your customer -->
+        <section class="tut-step" data-step="1">
+          <div class="tut-stage tut-customers">
+            <div class="mini-card pick">
+              <span class="mini-index">01</span>
+              <strong>{agents[0]?.label ?? 'The Haggler'}</strong>
+              <span>Pushes for a discount from hello.</span>
+            </div>
+            <div class="mini-card">
+              <span class="mini-index">02</span>
+              <strong>{agents[1]?.label ?? 'The Collector'}</strong>
+              <span>Tests if you know the real story.</span>
+            </div>
+            <div class="mini-card mini-mystery">
+              <span class="mini-index">?</span>
+              <strong>Mystery Customer</strong>
+              <span>Revealed only in your results.</span>
+            </div>
+            <span class="tap" aria-hidden="true"></span>
+          </div>
+          <h2>Pick who walks in</h2>
+          <p>
+            Each customer trains a different muscle — price pressure, provenance questions,
+            the easy yes you can still lose. Feeling brave? Mystery hides who it is until
+            the session ends.
+          </p>
+        </section>
+
+        <!-- 3 · Choose the product -->
+        <section class="tut-step" data-step="2">
+          <div class="tut-stage tut-products">
+            <div class="mini-chips">
+              <span class="mini-chip on">All</span>
+              <span class="mini-chip target">Jewelry</span>
+              <span class="mini-chip">Footwear</span>
+            </div>
+            <div class="mini-grid">
+              <div class="mini-product fades">
+                <img src={cdn(tutFootwear.image, 160)} alt="" width="56" height="56" loading="lazy" />
+                <span class="mini-product-name">{tutFootwear.name}</span>
+                <em>{tutFootwear.price}</em>
+              </div>
+              <div class="mini-product pick">
+                <img src={cdn(tutJewelry.image, 160)} alt="" width="56" height="56" loading="lazy" />
+                <span class="mini-product-name">{tutJewelry.name}</span>
+                <em>{tutJewelry.price}</em>
+              </div>
+            </div>
+            <span class="tap" aria-hidden="true"></span>
+          </div>
+          <h2>Pick the piece on the counter</h2>
+          <p>
+            Filter by category and choose what you're selling. Its &ldquo;Know your
+            piece&rdquo; story and likely objections stay on screen the whole call —
+            that's your crib sheet.
+          </p>
+        </section>
+
+        <!-- 4 · The session -->
+        <section class="tut-step" data-step="3">
+          <div class="tut-stage tut-session">
+            <div class="mini-crib">
+              <span class="mini-chip-label">The Haggler</span>
+              <strong>{tutJewelry.name} &middot; {tutJewelry.price}</strong>
+              <span class="mini-bullet">&mdash; {tutJewelry.story[0]}</span>
+            </div>
+            <div class="mini-call">
+              <span class="mini-orb" aria-hidden="true"></span>
+              <p class="mini-line l1"><b>You</b>Welcome in! Looking for something special?</p>
+              <p class="mini-line l2"><b>Customer</b>These are lovely — but at this price?</p>
+            </div>
+          </div>
+          <h2>Talk like it's real</h2>
+          <p>
+            Tap Start Training and greet them — you speak first, like on the floor. The orb
+            shows who's talking; your crib sheet stays beside you. The customer decides
+            when the deal closes.
+          </p>
+        </section>
+
+        <!-- 5 · The results -->
+        <section class="tut-step" data-step="4">
+          <div class="tut-stage tut-results">
+            <strong class="mini-outcome">Sold.</strong>
+            <p class="mini-ticket"><span>Ticket</span><em>{tutJewelry.price}</em>one at full price</p>
+            <ul class="mini-criteria">
+              <li class="c1"><span class="ok">&#10003;</span>Warm welcome</li>
+              <li class="c2"><span class="ok">&#10003;</span>Product knowledge demonstrated</li>
+              <li class="c3"><span class="no">&#10007;</span>Sale attempted</li>
+            </ul>
+          </div>
+          <h2>Read your results</h2>
+          <p>
+            Claude reviews the transcript: the five evaluation criteria, your ticket size,
+            which story points you told, and two or three things to fix next time. In
+            Mystery mode, this is where the customer is revealed.
+          </p>
+        </section>
+
+        <footer class="tut-controls">
+          <button class="btn-ghost tut-nav" id="tut-back" type="button">Back</button>
+          <div class="tut-dots" id="tut-dots" role="tablist" aria-label="Tutorial steps">
+            <button class="tut-dot" type="button" data-go="0" aria-label="Step 1"></button>
+            <button class="tut-dot" type="button" data-go="1" aria-label="Step 2"></button>
+            <button class="tut-dot" type="button" data-go="2" aria-label="Step 3"></button>
+            <button class="tut-dot" type="button" data-go="3" aria-label="Step 4"></button>
+            <button class="tut-dot" type="button" data-go="4" aria-label="Step 5"></button>
+          </div>
+          <button class="btn-end tut-nav" id="tut-next" type="button">Next</button>
+          <button class="btn-primary tut-nav" id="tut-cta" type="button" hidden>Start Training</button>
+        </footer>
+      </div>
     </div>
 
     <script type="application/json" id="app-data" set:html={appData} />

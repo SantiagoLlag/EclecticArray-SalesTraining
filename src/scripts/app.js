@@ -529,6 +529,55 @@ function downloadTranscript() {
   URL.revokeObjectURL(a.href);
 }
 
+// ——— Tutorial: guided walkthrough of the screens ———
+
+const tutorial = $('tutorial');
+let tutorialStep = 0;
+
+function tutorialGo(i) {
+  const steps = [...tutorial.querySelectorAll('.tut-step')];
+  tutorialStep = Math.max(0, Math.min(i, steps.length - 1));
+  // display:none → block restarts each stage's CSS animation loop on entry
+  steps.forEach((s, idx) => s.classList.toggle('is-active', idx === tutorialStep));
+  tutorial
+    .querySelectorAll('.tut-dot')
+    .forEach((d, idx) =>
+      d.setAttribute('aria-current', String(idx === tutorialStep))
+    );
+  $('tut-back').disabled = tutorialStep === 0;
+  $('tut-next').hidden = tutorialStep === steps.length - 1;
+  $('tut-cta').hidden = tutorialStep !== steps.length - 1;
+}
+
+function openTutorial() {
+  tutorial.hidden = false;
+  document.body.style.overflow = 'hidden';
+  tutorialGo(0);
+  $('tut-close').focus();
+}
+
+function closeTutorial() {
+  tutorial.hidden = true;
+  document.body.style.overflow = '';
+  $('btn-tutorial')?.focus();
+}
+
+$('btn-tutorial').addEventListener('click', openTutorial);
+$('tut-close').addEventListener('click', closeTutorial);
+$('tut-back').addEventListener('click', () => tutorialGo(tutorialStep - 1));
+$('tut-next').addEventListener('click', () => tutorialGo(tutorialStep + 1));
+$('tut-cta').addEventListener('click', () => {
+  closeTutorial();
+  show('agents');
+});
+$('tut-dots').addEventListener('click', (e) => {
+  const dot = e.target.closest('.tut-dot');
+  if (dot) tutorialGo(Number(dot.dataset.go));
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !tutorial.hidden) closeTutorial();
+});
+
 // ——— Wiring ———
 
 // Every button and the accordion get the same soft tap. Capture phase so the
