@@ -8,8 +8,12 @@ export const prerender = false;
 // Product data and customer type are read back from the ElevenLabs conversation
 // (dynamic variables + agent_id), so the report can't be fed a fake context.
 
-const env = (key: string): string | undefined =>
-  (import.meta.env[key] as string | undefined) ?? process.env[key];
+// process.env first: on Vercel it's the runtime source of truth; import.meta.env
+// covers astro dev. Empty/whitespace values count as missing.
+const env = (key: string): string | undefined => {
+  const value = process.env[key] ?? (import.meta.env[key] as string | undefined);
+  return typeof value === 'string' && value.trim() !== '' ? value.trim() : undefined;
+};
 
 const REPORT_SCHEMA = {
   type: 'object',
@@ -91,10 +95,14 @@ export const POST: APIRoute = async ({ request }) => {
   const elevenKey = env('ELEVENLABS_API_KEY');
   const anthropicKey = env('ANTHROPIC_API_KEY');
   if (!elevenKey || !anthropicKey) {
-    return json(
-      { error: 'Server is missing ELEVENLABS_API_KEY or ANTHROPIC_API_KEY.' },
-      500
-    );
+    const missing = [
+      !elevenKey && 'ELEVENLABS_API_KEY',
+      !anthropicKey && 'ANTHROPIC_API_KEY',
+    ]
+      .filter(Boolean)
+      .join(', ');
+    console.error(`[report] missing env: ${missing}`);
+    return json({ error: `Server is missing: ${missing}.` }, 500);
   }
 
   let conversationId: unknown;
