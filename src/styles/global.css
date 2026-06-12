@@ -202,6 +202,39 @@ body[data-view='report'] .topbar .back { visibility: hidden; }
   color: var(--ink-soft);
 }
 
+/* ——— Category chips ——— */
+
+.chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  margin: -10px 0 22px;
+  padding: 2px 0 10px;
+  scrollbar-width: none;
+}
+.chips::-webkit-scrollbar { display: none; }
+
+.chip {
+  flex: none;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  transition: border-color var(--speed) ease, color var(--speed) ease,
+    background var(--speed) ease;
+}
+
+.chip[aria-pressed='true'] {
+  background: var(--magenta);
+  border-color: var(--magenta);
+  color: #fffdf9;
+}
+
+.chip:hover:not([aria-pressed='true']) { border-color: var(--magenta); color: var(--magenta); }
+
 /* ——— Card lists (customers & products) ——— */
 
 .card-list {

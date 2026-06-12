@@ -1,4 +1,6 @@
-# Catálogo del Trainer — borrador para revisión
+# Catálogo del Trainer — registro de curaduría
+
+> **Estado: APLICADO (2026-06-13).** Este contenido ya vive en `src/data/products.json` (la fuente de verdad) + 2 productos de mascotas añadidos a petición (ver al final). Las Luna Sandals quedaron fuera. En los puntos ⚠️ se aplicó el default: la objeción se conserva como pregunta del cliente, sin respuesta afirmada. Para editar el catálogo, edita `products.json` directamente.
 
 **Qué es esto:** los 26 productos propuestos para el trainer (23 nuevos + los 3 actuales), con su **story** ("Know your piece" — la verdad contra la que Lori evalúa la honestidad del vendedor) y sus **objections**. Las stories salen *exclusivamente* del copy de eclecticarray.com — nada inventado. Los puntos marcados ⚠️ son datos que el sitio no confirma y deben validarse o borrarse.
 
@@ -148,6 +150,18 @@
 [ver en tienda](https://eclecticarray.com/products/islasjournalblackandwhitehairbrissoblack)
 - Story: Cowhide cover, handcrafted by artisans in Mexico · Made by a company that employs women with flexible home-based work, supporting their families · Hair-on-hide: every journal's pattern is one of a kind
 - Objections: "$42 for a notebook?" · "How do I care for the cowhide?" · "Can I get refills?" ⚠️ (no especificado en el copy)
+
+## Pets (2) *(añadidos a petición, 2026-06-13)*
+
+### 27. Beaded Dog Collar — Rainbow · $76
+[ver en tienda](https://eclecticarray.com/products/rainbow-beaded-dog-collar)
+- Story: Hand-beaded by a Mexican artisan, inspired by traditional Huichol beading · Intricate beaded strap on a high-quality, soft leather backing · Matching beaded bracelets are available — twin with your pup
+- Objections: "$76 for a dog collar?" · "Will the beads fall off with use?" · "Do you have it for a small/large dog?"
+
+### 28. Brick — Leather Dog Leash · $43.20
+[ver en tienda](https://eclecticarray.com/products/brickleash)
+- Story: Ethical leather with a handwoven macramé strap · Each leash is unique, ~4-5 hours to create · 50% off when purchased with its matching dog collar · Durable, easy to clean; designs vary
+- Objections: "$43 for a leash?" · "Is the macramé strong enough for a big dog?" · "Why is the matching collar separate?" — collar pairs get 50% off the leash; a natural bundle
 
 ---
 

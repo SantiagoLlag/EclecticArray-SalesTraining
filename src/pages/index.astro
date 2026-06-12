@@ -11,6 +11,10 @@ const isConfigured = (id: unknown): boolean =>
 const cdn = (url: string, width: number) =>
   `${url}${url.includes('?') ? '&' : '?'}width=${width}`;
 
+// Category chips, in order of first appearance in products.json (UI-only metadata —
+// it never travels to the agent).
+const categories = [...new Set(products.map((p) => p.category).filter(Boolean))];
+
 const appData = JSON.stringify({ agents, products }).replace(/</g, '\\u003c');
 ---
 
@@ -94,6 +98,15 @@ const appData = JSON.stringify({ agents, products }).replace(/</g, '\\u003c');
         <h1 class="screen-title">Choose the product</h1>
         <p class="screen-sub">This is the piece on the counter. Know it before they ask.</p>
 
+        {categories.length > 1 && (
+          <div class="chips" role="group" aria-label="Filter by category" id="category-chips">
+            <button class="chip" type="button" data-category="all" aria-pressed="true">All</button>
+            {categories.map((c) => (
+              <button class="chip" type="button" data-category={c} aria-pressed="false">{c}</button>
+            ))}
+          </div>
+        )}
+
         <div class="card-list products" role="listbox" aria-label="Products" id="product-list">
           {
             products.map((product, i) => (
@@ -103,6 +116,7 @@ const appData = JSON.stringify({ agents, products }).replace(/</g, '\\u003c');
                 role="option"
                 aria-selected="false"
                 data-product-index={i}
+                data-category={product.category}
               >
                 <figure>
                   <img

@@ -3,6 +3,7 @@
     "id": "chiapas-sandals-dark-magenta",
     "name": "Chiapas Sandals — Dark Magenta",
     "price": "$240",
+    "category": "Footwear",
     "image": "https://eclecticarray.com/cdn/shop/files/5_6eaabc56-a5d8-4278-8171-78e8d3970a3a.png",
     "description": "Handmade sandals from Chiapas with Eclectic Array's signature woven strap and a light, cork-like insole.",
     "story": [
@@ -17,9 +18,101 @@
     ]
   },
   {
+    "id": "chiapas-sandals-harmonic-tan",
+    "name": "Chiapas Sandals — Harmonic Tan",
+    "price": "$240",
+    "category": "Footwear",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/1_da056151-874a-4a20-8573-ae5b3a22cbb4.png",
+    "description": "The signature Chiapas sandal in warm tan — hand-woven straps on a light, cork-like insole.",
+    "story": [
+      "Each strap takes up to 8 hours to weave by hand",
+      "Crafted by artisans in Chiapas",
+      "Light, cork-like insole for all-day comfort",
+      "Fair-trade; each purchase supports artisan communities"
+    ],
+    "objections": [
+      "“$240 for sandals?”",
+      "“I saw similar ones at the market for $40”",
+      "“Do you have this exact pattern in another size?” — straps are hand-woven; patterns vary, turn it into value"
+    ]
+  },
+  {
+    "id": "puffy-sandals-guatemalteco-beige-azul-turquesa",
+    "name": "Puffy Sandals Guatemalteco — Beige/Azul Turquesa",
+    "price": "$252",
+    "category": "Footwear",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/18_175d317c-50f1-461e-a2b7-8a6a8bf7c4b8.png",
+    "description": "Statement sandals built on hand-woven backstrap-loom fabric — no two pairs alike.",
+    "story": [
+      "The fabric is woven by hand on a backstrap loom — nearly a week of work per piece",
+      "No two pairs are alike",
+      "100% handmade, then carefully assembled into the sandal"
+    ],
+    "objections": [
+      "“$252 for fabric sandals?”",
+      "“Will the woven fabric hold up?”",
+      "“I've seen Guatemalan textiles cheaper at the market”"
+    ]
+  },
+  {
+    "id": "alebrije-birkenstock-blue",
+    "name": "Alebrije Birkenstock — Blue",
+    "price": "$329",
+    "category": "Footwear",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/4_37ce3aa8-74be-4bde-95f7-cf9d0a01e5cf.png",
+    "description": "Birkenstocks hand-painted with alebrije art by two sisters from Oaxaca — one pair per size.",
+    "story": [
+      "Hand-painted by two sisters from Oaxaca whose family has preserved alebrije painting for generations",
+      "Freehand designs — no two pairs are alike",
+      "Only one pair is made per size"
+    ],
+    "objections": [
+      "“$329 for Birkenstocks I can buy anywhere?”",
+      "“Won't the paint chip or fade?”",
+      "“How do I know it's really hand-painted?”"
+    ]
+  },
+  {
+    "id": "olfe-sandals-for-men-nude",
+    "name": "Olfe Sandals for Men — Nude",
+    "price": "$179",
+    "category": "Footwear",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/Quero_Olfe.png",
+    "description": "Men's leather sandals from the QUERO Collection, handmade in Mexico with locally sourced leather.",
+    "story": [
+      "Handmade in Mexico with high-quality, locally sourced leather (QUERO Collection)",
+      "Soft leather straps that mold to your foot over time",
+      "Ethically made by skilled artisans, built to last"
+    ],
+    "objections": [
+      "“$179 for simple sandals?”",
+      "“Will they need breaking in?”",
+      "“How do I care for the leather at the beach?”"
+    ]
+  },
+  {
+    "id": "tennis-shoe-green-olive",
+    "name": "Tennis Shoe — Green Olive",
+    "price": "$179",
+    "category": "Footwear",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/products/Verde_Olivo.png",
+    "description": "Sneakers with hand-woven backstrap-loom bands made by women artisans — every pair unique.",
+    "story": [
+      "The fabric bands are hand-woven on a backstrap loom by women artisans",
+      "Every pair is unique and takes significant time to make",
+      "Each purchase supports the weavers behind the textiles"
+    ],
+    "objections": [
+      "“$179 for canvas sneakers?”",
+      "“Can I wash them?”",
+      "“They look like regular sneakers with a stripe”"
+    ]
+  },
+  {
     "id": "threaded-huichol-skull",
     "name": "Threaded Huichol Skull",
     "price": "$1,624",
+    "category": "Art & Sculpture",
     "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/Threadedhuicholskull1.png",
     "description": "A statement art piece threaded by Huichol (Wixárika) artisans of the Sierra Madre Occidental; every symbol represents their culture and the nature around them.",
     "story": [
@@ -34,9 +127,29 @@
     ]
   },
   {
+    "id": "beaded-huichol-skull-n64",
+    "name": "Beaded Huichol Skull N64",
+    "price": "$1,624",
+    "category": "Art & Sculpture",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/SkullMarch1.jpg",
+    "description": "A large beaded Huichol skull — every bead laid by hand into beeswax over a month of work.",
+    "story": [
+      "Made by Huichol (Wixárika) artisans of the Sierra Madre Occidental",
+      "The skulls are found in the mountains — no animal is harmed",
+      "Beeswax holds each bead, laid one by one",
+      "About a month of work per piece; 24.5\" tall, 21\" horn to horn"
+    ],
+    "objections": [
+      "“Is this a real skull?”",
+      "“What do the symbols mean?” — every symbol represents their culture and nature",
+      "“Why does this one cost the same as the smaller one?”"
+    ]
+  },
+  {
     "id": "tribal-macrame-earrings",
     "name": "Tribal Macrame Earrings",
     "price": "$48",
+    "category": "Jewelry",
     "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/Forpictures-website_7.png",
     "description": "Light, hand-threaded macramé earrings — easy to combine, one of a kind.",
     "story": [
@@ -48,6 +161,351 @@
       "“They look simple for $48”",
       "“Do you have two exactly alike?” — no; each pair is unique, turn variation into value",
       "“Will the thread fray?”"
+    ]
+  },
+  {
+    "id": "macrame-pearl-necklace",
+    "name": "Macrame Pearl Necklace",
+    "price": "$64",
+    "category": "Jewelry",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/products/bajatejido_4de7.jpg",
+    "description": "Thread-and-pearl necklace by Joanna — light, adjustable, one of a kind.",
+    "story": [
+      "Hand-threaded by Joanna, a Venezuelan artisan living in Los Cabos",
+      "Profits support her family in Venezuela",
+      "One-of-a-kind — designs vary slightly",
+      "17.5\" long, adjustable"
+    ],
+    "objections": [
+      "“Is the pearl real?”",
+      "“$64 for thread and a pearl?”",
+      "“Will the knots loosen?”"
+    ]
+  },
+  {
+    "id": "pearl-baja-earrings",
+    "name": "Pearl Baja Earrings",
+    "price": "$28",
+    "category": "Jewelry",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/products/WhatsApp_Image_2019-02-25_at_2.43.46_PM.jpg",
+    "description": "Handmade pearl earrings by Joanna — light, easy to combine.",
+    "story": [
+      "Handmade by Joanna, a Venezuelan artisan living in Los Cabos",
+      "Profits support her family in Venezuela",
+      "Light and easy to combine; designs vary slightly"
+    ],
+    "objections": [
+      "“Are these the same as the $48 ones?” — different design, same maker; answer honestly",
+      "“Will they tarnish?”"
+    ]
+  },
+  {
+    "id": "skeleton-earrings",
+    "name": "Skeleton Earrings",
+    "price": "$40",
+    "category": "Jewelry",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/Skeleton_Earrings.png",
+    "description": "Hand-woven palm skeleton earrings in the traditional Jipijapa technique.",
+    "story": [
+      "Woven from natural palm with the traditional Jipijapa technique",
+      "Made by women artisans in Campeche, Mexico",
+      "Lightweight; each pair is unique — no two alike (~3.4\" tall)"
+    ],
+    "objections": [
+      "“Aren't these just for Day of the Dead?”",
+      "“Will the palm fiber break?”",
+      "“$40 for palm?”"
+    ]
+  },
+  {
+    "id": "collar-doble-perla-blanca-cola-sirena",
+    "name": "Collar Doble Perla Blanca / Cola Sirena",
+    "price": "$124",
+    "category": "Jewelry",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/Collar_de_perla.png",
+    "description": "Layered necklace: freshwater pearl and a gold-plated mermaid tail, inspired by love for the ocean.",
+    "story": [
+      "14k gold-filled chain; 22k gold-plated mermaid tail; freshwater white pearl",
+      "Pearl symbolizes clarity and serenity; the mermaid tail, feminine power",
+      "Inspired by love for the ocean; adjustable 15\"–18\""
+    ],
+    "objections": [
+      "“Will the gold plating wear off?” — remove before swimming/showering; answer honestly",
+      "“$124 for a small pendant?”",
+      "“Is the pearl real?” — yes, freshwater"
+    ]
+  },
+  {
+    "id": "ring-snake-infinity",
+    "name": "Ring Snake Infinity",
+    "price": "$255",
+    "category": "Jewelry",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/products/infinityring-01_600x_b6ab28e6-b926-46c6-8785-1eafc321096c.jpg",
+    "description": "A snake in an infinity loop — sterling silver with 24K gold plating and green zirconia eyes.",
+    "story": [
+      "925 sterling silver with 24K gold plating; green zirconia eyes",
+      "The snake in an infinity shape symbolizes never-ending growth — \"shed your skin\"",
+      "Care: remove before showering, swimming, or creams; store in its own pouch"
+    ],
+    "objections": [
+      "“$255 for gold-plated?”",
+      "“Are the stones emeralds?” — no, green zirconias; answer honestly",
+      "“Won't the plating rub off?”"
+    ]
+  },
+  {
+    "id": "palm-cuff-right-place-r",
+    "name": "Palm Cuff Right Place R.",
+    "price": "$255",
+    "category": "Jewelry",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/products/ggg_600x_43779659-468e-4e8d-a369-a086ea3fd5bb.jpg",
+    "description": "A statement palm cuff in sterling silver with 24K gold plating — worn on the hand, beyond traditional jewelry.",
+    "story": [
+      "925 sterling silver with 24K gold plating",
+      "\"Right place, right time\" — a reminder to flow with synchronicity",
+      "A palm cuff: worn on the hand, a statement beyond traditional jewelry"
+    ],
+    "objections": [
+      "“How do I even wear this?”",
+      "“$255 for plated silver?”",
+      "“Will it fit my hand?” — adjustable"
+    ]
+  },
+  {
+    "id": "world-long-ring",
+    "name": "World Long Ring",
+    "price": "$242",
+    "category": "Jewelry",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/products/2World_Long_Ring1__WR14-R02-IM_f5fa12d1-f1b4-4129-b139-9d0951120831.jpg",
+    "description": "An intricate world-map ring for travelers — gold-plated or rhodium-plated brass.",
+    "story": [
+      "An intricate world-map design wrapping the finger (0.78\" tall)",
+      "24K gold-plated brass or rhodium-plated brass",
+      "A favorite gift for travelers"
+    ],
+    "objections": [
+      "“$242 for brass?”",
+      "“Will the plating wear off?”",
+      "“Do you have it in silver color?” — yes, rhodium-plated"
+    ]
+  },
+  {
+    "id": "cable-bag-irma",
+    "name": "Cable Bag (Irma Collection)",
+    "price": "$144",
+    "category": "Bags",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/Irma_bags_6.png",
+    "description": "A handwoven bag from the Irma Collection — backstrap-loom textiles, every piece unique.",
+    "story": [
+      "The textile is woven on a backstrap loom — a traditional technique",
+      "Each textile takes up to 6 hours to create",
+      "Every bag is unique; the collection preserves cultural traditions"
+    ],
+    "objections": [
+      "“$144 for a small bag?”",
+      "“I saw similar bags at the market”",
+      "“Is it sturdy enough for daily use?”"
+    ]
+  },
+  {
+    "id": "multi-color-otomi-clutch-red-tassels",
+    "name": "Multi Color Otomi Clutch with Red Tassels",
+    "price": "$270",
+    "category": "Bags",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/products/39_1.png",
+    "description": "Hand-stitched Otomi embroidery clutch — up to a month of work in every piece.",
+    "story": [
+      "Authentic Otomi embroidery — motifs reflect the culture and cosmology of the Otomi people",
+      "Hand-stitched; one piece takes up to a month to complete",
+      "Each clutch provides meaningful work for artisans (11\" × 7.4\"; designs vary)"
+    ],
+    "objections": [
+      "“$270 for a clutch?”",
+      "“Is it machine-embroidered?” — no, hand-stitched, up to a month of work",
+      "“Will the colors bleed?”"
+    ]
+  },
+  {
+    "id": "shirt-dress-helsol-flirty-long-yellow",
+    "name": "Shirt Dress Helsol — Flirty Long Yellow",
+    "price": "$218",
+    "category": "Clothing",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/26_1624b710-4316-4a40-82ad-8c56c27c7452.png",
+    "description": "A Baby Cotton shirt dress that works as shirt, dress, or beach coverup.",
+    "story": [
+      "100% Baby Cotton — a special process gives it exceptional softness",
+      "Wear it as a shirt, a dress, or a beach coverup",
+      "Helsol is a movement toward conscious consumerism"
+    ],
+    "objections": [
+      "“$218 for a cotton dress?”",
+      "“Won't it shrink or wrinkle?”",
+      "“It looks oversized — will it fit me?”"
+    ]
+  },
+  {
+    "id": "shift-dress-chelle-design-2",
+    "name": "Shift Dress — Chelle Design 2",
+    "price": "$188",
+    "category": "Clothing",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/IMG_4607.png",
+    "description": "A one-size shift dress handmade by Los Cabos seamstresses — wear it loose, belted, or knotted.",
+    "story": [
+      "Handmade by local Los Cabos seamstresses",
+      "Super-soft Australian rayon",
+      "Three ways to wear it: loose, belted, or knotted shorter",
+      "One size; patterns reflect the Baja spirit"
+    ],
+    "objections": [
+      "“One size fits all — really?”",
+      "“$188 for a simple dress?”",
+      "“Is it actually made here?” — yes, by Los Cabos seamstresses"
+    ]
+  },
+  {
+    "id": "crop-top-otomi-halter-sleeves",
+    "name": "Crop Top Otomi Halter Sleeves",
+    "price": "$238",
+    "category": "Clothing",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/EclecticArrayStyles9.jpg",
+    "description": "A contemporary crop top in Mexican Otomi textile art — hand-embroidered, timeless.",
+    "story": [
+      "Mexican Otomi textile art on a contemporary cut",
+      "Hand-embroidered — figures vary slightly piece to piece",
+      "Timeless: these don't go out of style"
+    ],
+    "objections": [
+      "“$238 for a crop top?”",
+      "“Why do the figures look different from the photo?” — handmade; variation is the signature",
+      "“How do I wash it?”"
+    ]
+  },
+  {
+    "id": "hand-embroidered-cactus-hat-kids",
+    "name": "Hand Embroidered Cactus Hat (Kids)",
+    "price": "$40",
+    "category": "Kids",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/products/3_463e6e5d-4f40-44d0-abb5-2f04192751df.png",
+    "description": "A kids' snapback hand-embroidered in Sayulita by Edgar and Mireya.",
+    "story": [
+      "Hand-embroidered by Edgar and his wife Mireya in Sayulita",
+      "Edgar was the first artisan to receive an Eclectic Array microloan to grow his business",
+      "They create job opportunities for women in their community",
+      "Adjustable snapback; hand wash only"
+    ],
+    "objections": [
+      "“$40 for a kids' hat?”",
+      "“Is the embroidery machine-made?” — no, hand-embroidered",
+      "“Can I throw it in the washer?” — no, hand wash only; answer honestly"
+    ]
+  },
+  {
+    "id": "amigo-lavable-whale",
+    "name": "Amigo Lavable Whale — Washable Coloring Friend",
+    "price": "$29",
+    "category": "Kids",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/Whale.png",
+    "description": "A washable coloring toy: color it, wash it, create again — designed and made in Mexico.",
+    "story": [
+      "Kids color it with water-based markers, wash it with soap and water, and start again",
+      "Designed and made in Mexico — \"Design Made by Hand\"",
+      "Inspired by Mexican culture, folklore, and nature"
+    ],
+    "objections": [
+      "“Will the colors really wash out?” — yes, with soap and water",
+      "“Do markers come with it?”",
+      "“Is it durable enough for daily play?”"
+    ]
+  },
+  {
+    "id": "small-paper-mache-devil-figurine",
+    "name": "Small Paper Mache Devil Figurine",
+    "price": "$30",
+    "category": "Gifts & Decor",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/Devil_Papel_Mache_Small_e0faade6-4127-41bf-a288-2e1d4e403dd5.png",
+    "description": "A hand-painted Diablito in paper mache from San Miguel de Allende — playful Day of the Dead folk art.",
+    "story": [
+      "Handcrafted in paper mache by Lupita and Pedro in San Miguel de Allende — a tradition passed down generations",
+      "The Diablito is the mischievous Day of the Dead character who tries to trick souls",
+      "Hand-painted; each figure is unique (~18\" tall)"
+    ],
+    "objections": [
+      "“$30 for paper?”",
+      "“Is it fragile?”",
+      "“What's it for?” — altars, décor, folk-art collections"
+    ]
+  },
+  {
+    "id": "ornament-ball-jicara",
+    "name": "Ornament Ball Jicara",
+    "price": "$24",
+    "category": "Gifts & Decor",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/Christmas_ornaments_-_jicara.jpg",
+    "description": "A hand-carved ornament made from a natural calabash gourd.",
+    "story": [
+      "Hand-carved from the fruit of the calabash tree — hollowed, dried, then carved",
+      "Traditionally these gourds were used as mezcal cups",
+      "Each shape and carving is unique; sustainable and natural"
+    ],
+    "objections": [
+      "“It's just a gourd — why $24?”",
+      "“Will it crack?”",
+      "“Do you have matching sets?” — each is unique"
+    ]
+  },
+  {
+    "id": "islas-journal-briso-black",
+    "name": "Islas Journal — Briso Black",
+    "price": "$42",
+    "category": "Gifts & Decor",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/cowhide.jpg",
+    "description": "A cowhide journal handcrafted in Mexico — hair-on-hide, every cover one of a kind.",
+    "story": [
+      "Cowhide cover, handcrafted by artisans in Mexico",
+      "Made by a company that employs women with flexible home-based work, supporting their families",
+      "Hair-on-hide: every journal's pattern is one of a kind"
+    ],
+    "objections": [
+      "“$42 for a notebook?”",
+      "“How do I care for the cowhide?”",
+      "“Can I get refills?”"
+    ]
+  },
+  {
+    "id": "rainbow-beaded-dog-collar",
+    "name": "Beaded Dog Collar — Rainbow",
+    "price": "$76",
+    "category": "Pets",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/21_a00bcef4-3e1b-43a6-bd14-b9c470dbbf79.jpg",
+    "description": "A hand-beaded dog collar inspired by traditional Huichol beading, on soft leather backing.",
+    "story": [
+      "Hand-beaded by a Mexican artisan, inspired by traditional Huichol beading",
+      "Intricate beaded strap on a high-quality, soft leather backing",
+      "Matching beaded bracelets are available — twin with your pup"
+    ],
+    "objections": [
+      "“$76 for a dog collar?”",
+      "“Will the beads fall off with use?”",
+      "“Do you have it for a small/large dog?”"
+    ]
+  },
+  {
+    "id": "brick-leather-dog-leash",
+    "name": "Brick — Leather Dog Leash",
+    "price": "$43.20",
+    "category": "Pets",
+    "image": "https://cdn.shopify.com/s/files/1/1041/4984/products/MLS024RBG.jpg",
+    "description": "An ethical leather leash with a handwoven macramé strap — 4-5 hours of work each.",
+    "story": [
+      "Ethical leather with a handwoven macramé strap",
+      "Each leash is unique and takes approximately 4-5 hours to create",
+      "50% off when purchased with its matching dog collar",
+      "Durable, comfortable, and easy to clean; designs vary"
+    ],
+    "objections": [
+      "“$43 for a leash?”",
+      "“Is the macramé strong enough for a big dog?”",
+      "“Why is the matching collar separate?” — collar pairs get 50% off the leash; a natural bundle"
     ]
   }
 ]

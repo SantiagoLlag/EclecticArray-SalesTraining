@@ -34,8 +34,37 @@ function show(view) {
   document
     .querySelectorAll(`#view-${view} [role="option"]`)
     .forEach((o) => o.setAttribute('aria-selected', 'false'));
+  if (view === 'products') resetCategoryFilter();
   document.body.dataset.view = view;
   window.scrollTo(0, 0);
+}
+
+// ——— Category filter (UI-only metadata; never sent to the agent) ———
+
+function resetCategoryFilter() {
+  const chips = $('category-chips');
+  if (!chips) return;
+  chips
+    .querySelectorAll('.chip')
+    .forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.category === 'all')));
+  document.querySelectorAll('#product-list [role="option"]').forEach((card) => {
+    card.hidden = false;
+  });
+}
+
+const categoryChips = $('category-chips');
+if (categoryChips) {
+  categoryChips.addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    categoryChips
+      .querySelectorAll('.chip')
+      .forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+    const category = chip.dataset.category;
+    document.querySelectorAll('#product-list [role="option"]').forEach((card) => {
+      card.hidden = category !== 'all' && card.dataset.category !== category;
+    });
+  });
 }
 
 // ——— Selection screens ———
@@ -56,7 +85,9 @@ function bindOptionList(listId, onPick) {
   // Arrow keys move between cards; Enter/Space activate (they're buttons).
   list.addEventListener('keydown', (e) => {
     if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
-    const options = [...list.querySelectorAll('[role="option"]:not(:disabled)')];
+    const options = [...list.querySelectorAll('[role="option"]:not(:disabled)')].filter(
+      (o) => !o.hidden
+    );
     const i = options.indexOf(document.activeElement);
     if (i === -1) return;
     e.preventDefault();
