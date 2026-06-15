@@ -529,6 +529,80 @@ function downloadTranscript() {
   URL.revokeObjectURL(a.href);
 }
 
+// Build the full coaching report as readable text (analysis + transcript).
+// Split from downloadAnalysis so it can be unit-checked without a real download.
+function buildAnalysisText(data) {
+  const { report = {}, criteria = [], transcript = [], customer = '', product = {} } = data || {};
+  const rule = '='.repeat(56);
+  const outcome =
+    { bought: 'Sold', deferred: 'Deferred', walked: 'Walked', incomplete: 'Cut short' }[report.outcome] ||
+    'Session results';
+  const L = [];
+  L.push('ECLECTIC ARRAY — SALES TRAINER · COACHING REPORT');
+  L.push(`${customer}${product?.name ? '  ·  ' + product.name : ''}${product?.price ? '  ·  ' + product.price : ''}`);
+  L.push(`Generated ${new Date().toLocaleString()}`);
+  L.push(rule, '');
+
+  L.push(`OUTCOME — ${outcome}`);
+  if (report.outcome_quote) L.push(`  "${report.outcome_quote}"`);
+  if (report.ticket?.amount)
+    L.push(`  Ticket: ${report.ticket.amount}${report.ticket.note ? '  (' + report.ticket.note + ')' : ''}`);
+  L.push('');
+
+  if (report.summary) L.push('SUMMARY', '  ' + report.summary, '');
+
+  if (criteria.length) {
+    const passed = criteria.filter((c) => c.result === 'success').length;
+    L.push(`EVALUATION CRITERIA — ${passed} of ${criteria.length} passed`);
+    criteria.forEach((c) => {
+      const m = c.result === 'success' ? '[PASS]' : c.result === 'failure' ? '[FAIL]' : '[ ?? ]';
+      L.push(`  ${m}  ${c.label}`);
+      if (c.rationale) L.push(`         ${c.rationale}`);
+    });
+    L.push('');
+  }
+
+  if (report.story_coverage?.length) {
+    L.push('KNOW YOUR PIECE — story coverage');
+    report.story_coverage.forEach((s) =>
+      L.push(`  [${s.covered ? 'x' : ' '}]  ${s.point}${s.note ? '  — ' + s.note : ''}`)
+    );
+    L.push('');
+  }
+
+  L.push('OBJECTION HANDLING');
+  if (!report.objection_handling?.length) L.push('  (the customer never really pushed back)');
+  (report.objection_handling || []).forEach((o) =>
+    L.push(`  [${String(o.rating || '').toUpperCase()}]  ${o.objection}${o.note ? '  — ' + o.note : ''}`)
+  );
+  L.push('');
+
+  if (report.best_moment) L.push('BEST MOMENT', `  "${report.best_moment}"`, '');
+
+  if (report.improvements?.length) {
+    L.push('NEXT TIME');
+    report.improvements.forEach((t, i) => L.push(`  ${i + 1}. ${t}`));
+    L.push('');
+  }
+
+  L.push(rule, 'FULL TRANSCRIPT', '');
+  transcript.forEach((t) => L.push(`${t.speaker === 'customer' ? customer : 'Seller'}: ${t.message}`));
+  L.push('');
+  return L.join('\n');
+}
+
+function downloadAnalysis() {
+  const data = state.lastReport;
+  if (!data) return;
+  const stamp = new Date().toISOString().slice(0, 16).replace(':', '');
+  const blob = new Blob([buildAnalysisText(data)], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `coaching-report-${stamp}.txt`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
 // ——— Tutorial: guided walkthrough of the screens ———
 
 const tutorial = $('tutorial');
@@ -601,6 +675,7 @@ $('btn-retry').addEventListener('click', startSession);
 $('btn-retry-report').addEventListener('click', analyze);
 $('btn-report-done').addEventListener('click', endAndGoHome);
 $('btn-download').addEventListener('click', downloadTranscript);
+$('btn-download-analysis').addEventListener('click', downloadAnalysis);
 
 $('btn-back').addEventListener('click', () => {
   const view = document.body.dataset.view;
@@ -611,7 +686,7 @@ $('btn-back').addEventListener('click', () => {
 // Dev-only hook so the report screen can be exercised without a live call;
 // stripped from production builds.
 if (import.meta.env.DEV) {
-  window.__trainer = { state, show, renderReport, analyze, setStatus };
+  window.__trainer = { state, show, renderReport, analyze, setStatus, buildAnalysisText, downloadAnalysis };
 }
 
 // Leaving the page mid-call: close the conversation cleanly.
