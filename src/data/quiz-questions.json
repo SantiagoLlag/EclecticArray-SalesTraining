@@ -1,0 +1,1497 @@
+[
+  {
+    "id": "chiapas-sandals-dark-magenta__price",
+    "productId": "chiapas-sandals-dark-magenta",
+    "dimension": "price",
+    "prompt": "What is the listed price of these sandals?",
+    "answer": "$240",
+    "distractors": [
+      "$252",
+      "$179",
+      "$329"
+    ],
+    "grounding": "Priced at $240."
+  },
+  {
+    "id": "chiapas-sandals-dark-magenta__origin",
+    "productId": "chiapas-sandals-dark-magenta",
+    "dimension": "origin",
+    "prompt": "Where are these sandals made?",
+    "answer": "Chiapas",
+    "distractors": [
+      "Oaxaca",
+      "Campeche",
+      "Sayulita"
+    ],
+    "grounding": "Crafted by artisans in Chiapas"
+  },
+  {
+    "id": "chiapas-sandals-dark-magenta__time",
+    "productId": "chiapas-sandals-dark-magenta",
+    "dimension": "time",
+    "prompt": "How long does each strap of these sandals take to weave by hand?",
+    "answer": "up to 8 hours",
+    "distractors": [
+      "nearly a week",
+      "4-5 hours",
+      "about a month"
+    ],
+    "grounding": "Each strap takes up to 8 hours to weave by hand"
+  },
+  {
+    "id": "chiapas-sandals-dark-magenta__care",
+    "productId": "chiapas-sandals-dark-magenta",
+    "dimension": "care",
+    "prompt": "What is the honest care guidance for this piece?",
+    "answer": "They shouldn't get wet",
+    "distractors": [
+      "They are fully waterproof",
+      "The insole should be replaced once a year",
+      "They can be tumble-dried on a low setting"
+    ],
+    "grounding": "they shouldn't get wet; answer honestly"
+  },
+  {
+    "id": "chiapas-sandals-harmonic-tan__price",
+    "productId": "chiapas-sandals-harmonic-tan",
+    "dimension": "price",
+    "prompt": "What is the price of these sandals?",
+    "answer": "$240",
+    "distractors": [
+      "$144",
+      "$218",
+      "$270"
+    ],
+    "grounding": "Priced at $240."
+  },
+  {
+    "id": "chiapas-sandals-harmonic-tan__material",
+    "productId": "chiapas-sandals-harmonic-tan",
+    "dimension": "material",
+    "prompt": "What kind of insole do these sandals have?",
+    "answer": "A light, cork-like insole for all-day comfort",
+    "distractors": [
+      "A memory-foam insole",
+      "A solid leather insole",
+      "A woven palm-fiber insole"
+    ],
+    "grounding": "Light, cork-like insole for all-day comfort"
+  },
+  {
+    "id": "chiapas-sandals-harmonic-tan__ethics",
+    "productId": "chiapas-sandals-harmonic-tan",
+    "dimension": "ethics",
+    "prompt": "What ethical sourcing claim is made for these sandals?",
+    "answer": "Fair-trade; each purchase supports artisan communities",
+    "distractors": [
+      "Profits support a Venezuelan family",
+      "Funded by an Eclectic Array microloan",
+      "Made by a company employing women with home-based work"
+    ],
+    "grounding": "Fair-trade; each purchase supports artisan communities"
+  },
+  {
+    "id": "chiapas-sandals-harmonic-tan__technique",
+    "productId": "chiapas-sandals-harmonic-tan",
+    "dimension": "technique",
+    "prompt": "How are the straps of these sandals produced?",
+    "answer": "Hand-woven, taking up to 8 hours each",
+    "distractors": [
+      "Woven on a backstrap loom over nearly a week",
+      "Hand-painted by two sisters from Oaxaca",
+      "Woven in the traditional Jipijapa palm technique"
+    ],
+    "grounding": "Each strap takes up to 8 hours to weave by hand"
+  },
+  {
+    "id": "puffy-sandals-guatemalteco-beige-azul-turquesa__price",
+    "productId": "puffy-sandals-guatemalteco-beige-azul-turquesa",
+    "dimension": "price",
+    "prompt": "What is the price of these sandals?",
+    "answer": "$252",
+    "distractors": [
+      "$240",
+      "$329",
+      "$179"
+    ],
+    "grounding": "Priced at $252."
+  },
+  {
+    "id": "puffy-sandals-guatemalteco-beige-azul-turquesa__technique",
+    "productId": "puffy-sandals-guatemalteco-beige-azul-turquesa",
+    "dimension": "technique",
+    "prompt": "How is the fabric of these sandals made?",
+    "answer": "Woven by hand on a backstrap loom",
+    "distractors": [
+      "Hand-stitched Otomi embroidery",
+      "Hand-threaded macramé",
+      "Hand-painted alebrije art"
+    ],
+    "grounding": "The fabric is woven by hand on a backstrap loom — nearly a week of work per piece"
+  },
+  {
+    "id": "puffy-sandals-guatemalteco-beige-azul-turquesa__time",
+    "productId": "puffy-sandals-guatemalteco-beige-azul-turquesa",
+    "dimension": "time",
+    "prompt": "About how long does the fabric for one pair of these sandals take to weave?",
+    "answer": "Nearly a week of work per piece",
+    "distractors": [
+      "Up to 8 hours",
+      "Up to 6 hours",
+      "About a month"
+    ],
+    "grounding": "nearly a week of work per piece"
+  },
+  {
+    "id": "puffy-sandals-guatemalteco-beige-azul-turquesa__symbolism",
+    "productId": "puffy-sandals-guatemalteco-beige-azul-turquesa",
+    "dimension": "uniqueness",
+    "prompt": "What does the catalog say about how each of these pairs compares to the others?",
+    "answer": "No two pairs are alike",
+    "distractors": [
+      "Each pair is woven to a single fixed house pattern",
+      "The fabric is loom-matched so pairs come in coordinated sets",
+      "Each pair is dyed to one of three set colorways"
+    ],
+    "grounding": "No two pairs are alike"
+  },
+  {
+    "id": "alebrije-birkenstock-blue__price",
+    "productId": "alebrije-birkenstock-blue",
+    "dimension": "price",
+    "prompt": "What is the price of this pair?",
+    "answer": "$329",
+    "distractors": [
+      "$252",
+      "$240",
+      "$270"
+    ],
+    "grounding": "Priced at $329."
+  },
+  {
+    "id": "alebrije-birkenstock-blue__maker",
+    "productId": "alebrije-birkenstock-blue",
+    "dimension": "maker",
+    "prompt": "Who hand-paints this pair?",
+    "answer": "Two sisters from Oaxaca",
+    "distractors": [
+      "Edgar and Mireya in Sayulita",
+      "Joanna, a Venezuelan artisan in Los Cabos",
+      "Lupita and Pedro in San Miguel de Allende"
+    ],
+    "grounding": "Hand-painted by two sisters from Oaxaca whose family has preserved alebrije painting for generations"
+  },
+  {
+    "id": "alebrije-birkenstock-blue__technique",
+    "productId": "alebrije-birkenstock-blue",
+    "dimension": "technique",
+    "prompt": "What art technique decorates this pair?",
+    "answer": "Freehand alebrije hand-painting",
+    "distractors": [
+      "Huichol beadwork laid into beeswax",
+      "Backstrap-loom weaving",
+      "Otomi embroidery"
+    ],
+    "grounding": "Hand-painted by two sisters from Oaxaca whose family has preserved alebrije painting for generations"
+  },
+  {
+    "id": "alebrije-birkenstock-blue__scarcity",
+    "productId": "alebrije-birkenstock-blue",
+    "dimension": "scarcity",
+    "prompt": "How many of this pair are made per size?",
+    "answer": "Only one pair per size",
+    "distractors": [
+      "Three pairs per size",
+      "An unlimited number per size",
+      "One pair per color, not per size"
+    ],
+    "grounding": "Only one pair is made per size"
+  },
+  {
+    "id": "olfe-sandals-for-men-nude__price",
+    "productId": "olfe-sandals-for-men-nude",
+    "dimension": "price",
+    "prompt": "What is the price of these sandals?",
+    "answer": "$179",
+    "distractors": [
+      "$240",
+      "$252",
+      "$144"
+    ],
+    "grounding": "Priced at $179."
+  },
+  {
+    "id": "olfe-sandals-for-men-nude__material",
+    "productId": "olfe-sandals-for-men-nude",
+    "dimension": "material",
+    "prompt": "What material are these sandals made from?",
+    "answer": "High-quality, locally sourced leather",
+    "distractors": [
+      "Backstrap-loom textile",
+      "Australian rayon",
+      "Natural palm fiber"
+    ],
+    "grounding": "Handmade in Mexico with high-quality, locally sourced leather (QUERO Collection)"
+  },
+  {
+    "id": "olfe-sandals-for-men-nude__origin",
+    "productId": "olfe-sandals-for-men-nude",
+    "dimension": "origin",
+    "prompt": "Where is this piece handmade?",
+    "answer": "Mexico",
+    "distractors": [
+      "Guatemala",
+      "Venezuela",
+      "Colombia"
+    ],
+    "grounding": "Handmade in Mexico with high-quality, locally sourced leather (QUERO Collection)"
+  },
+  {
+    "id": "tennis-shoe-green-olive__price",
+    "productId": "tennis-shoe-green-olive",
+    "dimension": "price",
+    "prompt": "What is the price of this pair?",
+    "answer": "$179",
+    "distractors": [
+      "$144",
+      "$240",
+      "$218"
+    ],
+    "grounding": "Priced at $179."
+  },
+  {
+    "id": "tennis-shoe-green-olive__technique",
+    "productId": "tennis-shoe-green-olive",
+    "dimension": "technique",
+    "prompt": "How are the fabric bands on this pair made?",
+    "answer": "Hand-woven on a backstrap loom by women artisans",
+    "distractors": [
+      "Hand-painted with alebrije designs",
+      "Hand-stitched with Otomi embroidery",
+      "Woven in the Jipijapa palm technique"
+    ],
+    "grounding": "The fabric bands are hand-woven on a backstrap loom by women artisans"
+  },
+  {
+    "id": "tennis-shoe-green-olive__maker",
+    "productId": "tennis-shoe-green-olive",
+    "dimension": "maker",
+    "prompt": "Who weaves the fabric bands on this pair?",
+    "answer": "Women artisans",
+    "distractors": [
+      "Two sisters from Oaxaca",
+      "Lupita and Pedro in San Miguel de Allende",
+      "Edgar and Mireya in Sayulita"
+    ],
+    "grounding": "The fabric bands are hand-woven on a backstrap loom by women artisans"
+  },
+  {
+    "id": "tennis-shoe-green-olive__ethics",
+    "productId": "tennis-shoe-green-olive",
+    "dimension": "ethics",
+    "prompt": "What does each purchase of this pair support?",
+    "answer": "The weavers behind the textiles",
+    "distractors": [
+      "A Venezuelan family back home",
+      "An Eclectic Array microloan recipient",
+      "A company employing women in home-based work"
+    ],
+    "grounding": "Each purchase supports the weavers behind the textiles"
+  },
+  {
+    "id": "threaded-huichol-skull__price",
+    "productId": "threaded-huichol-skull",
+    "dimension": "price",
+    "prompt": "What is the price of this piece?",
+    "answer": "$1,624",
+    "distractors": [
+      "$1,380",
+      "$1,490",
+      "$1,820"
+    ],
+    "grounding": "Priced at $1,624."
+  },
+  {
+    "id": "threaded-huichol-skull__ethics",
+    "productId": "threaded-huichol-skull",
+    "dimension": "ethics",
+    "prompt": "Regarding the skull used in this piece, what is true about animal harm?",
+    "answer": "Skulls are found in the mountains — no animal is harmed",
+    "distractors": [
+      "The animals are raised and slaughtered for the art",
+      "The skulls are resin replicas of hunted animals",
+      "The skulls are sourced from butcher waste"
+    ],
+    "grounding": "Skulls are found in the mountains — no animal is harmed"
+  },
+  {
+    "id": "threaded-huichol-skull__material",
+    "productId": "threaded-huichol-skull",
+    "dimension": "material",
+    "prompt": "What is applied to fix the thread on this piece?",
+    "answer": "Beeswax",
+    "distractors": [
+      "Epoxy resin",
+      "Pine resin",
+      "Natural latex"
+    ],
+    "grounding": "Beeswax is applied to fix the thread"
+  },
+  {
+    "id": "threaded-huichol-skull__maker",
+    "productId": "threaded-huichol-skull",
+    "dimension": "maker",
+    "prompt": "Who threads this piece?",
+    "answer": "Huichol (Wixárika) artisans of the Sierra Madre Occidental",
+    "distractors": [
+      "Two sisters from Oaxaca",
+      "Women artisans in Campeche",
+      "Lupita and Pedro in San Miguel de Allende"
+    ],
+    "grounding": "threaded by Huichol (Wixárika) artisans of the Sierra Madre Occidental"
+  },
+  {
+    "id": "threaded-huichol-skull__time",
+    "productId": "threaded-huichol-skull",
+    "dimension": "time",
+    "prompt": "How long does this piece take to complete?",
+    "answer": "About a month",
+    "distractors": [
+      "Nearly a week",
+      "Up to 8 hours",
+      "4-5 hours"
+    ],
+    "grounding": "One piece takes about a month to complete"
+  },
+  {
+    "id": "beaded-huichol-skull-n64__price",
+    "productId": "beaded-huichol-skull-n64",
+    "dimension": "price",
+    "prompt": "What is the listed price of this piece?",
+    "answer": "$1,624",
+    "distractors": [
+      "$1,290",
+      "$1,440",
+      "$1,820"
+    ],
+    "grounding": "Priced at $1,624."
+  },
+  {
+    "id": "beaded-huichol-skull-n64__maker",
+    "productId": "beaded-huichol-skull-n64",
+    "dimension": "maker",
+    "prompt": "Who makes this piece?",
+    "answer": "Huichol (Wixárika) artisans of the Sierra Madre Occidental",
+    "distractors": [
+      "Two sisters from Oaxaca",
+      "Joanna, a Venezuelan artisan living in Los Cabos",
+      "Women artisans in Campeche"
+    ],
+    "grounding": "Made by Huichol (Wixárika) artisans of the Sierra Madre Occidental"
+  },
+  {
+    "id": "beaded-huichol-skull-n64__ethics",
+    "productId": "beaded-huichol-skull-n64",
+    "dimension": "ethics",
+    "prompt": "A customer asks whether an animal was harmed to make this piece. What is the honest answer based on the catalog?",
+    "answer": "The skulls are found in the mountains — no animal is harmed",
+    "distractors": [
+      "The skulls are sourced from a licensed hunting program",
+      "The skulls are cast from resin, not real bone",
+      "Animals are raised on a ranch specifically for the skulls"
+    ],
+    "grounding": "The skulls are found in the mountains — no animal is harmed"
+  },
+  {
+    "id": "beaded-huichol-skull-n64__technique",
+    "productId": "beaded-huichol-skull-n64",
+    "dimension": "technique",
+    "prompt": "What holds each bead in place on this piece?",
+    "answer": "Beeswax holds each bead, laid one by one",
+    "distractors": [
+      "Industrial epoxy glue holds each bead",
+      "The beads are stitched on with thread",
+      "The beads are pressed into soft clay"
+    ],
+    "grounding": "Beeswax holds each bead, laid one by one"
+  },
+  {
+    "id": "beaded-huichol-skull-n64__time",
+    "productId": "beaded-huichol-skull-n64",
+    "dimension": "time",
+    "prompt": "How long does it take to complete this piece?",
+    "answer": "About a month of work per piece",
+    "distractors": [
+      "About a week of work per piece",
+      "About two weeks of work per piece",
+      "About two months of work per piece"
+    ],
+    "grounding": "About a month of work per piece; 24.5\" tall, 21\" horn to horn"
+  },
+  {
+    "id": "beaded-huichol-skull-n64__dimensions",
+    "productId": "beaded-huichol-skull-n64",
+    "dimension": "dimensions",
+    "prompt": "How tall is this piece, per the catalog?",
+    "answer": "24.5\" tall",
+    "distractors": [
+      "20\" tall",
+      "27\" tall",
+      "30\" tall"
+    ],
+    "grounding": "About a month of work per piece; 24.5\" tall, 21\" horn to horn"
+  },
+  {
+    "id": "tribal-macrame-earrings__price",
+    "productId": "tribal-macrame-earrings",
+    "dimension": "price",
+    "prompt": "What is the price of these earrings?",
+    "answer": "$48",
+    "distractors": [
+      "$28",
+      "$64",
+      "$40"
+    ],
+    "grounding": "Priced at $48."
+  },
+  {
+    "id": "tribal-macrame-earrings__maker",
+    "productId": "tribal-macrame-earrings",
+    "dimension": "maker",
+    "prompt": "Who hand-threads these earrings?",
+    "answer": "Joanna, a Venezuelan artisan living in Los Cabos",
+    "distractors": [
+      "Two sisters from Oaxaca",
+      "Edgar and his wife Mireya in Sayulita",
+      "Women artisans in Campeche"
+    ],
+    "grounding": "Hand-threaded by Joanna, a Venezuelan artisan living in Los Cabos"
+  },
+  {
+    "id": "tribal-macrame-earrings__technique",
+    "productId": "tribal-macrame-earrings",
+    "dimension": "technique",
+    "prompt": "How is this piece made?",
+    "answer": "Hand-threaded macramé",
+    "distractors": [
+      "Woven on a backstrap loom",
+      "Hand-woven in the Jipijapa palm technique",
+      "Cast in sterling silver"
+    ],
+    "grounding": "Light, hand-threaded macramé earrings — easy to combine, one of a kind."
+  },
+  {
+    "id": "tribal-macrame-earrings__ethics",
+    "productId": "tribal-macrame-earrings",
+    "dimension": "ethics",
+    "prompt": "Who benefits from sales of this collection?",
+    "answer": "Her family back in Venezuela",
+    "distractors": [
+      "Weavers in Guatemala",
+      "Women's cooperatives in Campeche",
+      "An artisan microloan fund in Sayulita"
+    ],
+    "grounding": "Her collection supports her family back in Venezuela"
+  },
+  {
+    "id": "macrame-pearl-necklace__price",
+    "productId": "macrame-pearl-necklace",
+    "dimension": "price",
+    "prompt": "What is the price of this necklace?",
+    "answer": "$64",
+    "distractors": [
+      "$48",
+      "$28",
+      "$124"
+    ],
+    "grounding": "Priced at $64."
+  },
+  {
+    "id": "macrame-pearl-necklace__maker",
+    "productId": "macrame-pearl-necklace",
+    "dimension": "maker",
+    "prompt": "Who hand-threads this necklace?",
+    "answer": "Joanna, a Venezuelan artisan living in Los Cabos",
+    "distractors": [
+      "Two sisters from Oaxaca",
+      "Lupita and Pedro in San Miguel de Allende",
+      "Los Cabos seamstresses"
+    ],
+    "grounding": "Hand-threaded by Joanna, a Venezuelan artisan living in Los Cabos"
+  },
+  {
+    "id": "macrame-pearl-necklace__material",
+    "productId": "macrame-pearl-necklace",
+    "dimension": "material",
+    "prompt": "What is this piece made of, per the catalog description?",
+    "answer": "Knotted macramé cord with a single freshwater pearl",
+    "distractors": [
+      "Saltwater Akoya pearls strung on a silver chain",
+      "Freshwater pearls on a 14k gold-filled chain",
+      "Jade beads knotted on a silk cord"
+    ],
+    "grounding": "Thread-and-pearl necklace by Joanna — light, adjustable, one of a kind."
+  },
+  {
+    "id": "pearl-baja-earrings__price",
+    "productId": "pearl-baja-earrings",
+    "dimension": "price",
+    "prompt": "What is the price of these earrings?",
+    "answer": "$28",
+    "distractors": [
+      "$48",
+      "$64",
+      "$40"
+    ],
+    "grounding": "Priced at $28."
+  },
+  {
+    "id": "pearl-baja-earrings__maker",
+    "productId": "pearl-baja-earrings",
+    "dimension": "maker",
+    "prompt": "Who makes these earrings?",
+    "answer": "Joanna, a Venezuelan artisan living in Los Cabos",
+    "distractors": [
+      "Women artisans in Campeche",
+      "Two sisters from Oaxaca",
+      "A Mexican artisan inspired by Huichol beading"
+    ],
+    "grounding": "Handmade by Joanna, a Venezuelan artisan living in Los Cabos"
+  },
+  {
+    "id": "pearl-baja-earrings__ethics",
+    "productId": "pearl-baja-earrings",
+    "dimension": "ethics",
+    "prompt": "Who do the profits from these earrings support?",
+    "answer": "Her family in Venezuela",
+    "distractors": [
+      "Women in a Sayulita community",
+      "Weavers behind the textiles",
+      "Artisan communities in Chiapas"
+    ],
+    "grounding": "Profits support her family in Venezuela"
+  },
+  {
+    "id": "pearl-baja-earrings__design",
+    "productId": "pearl-baja-earrings",
+    "dimension": "design",
+    "prompt": "A customer asks whether this piece is identical to another pair the same artisan makes. What is the honest answer from the catalog?",
+    "answer": "Different design, but the same maker",
+    "distractors": [
+      "Same design, and the same maker",
+      "Different design, by a different maker",
+      "Identical, just sold at a lower price"
+    ],
+    "grounding": "“Are these the same as the $48 ones?” — different design, same maker; answer honestly"
+  },
+  {
+    "id": "skeleton-earrings__price",
+    "productId": "skeleton-earrings",
+    "dimension": "price",
+    "prompt": "What is the price of these earrings?",
+    "answer": "$40",
+    "distractors": [
+      "$28",
+      "$48",
+      "$24"
+    ],
+    "grounding": "Priced at $40."
+  },
+  {
+    "id": "skeleton-earrings__technique",
+    "productId": "skeleton-earrings",
+    "dimension": "technique",
+    "prompt": "What traditional technique is used to make these earrings?",
+    "answer": "The traditional Jipijapa technique",
+    "distractors": [
+      "Macramé hand-threading",
+      "Backstrap-loom weaving",
+      "Huichol beadwork in beeswax"
+    ],
+    "grounding": "Woven from natural palm with the traditional Jipijapa technique"
+  },
+  {
+    "id": "skeleton-earrings__material",
+    "productId": "skeleton-earrings",
+    "dimension": "material",
+    "prompt": "What material are these earrings woven from?",
+    "answer": "Natural palm",
+    "distractors": [
+      "Sterling silver",
+      "Freshwater pearl and thread",
+      "Calabash gourd"
+    ],
+    "grounding": "Woven from natural palm with the traditional Jipijapa technique"
+  },
+  {
+    "id": "skeleton-earrings__maker",
+    "productId": "skeleton-earrings",
+    "dimension": "maker",
+    "prompt": "Who makes these earrings, and where?",
+    "answer": "Women artisans in Campeche, Mexico",
+    "distractors": [
+      "Joanna, a Venezuelan artisan in Los Cabos",
+      "Two sisters in Oaxaca",
+      "Edgar and Mireya in Sayulita"
+    ],
+    "grounding": "Made by women artisans in Campeche, Mexico"
+  },
+  {
+    "id": "collar-doble-perla-blanca-cola-sirena__price",
+    "productId": "collar-doble-perla-blanca-cola-sirena",
+    "dimension": "price",
+    "prompt": "What is the price of this necklace?",
+    "answer": "$124",
+    "distractors": [
+      "$64",
+      "$255",
+      "$48"
+    ],
+    "grounding": "Priced at $124."
+  },
+  {
+    "id": "collar-doble-perla-blanca-cola-sirena__material",
+    "productId": "collar-doble-perla-blanca-cola-sirena",
+    "dimension": "material",
+    "prompt": "What type of pearl is in this necklace?",
+    "answer": "Freshwater white pearl",
+    "distractors": [
+      "Saltwater Akoya pearl",
+      "Green zirconia",
+      "Jade bead"
+    ],
+    "grounding": "14k gold-filled chain; 22k gold-plated mermaid tail; freshwater white pearl"
+  },
+  {
+    "id": "collar-doble-perla-blanca-cola-sirena__symbolism",
+    "productId": "collar-doble-perla-blanca-cola-sirena",
+    "dimension": "symbolism",
+    "prompt": "In this necklace, what does the pearl symbolize?",
+    "answer": "Clarity and serenity",
+    "distractors": [
+      "Good fortune",
+      "Never-ending growth",
+      "Synchronicity and right timing"
+    ],
+    "grounding": "Pearl symbolizes clarity and serenity; the mermaid tail, feminine power"
+  },
+  {
+    "id": "collar-doble-perla-blanca-cola-sirena__care",
+    "productId": "collar-doble-perla-blanca-cola-sirena",
+    "dimension": "care",
+    "prompt": "A customer worries the gold plating on this necklace will wear off. What is the honest care guidance from the catalog?",
+    "answer": "Remove before swimming/showering",
+    "distractors": [
+      "It is fully waterproof and safe to swim in",
+      "Machine wash to clean the plating",
+      "Apply creams to protect the plating"
+    ],
+    "grounding": "“Will the gold plating wear off?” — remove before swimming/showering; answer honestly"
+  },
+  {
+    "id": "ring-snake-infinity__price",
+    "productId": "ring-snake-infinity",
+    "dimension": "price",
+    "prompt": "What is the price of this piece?",
+    "answer": "$255",
+    "distractors": [
+      "$242",
+      "$270",
+      "$329"
+    ],
+    "grounding": "Priced at $255."
+  },
+  {
+    "id": "ring-snake-infinity__material",
+    "productId": "ring-snake-infinity",
+    "dimension": "material",
+    "prompt": "What is this ring made of?",
+    "answer": "925 sterling silver with 24K gold plating",
+    "distractors": [
+      "24K gold-plated brass",
+      "14k gold-filled with freshwater pearl",
+      "Rhodium-plated brass"
+    ],
+    "grounding": "925 sterling silver with 24K gold plating; green zirconia eyes"
+  },
+  {
+    "id": "ring-snake-infinity__symbolism",
+    "productId": "ring-snake-infinity",
+    "dimension": "symbolism",
+    "prompt": "What meaning does the catalog give the design of this piece?",
+    "answer": "Never-ending growth — \"shed your skin\"",
+    "distractors": [
+      "Protection from harm and warding off evil",
+      "Eternal love bound between two people",
+      "Wisdom passed down through the generations"
+    ],
+    "grounding": "The snake in an infinity shape symbolizes never-ending growth — \"shed your skin\""
+  },
+  {
+    "id": "ring-snake-infinity__care",
+    "productId": "ring-snake-infinity",
+    "dimension": "care",
+    "prompt": "What is the care guidance for this piece?",
+    "answer": "Remove before showering, swimming, or creams; store in its own pouch",
+    "distractors": [
+      "Fine to shower and swim in — the gold plating is fully sealed",
+      "Polish weekly with an abrasive cleaner to keep it bright",
+      "Store it loose with your other rings; no special care needed"
+    ],
+    "grounding": "Care: remove before showering, swimming, or creams; store in its own pouch"
+  },
+  {
+    "id": "palm-cuff-right-place-r__price",
+    "productId": "palm-cuff-right-place-r",
+    "dimension": "price",
+    "prompt": "What is the price of this piece?",
+    "answer": "$255",
+    "distractors": [
+      "$242",
+      "$144",
+      "$270"
+    ],
+    "grounding": "Priced at $255."
+  },
+  {
+    "id": "palm-cuff-right-place-r__material",
+    "productId": "palm-cuff-right-place-r",
+    "dimension": "material",
+    "prompt": "What is this piece made of?",
+    "answer": "925 sterling silver with 24K gold plating",
+    "distractors": [
+      "24K gold-plated brass or rhodium-plated brass",
+      "14k gold-filled chain with a freshwater pearl",
+      "Solid gold with green zirconia"
+    ],
+    "grounding": "925 sterling silver with 24K gold plating"
+  },
+  {
+    "id": "palm-cuff-right-place-r__symbolism",
+    "productId": "palm-cuff-right-place-r",
+    "dimension": "symbolism",
+    "prompt": "What phrase and meaning are behind this piece?",
+    "answer": "\"Right place, right time\" — a reminder to flow with synchronicity",
+    "distractors": [
+      "\"Shed your skin\" — a symbol of never-ending growth",
+      "Feminine power, like a mermaid tail",
+      "Clarity and serenity, like a pearl"
+    ],
+    "grounding": "\"Right place, right time\" — a reminder to flow with synchronicity"
+  },
+  {
+    "id": "world-long-ring__price",
+    "productId": "world-long-ring",
+    "dimension": "price",
+    "prompt": "What is the price of this ring?",
+    "answer": "$242",
+    "distractors": [
+      "$255",
+      "$124",
+      "$218"
+    ],
+    "grounding": "Priced at $242."
+  },
+  {
+    "id": "world-long-ring__material",
+    "productId": "world-long-ring",
+    "dimension": "material",
+    "prompt": "What metal is this piece made from?",
+    "answer": "24K gold-plated brass or rhodium-plated brass",
+    "distractors": [
+      "925 sterling silver with 24K gold plating",
+      "Stainless steel with 18K gold plating",
+      "14k gold-filled chain"
+    ],
+    "grounding": "24K gold-plated brass or rhodium-plated brass"
+  },
+  {
+    "id": "cable-bag-irma__price",
+    "productId": "cable-bag-irma",
+    "dimension": "price",
+    "prompt": "What is the price of this bag?",
+    "answer": "$144",
+    "distractors": [
+      "$270",
+      "$238",
+      "$124"
+    ],
+    "grounding": "Priced at $144."
+  },
+  {
+    "id": "cable-bag-irma__technique",
+    "productId": "cable-bag-irma",
+    "dimension": "technique",
+    "prompt": "How is the textile for this piece made?",
+    "answer": "Hand-woven on a backstrap loom",
+    "distractors": [
+      "Woven on a pedal/floor loom",
+      "Woven in the Jipijapa palm technique",
+      "Hand-stitched as Otomi embroidery"
+    ],
+    "grounding": "The textile is woven on a backstrap loom — a traditional technique"
+  },
+  {
+    "id": "cable-bag-irma__time",
+    "productId": "cable-bag-irma",
+    "dimension": "time",
+    "prompt": "How long does each textile for this bag take to create?",
+    "answer": "up to 6 hours",
+    "distractors": [
+      "up to 8 hours",
+      "about a month",
+      "nearly a week"
+    ],
+    "grounding": "Each textile takes up to 6 hours to create"
+  },
+  {
+    "id": "cable-bag-irma__uniqueness",
+    "productId": "cable-bag-irma",
+    "dimension": "uniqueness",
+    "prompt": "What does the catalog say about the individuality of each bag like this one?",
+    "answer": "Every bag is unique; the collection preserves cultural traditions",
+    "distractors": [
+      "Only one is made per size",
+      "Every bag matches a set of others exactly",
+      "Each bag follows one of a few standard patterns"
+    ],
+    "grounding": "Every bag is unique; the collection preserves cultural traditions"
+  },
+  {
+    "id": "multi-color-otomi-clutch-red-tassels__price",
+    "productId": "multi-color-otomi-clutch-red-tassels",
+    "dimension": "price",
+    "prompt": "What is the price of this piece?",
+    "answer": "$270",
+    "distractors": [
+      "$144",
+      "$238",
+      "$218"
+    ],
+    "grounding": "Priced at $270."
+  },
+  {
+    "id": "multi-color-otomi-clutch-red-tassels__technique",
+    "productId": "multi-color-otomi-clutch-red-tassels",
+    "dimension": "technique",
+    "prompt": "How is the decoration on this piece produced?",
+    "answer": "Hand-stitched embroidery",
+    "distractors": [
+      "Machine-embroidered",
+      "Backstrap-loom woven",
+      "Hand-painted"
+    ],
+    "grounding": "Hand-stitched; one piece takes up to a month to complete"
+  },
+  {
+    "id": "multi-color-otomi-clutch-red-tassels__time",
+    "productId": "multi-color-otomi-clutch-red-tassels",
+    "dimension": "time",
+    "prompt": "How long does one piece like this take to complete?",
+    "answer": "up to a month",
+    "distractors": [
+      "up to 6 hours",
+      "up to 8 hours",
+      "nearly a week"
+    ],
+    "grounding": "Hand-stitched; one piece takes up to a month to complete"
+  },
+  {
+    "id": "multi-color-otomi-clutch-red-tassels__symbolism",
+    "productId": "multi-color-otomi-clutch-red-tassels",
+    "dimension": "symbolism",
+    "prompt": "What do the embroidered motifs on this piece reflect?",
+    "answer": "the culture and cosmology of the Otomi people",
+    "distractors": [
+      "love for the ocean",
+      "the Baja spirit",
+      "Day of the Dead folklore"
+    ],
+    "grounding": "Authentic Otomi embroidery — motifs reflect the culture and cosmology of the Otomi people"
+  },
+  {
+    "id": "shirt-dress-helsol-flirty-long-yellow__price",
+    "productId": "shirt-dress-helsol-flirty-long-yellow",
+    "dimension": "price",
+    "prompt": "What is the price of this dress?",
+    "answer": "$218",
+    "distractors": [
+      "$188",
+      "$238",
+      "$270"
+    ],
+    "grounding": "Priced at $218."
+  },
+  {
+    "id": "shirt-dress-helsol-flirty-long-yellow__material",
+    "productId": "shirt-dress-helsol-flirty-long-yellow",
+    "dimension": "material",
+    "prompt": "What is this dress made of?",
+    "answer": "100% Baby Cotton",
+    "distractors": [
+      "Super-soft Australian rayon",
+      "Backstrap-loom textile",
+      "Soft leather"
+    ],
+    "grounding": "100% Baby Cotton — a special process gives it exceptional softness"
+  },
+  {
+    "id": "shirt-dress-helsol-flirty-long-yellow__versatility",
+    "productId": "shirt-dress-helsol-flirty-long-yellow",
+    "dimension": "versatility",
+    "prompt": "In what three ways can this dress be worn?",
+    "answer": "as a shirt, a dress, or a beach coverup",
+    "distractors": [
+      "loose, belted, or knotted shorter",
+      "as a scarf, a wrap, or a sarong",
+      "as a top, a skirt, or a shawl"
+    ],
+    "grounding": "Wear it as a shirt, a dress, or a beach coverup"
+  },
+  {
+    "id": "shirt-dress-helsol-flirty-long-yellow__ethics",
+    "productId": "shirt-dress-helsol-flirty-long-yellow",
+    "dimension": "ethics",
+    "prompt": "This piece describes its brand as a movement toward what?",
+    "answer": "Conscious consumerism",
+    "distractors": [
+      "Zero-waste packaging",
+      "Carbon-neutral shipping",
+      "Circular fashion and garment recycling"
+    ],
+    "grounding": "Helsol is a movement toward conscious consumerism"
+  },
+  {
+    "id": "shift-dress-chelle-design-2__price",
+    "productId": "shift-dress-chelle-design-2",
+    "dimension": "price",
+    "prompt": "What is the price of this dress?",
+    "answer": "$188",
+    "distractors": [
+      "$218",
+      "$238",
+      "$144"
+    ],
+    "grounding": "Priced at $188."
+  },
+  {
+    "id": "shift-dress-chelle-design-2__maker",
+    "productId": "shift-dress-chelle-design-2",
+    "dimension": "maker",
+    "prompt": "Who handmakes this dress?",
+    "answer": "local Los Cabos seamstresses",
+    "distractors": [
+      "Joanna, a Venezuelan artisan living in Los Cabos",
+      "two sisters from Oaxaca",
+      "women artisans in Campeche"
+    ],
+    "grounding": "Handmade by local Los Cabos seamstresses"
+  },
+  {
+    "id": "shift-dress-chelle-design-2__material",
+    "productId": "shift-dress-chelle-design-2",
+    "dimension": "material",
+    "prompt": "What material is this piece made from?",
+    "answer": "Super-soft Australian rayon",
+    "distractors": [
+      "100% Baby Cotton",
+      "Backstrap-loom textile",
+      "Natural palm fiber"
+    ],
+    "grounding": "Super-soft Australian rayon"
+  },
+  {
+    "id": "shift-dress-chelle-design-2__versatility",
+    "productId": "shift-dress-chelle-design-2",
+    "dimension": "versatility",
+    "prompt": "What are the three ways to wear this dress?",
+    "answer": "loose, belted, or knotted shorter",
+    "distractors": [
+      "as a shirt, a dress, or a beach coverup",
+      "as a wrap, a scarf, or a sarong",
+      "as a top, a skirt, or a shawl"
+    ],
+    "grounding": "Three ways to wear it: loose, belted, or knotted shorter"
+  },
+  {
+    "id": "crop-top-otomi-halter-sleeves__price",
+    "productId": "crop-top-otomi-halter-sleeves",
+    "dimension": "price",
+    "prompt": "What is the price of this top?",
+    "answer": "$238",
+    "distractors": [
+      "$218",
+      "$188",
+      "$270"
+    ],
+    "grounding": "Priced at $238."
+  },
+  {
+    "id": "crop-top-otomi-halter-sleeves__technique",
+    "productId": "crop-top-otomi-halter-sleeves",
+    "dimension": "technique",
+    "prompt": "How are the figures applied to this top?",
+    "answer": "Hand-embroidered",
+    "distractors": [
+      "Machine-embroidered",
+      "Hand-painted",
+      "Screen-printed"
+    ],
+    "grounding": "Hand-embroidered — figures vary slightly piece to piece"
+  },
+  {
+    "id": "crop-top-otomi-halter-sleeves__symbolism",
+    "productId": "crop-top-otomi-halter-sleeves",
+    "dimension": "symbolism",
+    "prompt": "What do the embroidered motifs on this top carry?",
+    "answer": "the culture and cosmology of the Otomi people",
+    "distractors": [
+      "love for the ocean",
+      "the Baja spirit",
+      "alebrije folklore"
+    ],
+    "grounding": "The Otomi motifs carry the culture and cosmology of the Otomi people"
+  },
+  {
+    "id": "crop-top-otomi-halter-sleeves__style",
+    "productId": "crop-top-otomi-halter-sleeves",
+    "dimension": "style",
+    "prompt": "What does the catalog say about how this piece ages stylistically?",
+    "answer": "Timeless — these don't go out of style",
+    "distractors": [
+      "A trend-led cut updated with each new season's colors",
+      "A limited capsule drop tied to a single collection",
+      "Designed to be dressed up only for formal occasions"
+    ],
+    "grounding": "Timeless: these don't go out of style"
+  },
+  {
+    "id": "hand-embroidered-cactus-hat-kids__price",
+    "productId": "hand-embroidered-cactus-hat-kids",
+    "dimension": "price",
+    "prompt": "What is the price of this piece?",
+    "answer": "$40",
+    "distractors": [
+      "$29",
+      "$76",
+      "$24"
+    ],
+    "grounding": "Priced at $40."
+  },
+  {
+    "id": "hand-embroidered-cactus-hat-kids__origin",
+    "productId": "hand-embroidered-cactus-hat-kids",
+    "dimension": "origin",
+    "prompt": "In which town is this piece hand-embroidered?",
+    "answer": "Sayulita",
+    "distractors": [
+      "San Miguel de Allende",
+      "Campeche",
+      "Chiapas"
+    ],
+    "grounding": "Hand-embroidered by Edgar and his wife Mireya in Sayulita"
+  },
+  {
+    "id": "hand-embroidered-cactus-hat-kids__maker",
+    "productId": "hand-embroidered-cactus-hat-kids",
+    "dimension": "maker",
+    "prompt": "Who hand-embroiders this snapback?",
+    "answer": "Edgar and his wife Mireya",
+    "distractors": [
+      "Two sisters from Oaxaca",
+      "Joanna, a Venezuelan artisan",
+      "Lupita and Pedro"
+    ],
+    "grounding": "Hand-embroidered by Edgar and his wife Mireya in Sayulita"
+  },
+  {
+    "id": "hand-embroidered-cactus-hat-kids__care",
+    "productId": "hand-embroidered-cactus-hat-kids",
+    "dimension": "care",
+    "prompt": "What are the care instructions for this piece?",
+    "answer": "Hand wash only",
+    "distractors": [
+      "Machine washable",
+      "Dry clean only",
+      "Wipe with a damp cloth, do not wash"
+    ],
+    "grounding": "Adjustable snapback; hand wash only"
+  },
+  {
+    "id": "hand-embroidered-cactus-hat-kids__ethics",
+    "productId": "hand-embroidered-cactus-hat-kids",
+    "dimension": "ethics",
+    "prompt": "What distinction does the male artisan who makes this piece hold in the Eclectic Array story?",
+    "answer": "He was the first artisan to receive an Eclectic Array microloan to grow his business",
+    "distractors": [
+      "He preserved alebrije painting for generations",
+      "He founded a fair-trade cooperative in Chiapas",
+      "He won a national folk-art prize in Mexico"
+    ],
+    "grounding": "Edgar was the first artisan to receive an Eclectic Array microloan to grow his business"
+  },
+  {
+    "id": "amigo-lavable-whale__price",
+    "productId": "amigo-lavable-whale",
+    "dimension": "price",
+    "prompt": "What is the price of this piece?",
+    "answer": "$29",
+    "distractors": [
+      "$40",
+      "$24",
+      "$48"
+    ],
+    "grounding": "Priced at $29."
+  },
+  {
+    "id": "amigo-lavable-whale__technique",
+    "productId": "amigo-lavable-whale",
+    "dimension": "technique",
+    "prompt": "How is this piece meant to be used?",
+    "answer": "Color it with washable markers, then rinse it clean and color it again",
+    "distractors": [
+      "Color it once with permanent markers and keep it as a finished piece",
+      "Decorate it with peel-and-stick fabric stickers, swapped to restyle",
+      "Paint it with the included acrylic kit for a one-time keepsake"
+    ],
+    "grounding": "Kids color it with water-based markers, wash it with soap and water, and start again"
+  },
+  {
+    "id": "amigo-lavable-whale__origin",
+    "productId": "amigo-lavable-whale",
+    "dimension": "origin",
+    "prompt": "Where is this piece designed and made?",
+    "answer": "Designed and made in Mexico",
+    "distractors": [
+      "Designed in Mexico, manufactured in Guatemala",
+      "Made in Venezuela",
+      "Imported from Peru"
+    ],
+    "grounding": "Designed and made in Mexico — \"Design Made by Hand\""
+  },
+  {
+    "id": "amigo-lavable-whale__symbolism",
+    "productId": "amigo-lavable-whale",
+    "dimension": "symbolism",
+    "prompt": "What is this piece inspired by?",
+    "answer": "Mexican culture, folklore, and nature",
+    "distractors": [
+      "Otomi cosmology and the Otomi people",
+      "Huichol symbols and the Sierra Madre Occidental",
+      "Day of the Dead characters"
+    ],
+    "grounding": "Inspired by Mexican culture, folklore, and nature"
+  },
+  {
+    "id": "small-paper-mache-devil-figurine__price",
+    "productId": "small-paper-mache-devil-figurine",
+    "dimension": "price",
+    "prompt": "What is the price of this piece?",
+    "answer": "$30",
+    "distractors": [
+      "$24",
+      "$42",
+      "$48"
+    ],
+    "grounding": "Priced at $30."
+  },
+  {
+    "id": "small-paper-mache-devil-figurine__origin",
+    "productId": "small-paper-mache-devil-figurine",
+    "dimension": "origin",
+    "prompt": "Where is this figurine handcrafted?",
+    "answer": "San Miguel de Allende",
+    "distractors": [
+      "Sayulita",
+      "Oaxaca",
+      "Campeche"
+    ],
+    "grounding": "Handcrafted in paper mache by Lupita and Pedro in San Miguel de Allende — a tradition passed down generations"
+  },
+  {
+    "id": "small-paper-mache-devil-figurine__maker",
+    "productId": "small-paper-mache-devil-figurine",
+    "dimension": "maker",
+    "prompt": "Who handcrafts this figurine?",
+    "answer": "Lupita and Pedro",
+    "distractors": [
+      "Edgar and Mireya",
+      "Two sisters from Oaxaca",
+      "Joanna, a Venezuelan artisan"
+    ],
+    "grounding": "Handcrafted in paper mache by Lupita and Pedro in San Miguel de Allende — a tradition passed down generations"
+  },
+  {
+    "id": "small-paper-mache-devil-figurine__symbolism",
+    "productId": "small-paper-mache-devil-figurine",
+    "dimension": "symbolism",
+    "prompt": "Which character does this figurine depict?",
+    "answer": "The mischievous Day of the Dead character who tries to trick souls",
+    "distractors": [
+      "A guardian spirit who protects the family altar",
+      "A Huichol deity representing the sun",
+      "An Otomi cosmology figure representing rain"
+    ],
+    "grounding": "The Diablito is the mischievous Day of the Dead character who tries to trick souls"
+  },
+  {
+    "id": "small-paper-mache-devil-figurine__material",
+    "productId": "small-paper-mache-devil-figurine",
+    "dimension": "material",
+    "prompt": "What material is this figurine made from?",
+    "answer": "Paper mache",
+    "distractors": [
+      "Carved copal wood",
+      "Calabash gourd",
+      "Hand-painted ceramic"
+    ],
+    "grounding": "Handcrafted in paper mache by Lupita and Pedro in San Miguel de Allende"
+  },
+  {
+    "id": "ornament-ball-jicara__price",
+    "productId": "ornament-ball-jicara",
+    "dimension": "price",
+    "prompt": "What is the price of this ornament?",
+    "answer": "$24",
+    "distractors": [
+      "$30",
+      "$29",
+      "$42"
+    ],
+    "grounding": "Priced at $24."
+  },
+  {
+    "id": "ornament-ball-jicara__material",
+    "productId": "ornament-ball-jicara",
+    "dimension": "material",
+    "prompt": "What natural material is this ornament hand-carved from?",
+    "answer": "The fruit of the calabash tree (calabash gourd)",
+    "distractors": [
+      "Copal wood",
+      "Cowhide",
+      "Natural palm fiber"
+    ],
+    "grounding": "Hand-carved from the fruit of the calabash tree — hollowed, dried, then carved"
+  },
+  {
+    "id": "ornament-ball-jicara__technique",
+    "productId": "ornament-ball-jicara",
+    "dimension": "technique",
+    "prompt": "How is this piece made?",
+    "answer": "It is hollowed, dried, then carved",
+    "distractors": [
+      "It is woven on a backstrap loom",
+      "It is hand-painted with alebrije art",
+      "It is beaded by hand into beeswax"
+    ],
+    "grounding": "Hand-carved from the fruit of the calabash tree — hollowed, dried, then carved"
+  },
+  {
+    "id": "ornament-ball-jicara__origin",
+    "productId": "ornament-ball-jicara",
+    "dimension": "origin",
+    "prompt": "What were the gourds used for this ornament traditionally used as?",
+    "answer": "Mezcal cups",
+    "distractors": [
+      "Water canteens for travelers",
+      "Musical rattles for ceremonies",
+      "Bowls for grinding corn"
+    ],
+    "grounding": "Traditionally these gourds were used as mezcal cups"
+  },
+  {
+    "id": "islas-journal-briso-black__price",
+    "productId": "islas-journal-briso-black",
+    "dimension": "price",
+    "prompt": "What is the price of this journal?",
+    "answer": "$42",
+    "distractors": [
+      "$24",
+      "$30",
+      "$76"
+    ],
+    "grounding": "Priced at $42."
+  },
+  {
+    "id": "islas-journal-briso-black__material",
+    "productId": "islas-journal-briso-black",
+    "dimension": "material",
+    "prompt": "What is the cover of this piece made from?",
+    "answer": "Cowhide (hair-on-hide)",
+    "distractors": [
+      "Vegetable-tanned smooth leather",
+      "Embossed faux-leather over cardboard",
+      "Suede over a wooden board"
+    ],
+    "grounding": "Cowhide cover, handcrafted by artisans in Mexico"
+  },
+  {
+    "id": "islas-journal-briso-black__technique",
+    "productId": "islas-journal-briso-black",
+    "dimension": "technique",
+    "prompt": "What makes the surface of each of these covers one of a kind?",
+    "answer": "It is hair-on-hide, so the natural pattern is unique to each piece",
+    "distractors": [
+      "The leather is hand-tooled with a different stamped motif on each",
+      "Each cover is dyed in small batches, so the shade varies piece to piece",
+      "Each is hand-embossed with a one-off geometric design"
+    ],
+    "grounding": "Hair-on-hide: every journal's pattern is one of a kind"
+  },
+  {
+    "id": "islas-journal-briso-black__ethics",
+    "productId": "islas-journal-briso-black",
+    "dimension": "ethics",
+    "prompt": "How does the company behind this piece support its workers?",
+    "answer": "It employs women with flexible home-based work, supporting their families",
+    "distractors": [
+      "It funds microloans for first-time artisans",
+      "It operates a fair-trade cooperative in Chiapas",
+      "Profits support a maker's family back in Venezuela"
+    ],
+    "grounding": "Made by a company that employs women with flexible home-based work, supporting their families"
+  },
+  {
+    "id": "rainbow-beaded-dog-collar__price",
+    "productId": "rainbow-beaded-dog-collar",
+    "dimension": "price",
+    "prompt": "What is the listed price of this piece?",
+    "answer": "$76",
+    "distractors": [
+      "$58",
+      "$64",
+      "$88"
+    ],
+    "grounding": "Priced at $76."
+  },
+  {
+    "id": "rainbow-beaded-dog-collar__technique",
+    "productId": "rainbow-beaded-dog-collar",
+    "dimension": "technique",
+    "prompt": "What beading tradition inspires this piece?",
+    "answer": "Traditional Huichol beading",
+    "distractors": [
+      "Traditional Otomi beadwork",
+      "Czech loom-bead weaving",
+      "Zapotec bead-netting"
+    ],
+    "grounding": "Hand-beaded by a Mexican artisan, inspired by traditional Huichol beading"
+  },
+  {
+    "id": "rainbow-beaded-dog-collar__material",
+    "productId": "rainbow-beaded-dog-collar",
+    "dimension": "material",
+    "prompt": "What is the beaded strap of this collar mounted on?",
+    "answer": "A high-quality, soft leather backing",
+    "distractors": [
+      "A woven backstrap-loom textile",
+      "A natural palm-fiber band",
+      "A macramé cord strap"
+    ],
+    "grounding": "Intricate beaded strap on a high-quality, soft leather backing"
+  },
+  {
+    "id": "rainbow-beaded-dog-collar__ethics",
+    "productId": "rainbow-beaded-dog-collar",
+    "dimension": "cross-sell",
+    "prompt": "What matching item is available with this piece so you can twin with your pet?",
+    "answer": "Matching beaded bracelets",
+    "distractors": [
+      "A matching beaded keychain",
+      "A matching beaded phone strap",
+      "A matching macramé collar"
+    ],
+    "grounding": "Matching beaded bracelets are available — twin with your pup"
+  },
+  {
+    "id": "brick-leather-dog-leash__price",
+    "productId": "brick-leather-dog-leash",
+    "dimension": "price",
+    "prompt": "What is the price of this leash?",
+    "answer": "$43.20",
+    "distractors": [
+      "$54.00",
+      "$38.40",
+      "$49.60"
+    ],
+    "grounding": "Priced at $43.20."
+  },
+  {
+    "id": "brick-leather-dog-leash__technique",
+    "productId": "brick-leather-dog-leash",
+    "dimension": "technique",
+    "prompt": "What kind of strap does this leash have?",
+    "answer": "A handwoven macramé strap",
+    "distractors": [
+      "A hand-beaded Huichol strap",
+      "A backstrap-loom woven strap",
+      "A hand-embroidered Otomi strap"
+    ],
+    "grounding": "Ethical leather with a handwoven macramé strap"
+  },
+  {
+    "id": "brick-leather-dog-leash__time",
+    "productId": "brick-leather-dog-leash",
+    "dimension": "time",
+    "prompt": "Approximately how long does each one of these take to create?",
+    "answer": "Approximately 4-5 hours",
+    "distractors": [
+      "About 6 hours",
+      "Nearly a week",
+      "About a month"
+    ],
+    "grounding": "Each leash is unique and takes approximately 4-5 hours to create"
+  },
+  {
+    "id": "brick-leather-dog-leash__ethics",
+    "productId": "brick-leather-dog-leash",
+    "dimension": "promotion",
+    "prompt": "What discount applies to this piece when bought with its matching collar?",
+    "answer": "50% off when purchased with its matching dog collar",
+    "distractors": [
+      "The matching collar is free",
+      "25% off the pair",
+      "Free shipping on the bundle"
+    ],
+    "grounding": "50% off when purchased with its matching dog collar"
+  },
+  {
+    "id": "olfe-sandals-for-men-nude__ethics",
+    "productId": "olfe-sandals-for-men-nude",
+    "dimension": "ethics",
+    "prompt": "What does the catalog say about how this piece is made?",
+    "answer": "Ethically made by skilled artisans, built to last",
+    "distractors": [
+      "Funded through an Eclectic Array artisan microloan",
+      "Made by a fair-trade cooperative in Chiapas",
+      "Profits go to support a maker's family in Venezuela"
+    ],
+    "grounding": "Ethically made by skilled artisans, built to last"
+  },
+  {
+    "id": "world-long-ring__finish",
+    "productId": "world-long-ring",
+    "dimension": "finish",
+    "prompt": "This piece comes in two metal finishes — a gold tone and which silver-toned option?",
+    "answer": "Rhodium-plated brass",
+    "distractors": [
+      "Sterling silver",
+      "White gold",
+      "Stainless steel"
+    ],
+    "grounding": "24K gold-plated brass or rhodium-plated brass"
+  },
+  {
+    "id": "macrame-pearl-necklace__ethics",
+    "productId": "macrame-pearl-necklace",
+    "dimension": "ethics",
+    "prompt": "Where do the profits from this piece go?",
+    "answer": "To the maker's family in Venezuela",
+    "distractors": [
+      "To a fair-trade cooperative in Chiapas",
+      "To fund artisan microloans",
+      "To a women’s home-based work program"
+    ],
+    "grounding": "Profits support her family in Venezuela"
+  }
+]

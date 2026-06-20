@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "check:quiz": "node scripts/check-quiz.mjs",
+    "prebuild": "node scripts/check-quiz.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

@@ -18,5 +18,11 @@
     "agent_id": "agent_7001ktyhkk8vf5d8m0tq9jzgx6wg",
     "label": "The Hard Case",
     "description": "Cold, blunt, and slow to thaw — nothing impresses her and she lets you know it. Practice keeping your warmth and your footing when the customer gives you nothing back."
+  },
+  {
+    "agent_id": "agent_4001kvf5fgp0er5b0h3ps4t738ex",
+    "label": "The Browser",
+    "description": "Falls for everything and can't sit still — spots a piece, asks a couple of things, then 'ooh, what about this?' and you're off again. An inventory drill: know every story, stay eloquent through the pivots, think on your feet across the whole floor.",
+    "mode": "inventory"
   }
 ]

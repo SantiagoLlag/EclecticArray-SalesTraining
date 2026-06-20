@@ -3,7 +3,7 @@ import { playTap, startReadyMusic, stopReadyMusic } from './audio.js';
 
 // ——— Data (rendered into the page at build time from agents.json / products.json) ———
 
-const { agents, products } = JSON.parse(
+const { agents, products, quiz = [] } = JSON.parse(
   document.getElementById('app-data').textContent
 );
 
@@ -40,6 +40,14 @@ function show(view) {
     .querySelectorAll(`#view-${view} [role="option"]`)
     .forEach((o) => o.setAttribute('aria-selected', 'false'));
   if (view === 'products') resetCategoryFilter();
+  // The dashboard always re-opens with both tracks equal (no track expanded yet).
+  if (view === 'agents') {
+    const sw = $('track-switch');
+    if (sw) {
+      sw.classList.remove('has-selection');
+      sw.querySelectorAll('.track-panel').forEach((p) => p.classList.remove('is-active'));
+    }
+  }
   document.body.dataset.view = view;
   window.scrollTo(0, 0);
 }
@@ -101,16 +109,45 @@ function bindOptionList(listId, onPick) {
   });
 }
 
-bindOptionList('agent-list', (card) => {
+function pickAgent(card) {
+  if ('quiz' in card.dataset) {
+    // The Inventory Quiz is a screen-based drill, not a voice agent.
+    show('quiz-setup');
+    return;
+  }
   if ('mystery' in card.dataset) {
-    const pool = agents.filter((a) => isConfigured(a.agent_id));
+    // Mystery pools only over close-the-sale agents; The Browser (no close) would be a giveaway.
+    const pool = agents.filter((a) => isConfigured(a.agent_id) && a.mode !== 'inventory');
     state.agent = pool[Math.floor(Math.random() * pool.length)];
     state.mystery = true;
   } else {
     state.agent = agents[Number(card.dataset.agentIndex)];
     state.mystery = false;
   }
-  show('products');
+  if (state.agent && state.agent.mode === 'inventory') {
+    // The Browser roams the whole floor — there is no single product to pick.
+    state.product = null;
+    show('session');
+    prepareSession();
+  } else {
+    show('products');
+  }
+}
+// The dashboard has two tracks; both pick an agent the same way.
+bindOptionList('agent-list', pickAgent);
+bindOptionList('inventory-list', pickAgent);
+
+// Two side-by-side track panels: clicking one expands it (revealing its options) and shrinks the other.
+function selectTrack(name) {
+  const sw = $('track-switch');
+  if (!sw) return;
+  sw.classList.add('has-selection');
+  sw.querySelectorAll('.track-panel').forEach((p) => {
+    p.classList.toggle('is-active', p.dataset.track === name);
+  });
+}
+document.querySelectorAll('[data-select-track]').forEach((btn) => {
+  btn.addEventListener('click', () => selectTrack(btn.dataset.selectTrack));
 });
 
 bindOptionList('product-list', (card) => {
@@ -200,31 +237,80 @@ function setStatus(name) {
   $('btn-home').hidden = !s.actions.includes('home');
 }
 
-function renderCrib() {
-  const { product } = state;
-  $('session-customer').textContent = customerLabel();
-  $('session-product').textContent = product.name;
-  $('session-price').textContent = product.price;
+const fillList = (id, items) => {
+  const ul = $(id);
+  ul.textContent = '';
+  (items || []).forEach((text) => {
+    const li = document.createElement('li');
+    li.textContent = text;
+    ul.appendChild(li);
+  });
+};
 
+function setPieceThumb(product) {
   const thumb = $('session-thumb');
+  thumb.classList.remove('is-empty');
   thumb.src = `${product.image}${product.image.includes('?') ? '&' : '?'}width=160`;
   thumb.alt = product.name;
   thumb.onerror = () => {
     thumb.onerror = null;
     thumb.src = `/products/${product.id}.png`;
   };
+}
 
-  const fill = (id, items) => {
-    const ul = $(id);
-    ul.textContent = '';
-    items.forEach((text) => {
-      const li = document.createElement('li');
-      li.textContent = text;
-      ul.appendChild(li);
-    });
-  };
-  fill('session-story', product.story);
-  fill('session-objections', product.objections);
+function renderCrib() {
+  $('session-customer').textContent = customerLabel();
+  const crib = document.querySelector('.crib');
+
+  if (state.agent?.mode === 'inventory') {
+    // The Browser: an empty 'current piece' panel that fills live as she points (focus_product).
+    crib.classList.add('crib--inventory');
+    state.roamTrail = [];
+    $('session-roam').hidden = false;
+    $('session-roam').textContent = 'Roaming the whole floor…';
+    $('session-product').textContent = 'The whole floor';
+    $('session-price').textContent = '';
+    const thumb = $('session-thumb');
+    thumb.removeAttribute('src');
+    thumb.alt = '';
+    thumb.classList.add('is-empty');
+    fillList('session-story', ['They’re browsing — each piece appears here as they point at it. Tell its story.']);
+    fillList('session-objections', []);
+    $('session-story-wrap').open = true; // hint visible until the first piece
+    $('session-objections-wrap').open = false;
+    return;
+  }
+
+  // Single-product trainers (the 4 close-the-sale agents) — unchanged behavior.
+  const { product } = state;
+  crib.classList.remove('crib--inventory');
+  $('session-roam').hidden = true;
+  $('session-product').textContent = product.name;
+  $('session-price').textContent = product.price;
+  setPieceThumb(product);
+  fillList('session-story', product.story);
+  fillList('session-objections', product.objections);
+  $('session-story-wrap').open = true;
+  $('session-objections-wrap').open = false;
+}
+
+// Driven live by the agent's focus_product client tool: show the piece she's now on.
+function showCurrentPiece(productId) {
+  const product = products.find((p) => p.id === productId);
+  if (!product) return;
+  $('session-product').textContent = product.name;
+  $('session-price').textContent = product.price;
+  setPieceThumb(product);
+  fillList('session-story', product.story);
+  fillList('session-objections', product.objections);
+  // Details stay COLLAPSED by default — the seller improvises, and can expand to peek if stuck.
+  $('session-story-wrap').open = false;
+  $('session-objections-wrap').open = false;
+  state.roamTrail = state.roamTrail || [];
+  if (state.roamTrail[state.roamTrail.length - 1] !== product.name) {
+    state.roamTrail.push(product.name);
+    $('session-roam').textContent = 'Roamed: ' + state.roamTrail.join('  →  ');
+  }
 }
 
 function appendTranscript(source, message) {
@@ -252,6 +338,23 @@ function prepareSession() {
   if (ready) startReadyMusic();
 }
 
+// Fresh real-entropy seed each session so The Browser's roam varies session-to-session.
+function makeRoamSeed() {
+  const ids = products.map((p) => p.id);
+  const buf = new Uint32Array(8);
+  crypto.getRandomValues(buf);
+  const picks = [];
+  const used = new Set();
+  for (let i = 0; i < buf.length && picks.length < 5; i++) {
+    const idx = buf[i] % ids.length;
+    if (!used.has(idx)) {
+      used.add(idx);
+      picks.push(ids[idx]);
+    }
+  }
+  return picks.join(', ');
+}
+
 async function startSession() {
   const { agent, product } = state;
   stopReadyMusic();
@@ -273,17 +376,30 @@ async function startSession() {
     return;
   }
 
+  const inventory = agent.mode === 'inventory';
+
   try {
     state.conversation = await Conversation.startSession({
       agentId: agent.agent_id,
       connectionType: 'webrtc',
 
-      // The contract with the agent prompts — exactly these four variables.
-      dynamicVariables: {
-        product_name: product.name,
-        product_price: product.price,
-        product_story: product.story.map((s) => `- ${s}`).join('\n'),
-        product_objections: product.objections.map((s) => `- ${s}`).join('\n'),
+      // The Browser roams the whole (baked-in) catalog and gets a fresh entropy seed;
+      // the four single-product trainers get exactly their four product variables.
+      dynamicVariables: inventory
+        ? { roam_seed: makeRoamSeed() }
+        : {
+            product_name: product.name,
+            product_price: product.price,
+            product_story: product.story.map((s) => `- ${s}`).join('\n'),
+            product_objections: product.objections.map((s) => `- ${s}`).join('\n'),
+          },
+
+      // The Browser drives the on-screen reference by calling focus_product on each pivot.
+      // Harmless for the other agents (they never call it).
+      clientTools: {
+        focus_product: ({ product_id }) => {
+          showCurrentPiece(product_id);
+        },
       },
 
       onConnect: ({ conversationId }) => {
@@ -384,10 +500,18 @@ const OUTCOME_TITLES = {
   deferred: 'On the fence.',
   walked: 'They walked.',
   incomplete: 'Cut short.',
+  wandered_well: 'Wandered well.',
+  went_flat: 'Went flat.',
+  froze: 'Froze up.',
 };
 
-function renderReport({ report, criteria = [], transcript, customer, product }) {
-  // The agent's 5 evaluation criteria, graded by ElevenLabs after the call.
+function renderReport({ report, criteria = [], transcript, customer, product, mode }) {
+  const inventory = mode === 'inventory';
+  // The Browser report repurposes two cards: pieces-she-asked-about + improvisation.
+  $('report-story-title').textContent = inventory ? 'Pieces she asked about' : 'Know your piece';
+  $('report-objections-title').textContent = inventory ? 'Improvisation & eloquence' : 'Objections';
+
+  // The agent's evaluation criteria, graded by ElevenLabs after the call.
   $('report-criteria-wrap').hidden = criteria.length === 0;
   const passed = criteria.filter((c) => c.result === 'success').length;
   $('report-criteria-score').textContent = criteria.length
@@ -436,46 +560,84 @@ function renderReport({ report, criteria = [], transcript, customer, product }) 
     ticket.hidden = true;
   }
 
-  $('report-summary').textContent = report.summary;
+  $('report-summary').textContent =
+    (inventory && report.disqualifier_triggered
+      ? '⚠ Invented a product fact — that disqualifies story accuracy. '
+      : '') + report.summary;
 
   const story = $('report-story');
   story.textContent = '';
-  report.story_coverage.forEach(({ point, covered, note }) => {
-    const li = document.createElement('li');
-    li.className = covered ? 'told' : 'missed';
-    const mark = document.createElement('span');
-    mark.className = 'mark';
-    mark.textContent = covered ? '✓' : '—';
-    const body = document.createElement('span');
-    const pointEl = document.createElement('span');
-    pointEl.className = 'point';
-    pointEl.textContent = point;
-    body.appendChild(pointEl);
-    if (note) {
-      const noteEl = document.createElement('span');
-      noteEl.className = 'note';
-      noteEl.textContent = note;
-      body.appendChild(noteEl);
-    }
-    li.append(mark, body);
-    story.appendChild(li);
-  });
+  if (inventory) {
+    // Per-piece story accuracy across the pieces she actually asked about.
+    const ACC = {
+      strong: { cls: 'told', mark: '✓' },
+      mixed: { cls: 'missed', mark: '~' },
+      wrong: { cls: 'failed', mark: '✗' },
+      not_probed: { cls: 'missed', mark: '—' },
+    };
+    (report.pieces_touched || []).forEach(({ piece, accuracy, note }) => {
+      const a = ACC[accuracy] || ACC.not_probed;
+      const li = document.createElement('li');
+      li.className = a.cls;
+      const mark = document.createElement('span');
+      mark.className = 'mark';
+      mark.textContent = a.mark;
+      const body = document.createElement('span');
+      const pointEl = document.createElement('span');
+      pointEl.className = 'point';
+      pointEl.textContent = piece;
+      body.appendChild(pointEl);
+      if (note) {
+        const noteEl = document.createElement('span');
+        noteEl.className = 'note';
+        noteEl.textContent = note;
+        body.appendChild(noteEl);
+      }
+      li.append(mark, body);
+      story.appendChild(li);
+    });
+  } else {
+    report.story_coverage.forEach(({ point, covered, note }) => {
+      const li = document.createElement('li');
+      li.className = covered ? 'told' : 'missed';
+      const mark = document.createElement('span');
+      mark.className = 'mark';
+      mark.textContent = covered ? '✓' : '—';
+      const body = document.createElement('span');
+      const pointEl = document.createElement('span');
+      pointEl.className = 'point';
+      pointEl.textContent = point;
+      body.appendChild(pointEl);
+      if (note) {
+        const noteEl = document.createElement('span');
+        noteEl.className = 'note';
+        noteEl.textContent = note;
+        body.appendChild(noteEl);
+      }
+      li.append(mark, body);
+      story.appendChild(li);
+    });
+  }
 
   const objections = $('report-objections');
   objections.textContent = '';
-  if (report.objection_handling.length === 0) {
+  // Inventory: the four improv dimensions. Single: the objections she raised.
+  const items = inventory
+    ? (report.improv_scorecard || []).map(({ dimension, rating, note }) => ({ label: dimension, rating, note }))
+    : (report.objection_handling || []).map(({ objection, rating, note }) => ({ label: objection, rating, note }));
+  if (!inventory && items.length === 0) {
     const li = document.createElement('li');
     li.textContent = 'The customer never pushed back — an unusually easy room.';
     objections.appendChild(li);
   }
-  report.objection_handling.forEach(({ objection, rating, note }) => {
+  items.forEach(({ label, rating, note }) => {
     const li = document.createElement('li');
     const chip = document.createElement('span');
     chip.className = `rating ${rating}`;
     chip.textContent = rating;
     const body = document.createElement('span');
     const obj = document.createElement('span');
-    obj.textContent = objection;
+    obj.textContent = label;
     body.appendChild(obj);
     if (note) {
       const noteEl = document.createElement('span');
@@ -532,11 +694,14 @@ function downloadTranscript() {
 // Build the full coaching report as readable text (analysis + transcript).
 // Split from downloadAnalysis so it can be unit-checked without a real download.
 function buildAnalysisText(data) {
-  const { report = {}, criteria = [], transcript = [], customer = '', product = {} } = data || {};
+  const { report = {}, criteria = [], transcript = [], customer = '', product = {}, mode } = data || {};
+  const inventory = mode === 'inventory';
   const rule = '='.repeat(56);
   const outcome =
-    { bought: 'Sold', deferred: 'Deferred', walked: 'Walked', incomplete: 'Cut short' }[report.outcome] ||
-    'Session results';
+    {
+      bought: 'Sold', deferred: 'Deferred', walked: 'Walked', incomplete: 'Cut short',
+      wandered_well: 'Wandered well', went_flat: 'Went flat', froze: 'Froze up',
+    }[report.outcome] || 'Session results';
   const L = [];
   L.push('ECLECTIC ARRAY — SALES TRAINER · COACHING REPORT');
   L.push(`${customer}${product?.name ? '  ·  ' + product.name : ''}${product?.price ? '  ·  ' + product.price : ''}`);
@@ -562,20 +727,36 @@ function buildAnalysisText(data) {
     L.push('');
   }
 
-  if (report.story_coverage?.length) {
-    L.push('KNOW YOUR PIECE — story coverage');
-    report.story_coverage.forEach((s) =>
-      L.push(`  [${s.covered ? 'x' : ' '}]  ${s.point}${s.note ? '  — ' + s.note : ''}`)
+  if (inventory) {
+    if (report.disqualifier_triggered) L.push('!! INVENTED A PRODUCT FACT — accuracy disqualified', '');
+    if (report.pieces_touched?.length) {
+      L.push('PIECES SHE ASKED ABOUT — story accuracy');
+      report.pieces_touched.forEach((p) =>
+        L.push(`  [${String(p.accuracy || '').toUpperCase()}]  ${p.piece}${p.note ? '  — ' + p.note : ''}`)
+      );
+      L.push('');
+    }
+    L.push('IMPROVISATION & ELOQUENCE');
+    (report.improv_scorecard || []).forEach((d) =>
+      L.push(`  [${String(d.rating || '').toUpperCase()}]  ${d.dimension}${d.note ? '  — ' + d.note : ''}`)
+    );
+    L.push('');
+  } else {
+    if (report.story_coverage?.length) {
+      L.push('KNOW YOUR PIECE — story coverage');
+      report.story_coverage.forEach((s) =>
+        L.push(`  [${s.covered ? 'x' : ' '}]  ${s.point}${s.note ? '  — ' + s.note : ''}`)
+      );
+      L.push('');
+    }
+
+    L.push('OBJECTION HANDLING');
+    if (!report.objection_handling?.length) L.push('  (the customer never really pushed back)');
+    (report.objection_handling || []).forEach((o) =>
+      L.push(`  [${String(o.rating || '').toUpperCase()}]  ${o.objection}${o.note ? '  — ' + o.note : ''}`)
     );
     L.push('');
   }
-
-  L.push('OBJECTION HANDLING');
-  if (!report.objection_handling?.length) L.push('  (the customer never really pushed back)');
-  (report.objection_handling || []).forEach((o) =>
-    L.push(`  [${String(o.rating || '').toUpperCase()}]  ${o.objection}${o.note ? '  — ' + o.note : ''}`)
-  );
-  L.push('');
 
   if (report.best_moment) L.push('BEST MOMENT', `  "${report.best_moment}"`, '');
 
@@ -650,7 +831,255 @@ $('tut-dots').addEventListener('click', (e) => {
 });
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !tutorial.hidden) closeTutorial();
+  if (document.body.dataset.view === 'quiz') handleQuizKey(e);
 });
+
+// ——— Inventory Quiz (screen-based; no agent, no API call) ———
+
+const QUIZ_SEEN_KEY = 'eclectic_quiz_seen';
+const QUIZ_SEEN_MAX = 40;
+let quizState = null;
+
+const quizSeen = () => {
+  try {
+    return JSON.parse(localStorage.getItem(QUIZ_SEEN_KEY)) || [];
+  } catch {
+    return [];
+  }
+};
+const quizMarkSeen = (ids) => {
+  try {
+    const ring = quizSeen().concat(ids);
+    localStorage.setItem(QUIZ_SEEN_KEY, JSON.stringify(ring.slice(-QUIZ_SEEN_MAX)));
+  } catch {
+    /* storage off — degrade to pure crypto-random freshness */
+  }
+};
+
+// Deterministic-from-seed PRNG so a session is reproducible for debugging yet fresh per run.
+function mulberry32(a) {
+  return () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const shuffled = (arr, rnd) => {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rnd() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
+
+// Near-identical pieces — at most one per look-alike group in a Quick round, and never two
+// questions with the same answer in one round (so a seller can't be confused / penalized).
+const QUIZ_DUP_GROUPS = [
+  ['threaded-huichol-skull', 'beaded-huichol-skull-n64'],
+  ['macrame-pearl-necklace', 'collar-doble-perla-blanca-cola-sirena', 'pearl-baja-earrings', 'tribal-macrame-earrings'],
+  ['chiapas-sandals-dark-magenta', 'chiapas-sandals-harmonic-tan'],
+];
+const QUIZ_DUP_GROUP = (() => {
+  const m = {};
+  QUIZ_DUP_GROUPS.forEach((g, gi) => g.forEach((id) => (m[id] = gi)));
+  return m;
+})();
+
+function buildQuizSet(mode) {
+  const seed = crypto.getRandomValues(new Uint32Array(1))[0] >>> 0;
+  const rnd = mulberry32(seed);
+  const norm = (s) => String(s).toLowerCase().trim();
+  const productById = Object.fromEntries(products.map((p) => [p.id, p]));
+  const byProduct = {};
+  quiz.forEach((q) => {
+    (byProduct[q.productId] = byProduct[q.productId] || []).push(q);
+  });
+  const seen = new Set(quizSeen());
+
+  // Choose the products for this round.
+  let productIds = shuffled(Object.keys(byProduct), rnd);
+  if (mode !== 'full') {
+    const usedGroups = new Set();
+    const picked = [];
+    for (const pid of productIds) {
+      const g = QUIZ_DUP_GROUP[pid];
+      if (g !== undefined && usedGroups.has(g)) continue;
+      if (g !== undefined) usedGroups.add(g);
+      picked.push(pid);
+      if (picked.length >= 10) break;
+    }
+    productIds = picked;
+  }
+
+  // Pick one question per product under constraints: cap price at 2, no repeated answer,
+  // soft dimension variety, and prefer fresh (unseen) questions.
+  const usedAnswers = new Set();
+  const dimCount = {};
+  let priceCount = 0;
+  const ok = (q) =>
+    !usedAnswers.has(norm(q.answer)) &&
+    !(q.dimension === 'price' && priceCount >= 2) &&
+    (dimCount[q.dimension] || 0) < 3;
+  const chosen = [];
+  for (const pid of productIds) {
+    const qs = byProduct[pid];
+    const fresh = qs.filter((q) => !seen.has(q.id) && ok(q));
+    const allowed = qs.filter(ok);
+    const pool = fresh.length ? fresh : allowed.length ? allowed : qs;
+    const q = pool[Math.floor(rnd() * pool.length)];
+    usedAnswers.add(norm(q.answer));
+    dimCount[q.dimension] = (dimCount[q.dimension] || 0) + 1;
+    if (q.dimension === 'price') priceCount++;
+    chosen.push(q);
+  }
+
+  // Each question gets its options shuffled, correct index recomputed (kills "always C").
+  const questions = shuffled(chosen, rnd).map((q) => {
+    const options = shuffled([q.answer, ...q.distractors], rnd);
+    return { ...q, options, correctIndex: options.indexOf(q.answer), product: productById[q.productId] };
+  });
+  return { mode, seed, questions };
+}
+
+function startQuiz(mode) {
+  const set = buildQuizSet(mode);
+  quizState = { ...set, i: 0, correct: 0, locked: false, results: [] };
+  quizMarkSeen(set.questions.map((q) => q.id));
+  show('quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const s = quizState;
+  const q = s.questions[s.i];
+  s.locked = false;
+  $('quiz-count').textContent = `Question ${s.i + 1} of ${s.questions.length}`;
+  $('quiz-score').textContent = s.i ? `${s.correct}/${s.i}` : '';
+  $('quiz-bar-fill').style.width = `${(s.i / s.questions.length) * 100}%`;
+
+  // Photo only — the name/price/category would give the answer away.
+  const thumb = $('quiz-thumb');
+  thumb.src = `${q.product.image}${q.product.image.includes('?') ? '&' : '?'}width=480`;
+  thumb.alt = 'The piece shown';
+  thumb.onerror = () => {
+    thumb.onerror = null;
+    thumb.src = `/products/${q.product.id}.png`;
+  };
+  $('quiz-prompt').textContent = q.prompt;
+
+  const fb = $('quiz-feedback');
+  fb.hidden = true;
+  fb.textContent = '';
+  const next = $('btn-quiz-next');
+  next.hidden = true;
+  next.textContent = s.i + 1 < s.questions.length ? 'Next' : 'See results';
+
+  const wrap = $('quiz-options');
+  wrap.textContent = '';
+  q.options.forEach((opt, idx) => {
+    const b = document.createElement('button');
+    b.className = 'quiz-option';
+    b.type = 'button';
+    b.dataset.idx = String(idx);
+    const letter = document.createElement('span');
+    letter.className = 'quiz-letter';
+    letter.textContent = 'ABCD'[idx];
+    const txt = document.createElement('span');
+    txt.textContent = opt;
+    b.append(letter, txt);
+    b.addEventListener('click', () => pickOption(idx));
+    wrap.appendChild(b);
+  });
+}
+
+function pickOption(idx) {
+  const s = quizState;
+  if (s.locked) return;
+  s.locked = true;
+  const q = s.questions[s.i];
+  const correct = idx === q.correctIndex;
+  if (correct) s.correct++;
+  s.results.push({ q, correct });
+
+  [...$('quiz-options').querySelectorAll('.quiz-option')].forEach((b, i) => {
+    b.disabled = true;
+    if (i === q.correctIndex) b.classList.add('is-correct');
+    else if (i === idx) b.classList.add('is-wrong');
+  });
+
+  const fb = $('quiz-feedback');
+  fb.hidden = false;
+  fb.className = `quiz-feedback ${correct ? 'good' : 'bad'}`;
+  fb.textContent = '';
+  const head = document.createElement('strong');
+  head.textContent = correct ? 'Correct.' : `Not quite — it’s ${q.answer}.`;
+  const why = document.createElement('span');
+  why.className = 'quiz-why';
+  why.textContent = q.grounding;
+  fb.append(head, why);
+
+  $('btn-quiz-next').hidden = false;
+  $('btn-quiz-next').focus();
+  $('quiz-score').textContent = `${s.correct}/${s.i + 1}`;
+}
+
+function nextQuestion() {
+  const s = quizState;
+  s.i++;
+  if (s.i >= s.questions.length) renderQuizResults();
+  else renderQuestion();
+}
+
+function renderQuizResults() {
+  const s = quizState;
+  const total = s.questions.length;
+  const pct = Math.round((s.correct / total) * 100);
+  $('quiz-result-title').textContent =
+    pct >= 85 ? 'You know this floor.' : pct >= 60 ? 'Solid — a few stories to firm up.' : 'Worth another lap.';
+  $('quiz-result-score').textContent = `${s.correct} of ${total} correct · ${pct}%`;
+
+  const missed = s.results.filter((r) => !r.correct);
+  $('quiz-weak-wrap').hidden = missed.length === 0;
+  const ul = $('quiz-weak');
+  ul.textContent = '';
+  missed.forEach(({ q }) => {
+    const li = document.createElement('li');
+    li.className = 'missed';
+    const mark = document.createElement('span');
+    mark.className = 'mark';
+    mark.textContent = '—';
+    const body = document.createElement('span');
+    const pt = document.createElement('span');
+    pt.className = 'point';
+    pt.textContent = `${q.product.name}: ${q.answer}`;
+    const note = document.createElement('span');
+    note.className = 'note';
+    note.textContent = q.grounding;
+    body.append(pt, note);
+    li.append(mark, body);
+    ul.appendChild(li);
+  });
+  show('quiz-results');
+}
+
+function handleQuizKey(e) {
+  if (!quizState) return;
+  const k = e.key.toLowerCase();
+  const letterIdx = { a: 0, b: 1, c: 2, d: 3, 1: 0, 2: 1, 3: 2, 4: 3 };
+  if (!quizState.locked && k in letterIdx) {
+    const opts = $('quiz-options').querySelectorAll('.quiz-option');
+    if (opts[letterIdx[k]]) {
+      e.preventDefault();
+      pickOption(letterIdx[k]);
+    }
+  } else if ((e.key === 'Enter' || e.key === ' ') && quizState.locked && !$('btn-quiz-next').hidden) {
+    e.preventDefault();
+    nextQuestion();
+  }
+}
 
 // ——— Wiring ———
 
@@ -677,16 +1106,26 @@ $('btn-report-done').addEventListener('click', endAndGoHome);
 $('btn-download').addEventListener('click', downloadTranscript);
 $('btn-download-analysis').addEventListener('click', downloadAnalysis);
 
+// Inventory quiz wiring
+document.querySelectorAll('[data-quiz-mode]').forEach((b) =>
+  b.addEventListener('click', () => startQuiz(b.dataset.quizMode))
+);
+$('btn-quiz-next').addEventListener('click', nextQuestion);
+$('btn-quiz-again').addEventListener('click', () => show('quiz-setup'));
+$('btn-quiz-home').addEventListener('click', endAndGoHome);
+
 $('btn-back').addEventListener('click', () => {
   const view = document.body.dataset.view;
   if (view === 'products') show('agents');
   else if (view === 'agents') show('start');
+  else if (view === 'quiz') show('quiz-setup');
+  else if (view === 'quiz-setup' || view === 'quiz-results') show('agents');
 });
 
 // Dev-only hook so the report screen can be exercised without a live call;
 // stripped from production builds.
 if (import.meta.env.DEV) {
-  window.__trainer = { state, show, renderReport, analyze, setStatus, buildAnalysisText, downloadAnalysis };
+  window.__trainer = { state, show, renderReport, analyze, setStatus, buildAnalysisText, downloadAnalysis, showCurrentPiece };
 }
 
 // Leaving the page mid-call: close the conversation cleanly.

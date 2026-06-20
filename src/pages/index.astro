@@ -1,6 +1,7 @@
 ---
 import agents from '../data/agents.json';
 import products from '../data/products.json';
+import quiz from '../data/quiz-questions.json';
 import '../styles/global.css';
 
 // An agent is usable only when the composer has written a real ElevenLabs id.
@@ -20,7 +21,7 @@ const categories = [...new Set(products.map((p) => p.category).filter(Boolean))]
 const tutFootwear = products.find((p) => p.category === 'Footwear') ?? products[0];
 const tutJewelry = products.find((p) => p.category === 'Jewelry') ?? products[0];
 
-const appData = JSON.stringify({ agents, products }).replace(/</g, '\\u003c');
+const appData = JSON.stringify({ agents, products, quiz }).replace(/</g, '\\u003c');
 ---
 
 <!doctype html>
@@ -65,57 +66,130 @@ const appData = JSON.stringify({ agents, products }).replace(/</g, '\\u003c');
         </div>
       </section>
 
-      <!-- 2 · Choose your customer -->
-      <section id="view-agents" class="view" aria-label="Choose your customer">
-        <p class="eyebrow">Step 1 of 2</p>
-        <h1 class="screen-title">Choose your customer</h1>
-        <p class="screen-sub">Each one trains a different muscle. Pick who walks in today.</p>
+      <!-- 2 · Training dashboard: two tracks -->
+      <section id="view-agents" class="view" aria-label="Training dashboard">
+        <p class="eyebrow">Training dashboard</p>
+        <h1 class="screen-title">What do you want to practice?</h1>
+        <p class="screen-sub">Two ways to train: face a customer and close the sale, or roam the floor and master your inventory.</p>
 
-        <div class="card-list" role="listbox" aria-label="Customer types" id="agent-list">
-          {
-            agents.map((agent, i) => {
-              const ready = isConfigured(agent.agent_id);
-              return (
-                <button
-                  class="card customer-card"
-                  type="button"
-                  role="option"
-                  aria-selected="false"
-                  data-agent-index={i}
-                  disabled={!ready}
-                >
-                  <div class="card-body">
-                    <span class="index">{String(i + 1).padStart(2, '0')}</span>
-                    <h2>{agent.label}</h2>
-                    <p>{agent.description}</p>
-                    {!ready && <span class="badge-unavailable">Not available yet</span>}
+        {(() => {
+          const indexed = agents.map((agent, i) => ({ agent, i }));
+          const customers = indexed.filter((x) => x.agent.mode !== 'inventory');
+          const inventory = indexed.filter((x) => x.agent.mode === 'inventory');
+          const readyCount = agents.filter((a) => isConfigured(a.agent_id)).length;
+          return (
+            <>
+              <div class="track-switch" id="track-switch">
+                <div class="track-panel" data-track="customers">
+                  <button class="track-toggle" type="button" data-select-track="customers">
+                    <span class="track-num">A</span>
+                    <span class="track-toggle-text">
+                      <span class="track-title">Sell to a customer</span>
+                      <span class="track-sub">Pick who walks in, then the piece on the counter. Practice discovery, the story, objections, and the close.</span>
+                    </span>
+                    <span class="track-cue" aria-hidden="true">Choose →</span>
+                  </button>
+                  <div class="track-cards">
+                    <div class="card-list" role="listbox" aria-label="Customer types" id="agent-list">
+                      {customers.map(({ agent, i }) => {
+                        const ready = isConfigured(agent.agent_id);
+                        return (
+                          <button
+                            class="card customer-card"
+                            type="button"
+                            role="option"
+                            aria-selected="false"
+                            data-agent-index={i}
+                            disabled={!ready}
+                          >
+                            <div class="card-body">
+                              <span class="index">{String(i + 1).padStart(2, '0')}</span>
+                              <h2>{agent.label}</h2>
+                              <p>{agent.description}</p>
+                              {!ready && <span class="badge-unavailable">Not available yet</span>}
+                            </div>
+                          </button>
+                        );
+                      })}
+                      {readyCount >= 2 && (
+                        <button
+                          class="card customer-card mystery-card"
+                          type="button"
+                          role="option"
+                          aria-selected="false"
+                          data-mystery
+                        >
+                          <div class="card-body">
+                            <span class="index">?</span>
+                            <h2>Mystery Customer</h2>
+                            <p>
+                              Whoever walks in, walks in. You won't know who you sold to until your
+                              results — practice reading the customer cold.
+                            </p>
+                          </div>
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </button>
-              );
-            })
-          }
-          {agents.filter((a) => isConfigured(a.agent_id)).length >= 2 && (
-            <button
-              class="card customer-card mystery-card"
-              type="button"
-              role="option"
-              aria-selected="false"
-              data-mystery
-            >
-              <div class="card-body">
-                <span class="index">?</span>
-                <h2>Mystery Customer</h2>
-                <p>
-                  Whoever walks in, walks in. You won't know who you sold to until your
-                  results — practice reading the customer cold.
-                </p>
+                </div>
+
+                {inventory.length > 0 && (
+                  <div class="track-panel" data-track="inventory">
+                    <button class="track-toggle" type="button" data-select-track="inventory">
+                      <span class="track-num">B</span>
+                      <span class="track-toggle-text">
+                        <span class="track-title">Know your inventory</span>
+                        <span class="track-sub">A curious browser roams the whole floor, piece after piece. No product to pick — you're off the moment they point. Practice telling every story right, and staying eloquent on your feet.</span>
+                      </span>
+                      <span class="track-cue" aria-hidden="true">Choose →</span>
+                    </button>
+                    <div class="track-cards">
+                      <div class="card-list" role="listbox" aria-label="Inventory training" id="inventory-list">
+                        {inventory.map(({ agent, i }) => {
+                          const ready = isConfigured(agent.agent_id);
+                          return (
+                            <button
+                              class="card customer-card inventory-card"
+                              type="button"
+                              role="option"
+                              aria-selected="false"
+                              data-agent-index={i}
+                              disabled={!ready}
+                            >
+                              <div class="card-body">
+                                <span class="index">★</span>
+                                <h2>{agent.label}</h2>
+                                <p>{agent.description}</p>
+                                {!ready && <span class="badge-unavailable">Not available yet</span>}
+                              </div>
+                            </button>
+                          );
+                        })}
+                        <button
+                          class="card customer-card inventory-card quiz-card"
+                          type="button"
+                          role="option"
+                          aria-selected="false"
+                          data-quiz
+                        >
+                          <div class="card-body">
+                            <span class="index">✎</span>
+                            <h2>Inventory Quiz</h2>
+                            <p>A fast multiple-choice drill on every piece — origin, maker, technique, price. Fresh questions each round; you learn the true story as you go.</p>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-            </button>
-          )}
-          {agents.length === 0 && (
-            <p class="screen-sub">No customers available yet — check back soon.</p>
-          )}
-        </div>
+
+              {agents.length === 0 && (
+                <p class="screen-sub">No customers available yet — check back soon.</p>
+              )}
+            </>
+          );
+        })()}
       </section>
 
       <!-- 3 · Choose the product -->
@@ -165,6 +239,68 @@ const appData = JSON.stringify({ agents, products }).replace(/</g, '\\u003c');
         </div>
       </section>
 
+      <!-- Quiz · Lobby -->
+      <section id="view-quiz-setup" class="view" aria-label="Inventory quiz">
+        <p class="eyebrow">Know your inventory</p>
+        <h1 class="screen-title">Inventory quiz</h1>
+        <p class="screen-sub">Multiple choice on the true story of every piece. Fresh questions each round.</p>
+        <div class="card-list quiz-modes" role="listbox" aria-label="Quiz length">
+          <button class="card customer-card" type="button" role="option" aria-selected="false" data-quiz-mode="quick">
+            <div class="card-body">
+              <span class="index">10</span>
+              <h2>Quick round</h2>
+              <p>Ten questions across the floor. About two minutes.</p>
+            </div>
+          </button>
+          <button class="card customer-card" type="button" role="option" aria-selected="false" data-quiz-mode="full">
+            <div class="card-body">
+              <span class="index">28</span>
+              <h2>Full floor</h2>
+              <p>One question per piece — every item in the shop. About six minutes.</p>
+            </div>
+          </button>
+        </div>
+      </section>
+
+      <!-- Quiz · Question -->
+      <section id="view-quiz" class="view" aria-label="Quiz question">
+        <div class="quiz-top">
+          <div class="quiz-progress">
+            <span id="quiz-count"></span>
+            <span class="quiz-score" id="quiz-score"></span>
+          </div>
+          <div class="quiz-bar" aria-hidden="true"><span id="quiz-bar-fill"></span></div>
+        </div>
+        <div class="quiz-stage">
+          <div class="quiz-piece">
+            <img id="quiz-thumb" class="quiz-photo" src="" alt="The piece shown" width="240" height="240" />
+          </div>
+          <p class="quiz-prompt" id="quiz-prompt"></p>
+          <div class="quiz-options" id="quiz-options" role="group" aria-label="Answer options"></div>
+          <div class="quiz-feedback" id="quiz-feedback" aria-live="polite" hidden></div>
+          <div class="quiz-actions">
+            <button class="btn-primary" id="btn-quiz-next" type="button" hidden>Next</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quiz · Results -->
+      <section id="view-quiz-results" class="view" aria-label="Quiz results">
+        <p class="eyebrow">Inventory quiz</p>
+        <h1 class="screen-title" id="quiz-result-title"></h1>
+        <p class="report-context" id="quiz-result-score"></p>
+        <div class="report-grid">
+          <section class="report-card" id="quiz-weak-wrap">
+            <h2>Worth another look</h2>
+            <ul class="coverage" id="quiz-weak"></ul>
+          </section>
+        </div>
+        <div class="report-actions">
+          <button class="btn-primary" id="btn-quiz-again" type="button">Try again</button>
+          <button class="btn-ghost" id="btn-quiz-home" type="button">Back to start</button>
+        </div>
+      </section>
+
       <!-- 5 · Results -->
       <section id="view-report" class="view" aria-label="Session results">
         <p class="eyebrow">Session results</p>
@@ -186,12 +322,12 @@ const appData = JSON.stringify({ agents, products }).replace(/</g, '\\u003c');
           </section>
 
           <section class="report-card">
-            <h2>Know your piece</h2>
+            <h2 id="report-story-title">Know your piece</h2>
             <ul class="coverage" id="report-story"></ul>
           </section>
 
           <section class="report-card">
-            <h2>Objections</h2>
+            <h2 id="report-objections-title">Objections</h2>
             <ul class="objections" id="report-objections"></ul>
           </section>
 
@@ -230,9 +366,12 @@ const appData = JSON.stringify({ agents, products }).replace(/</g, '\\u003c');
                 <p class="price" id="session-price"></p>
               </div>
             </div>
-            <h3>Know your piece</h3>
-            <ul id="session-story"></ul>
-            <details>
+            <p class="roam-trail" id="session-roam" hidden></p>
+            <details id="session-story-wrap" open>
+              <summary>Know your piece</summary>
+              <ul id="session-story"></ul>
+            </details>
+            <details id="session-objections-wrap">
               <summary>Objections to expect</summary>
               <ul id="session-objections"></ul>
             </details>
