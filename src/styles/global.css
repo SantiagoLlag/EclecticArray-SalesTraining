@@ -211,7 +211,8 @@ body[data-view='report'] .topbar .back { visibility: hidden; }
 
 @media (max-width: 720px) {
   .track-switch { flex-direction: column; }
-  .track-switch.has-selection .track-panel:not(.is-active) { flex-basis: auto; }
+  /* In a column, flex-basis:0 + flex-grow collapses panels to ~0 height; size to content instead. */
+  .track-panel { flex: none; }
   .track-cue { display: none; }
 }
 
