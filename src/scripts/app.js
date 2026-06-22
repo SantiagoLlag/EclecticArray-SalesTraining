@@ -338,6 +338,13 @@ function prepareSession() {
   if (ready) startReadyMusic();
 }
 
+// Fresh real-entropy token each session so the single-product customers vary their encounter
+// (opening, which concerns they lead with, order, angle, mood) session-to-session.
+function makeSessionSeed() {
+  const b = crypto.getRandomValues(new Uint32Array(2));
+  return (b[0] >>> 0).toString(36) + (b[1] >>> 0).toString(36);
+}
+
 // Fresh real-entropy seed each session so The Browser's roam varies session-to-session.
 function makeRoamSeed() {
   const ids = products.map((p) => p.id);
@@ -392,6 +399,7 @@ async function startSession() {
             product_price: product.price,
             product_story: product.story.map((s) => `- ${s}`).join('\n'),
             product_objections: product.objections.map((s) => `- ${s}`).join('\n'),
+            session_seed: makeSessionSeed(),
           },
 
       // The Browser drives the on-screen reference by calling focus_product on each pivot.
