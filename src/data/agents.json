@@ -24,5 +24,11 @@
     "label": "The Browser",
     "description": "Falls for everything and can't sit still — spots a piece, asks a couple of things, then 'ooh, what about this?' and you're off again. An inventory drill: know every story, stay eloquent through the pivots, think on your feet across the whole floor.",
     "mode": "inventory"
+  },
+  {
+    "agent_id": "agent_6601kvxha9yges58ge2418n4ews1",
+    "label": "Mentor de Ventas",
+    "description": "Flip the roles: YOU are the customer, and a master seller shows you how it's done. Pick a piece, then haggle, probe, and push — watch a pro stay warm, tell the true story, hold the price, and close. A live masterclass you learn by being sold to.",
+    "mode": "mentor"
   }
 ]

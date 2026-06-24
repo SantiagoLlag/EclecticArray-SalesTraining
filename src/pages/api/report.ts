@@ -157,6 +157,72 @@ outcome: wandered_well = engaged smoothly and accurately across the pivots; went
 
 best_moment: the seller's single best line, quoted. improvements: 2-3 concrete, actionable changes, most important first. summary: direct and kind. Write everything in English.`;
 
+// ——— Mentor de Ventas (role-model master seller): roles flipped, a masterclass breakdown ———
+// The trainee played the CUSTOMER; an exemplary master seller sold to them. We dissect the
+// master's moves so the trainee can copy them (positive role-model, not a critique).
+const MENTOR_REPORT_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['outcome', 'outcome_quote', 'ticket', 'summary', 'techniques', 'objection_handling', 'emulate', 'best_moment'],
+  properties: {
+    outcome: { type: 'string', enum: ['bought', 'deferred', 'walked', 'incomplete'] },
+    outcome_quote: { type: 'string', description: "The customer's (trainee's) closing line, verbatim; empty if cut short" },
+    ticket: {
+      type: 'object',
+      additionalProperties: false,
+      required: ['amount', 'note'],
+      properties: {
+        amount: { type: 'string', description: "Sale total if the master closed, e.g. '$240'; '$0' if no sale" },
+        note: { type: 'string', description: "One short clause with the math, e.g. 'one piece, full price' or 'no sale — client deferred'" },
+      },
+    },
+    summary: { type: 'string', description: 'Two to three plain-English sentences on how the master handled the room' },
+    techniques: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['move', 'quote', 'why'],
+        properties: {
+          move: { type: 'string', description: 'The master move, e.g. "Warm welcome", "Discovery before pitching", "True story, unprompted", "Substance over bluff", "Held the price", "Read a buying signal", "Asked for the sale", "Composure under pressure"' },
+          quote: { type: 'string', description: "The seller's exact line that demonstrates the move, verbatim" },
+          why: { type: 'string', description: 'One sentence: why this move worked on this customer' },
+        },
+      },
+      description: "The master seller's key moves, in the order they happened — each with the exact line and why it worked. 4-8 entries.",
+    },
+    objection_handling: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['objection', 'rating', 'note'],
+        properties: {
+          objection: { type: 'string', description: 'A pushback the customer (trainee) actually raised' },
+          rating: { type: 'string', enum: ['strong', 'partial', 'weak'] },
+          note: { type: 'string', description: 'Max one sentence on how the master handled it' },
+        },
+      },
+    },
+    emulate: { type: 'array', items: { type: 'string' }, description: '2-3 concrete things the trainee should copy next time THEY sell, most important first' },
+    best_moment: { type: 'string', description: "The master's single best line, quoted verbatim" },
+  },
+} as const;
+
+const MENTOR_SYSTEM_PROMPT = `You are a sales-training analyst for Eclectic Array, a fair-trade B-Corp boutique. The trainee just experienced a MASTERCLASS: THEY played the customer, and an exemplary master seller (the lines labeled "Seller") sold to them. Your job is to dissect what the MASTER did well so the trainee can copy it — this is a positive role-model breakdown, not a critique. Annotate ONLY the Seller's lines (the master); the "Customer" lines are the trainee.
+
+What a master does here: a warm, genuine welcome; discovery (understanding who the client is) before pitching; telling the TRUE story of the piece unprompted — maker, technique, origin; answering objections with substance and honesty instead of discounts or invented facts; holding the price with warmth and conceding only within policy (~max 10% with a real reason); reading buying signals; staying composed under haggling or coldness; and directly asking for the sale.
+
+Rules for your report:
+- techniques: walk through the master's key moves IN ORDER (4-8 of them). For each, name the move, quote the exact line, and say in one sentence why it worked on this client. This is the heart of the report.
+- objection_handling: one entry per pushback the customer actually raised; rate strong/partial/weak with a one-sentence note. For a true master this is mostly 'strong'.
+- emulate: 2-3 concrete things the trainee should copy next time they themselves sell, most important first.
+- ticket: the sale total if the master closed (units × price minus any concession), else "$0", with a one-clause note.
+- best_moment: the master's single best line, quoted. outcome_quote: the customer's closing line, verbatim.
+- outcome: bought = the master closed the sale; deferred/walked = the client didn't buy; incomplete = too short to judge.
+- A reference "true story" and "concerns" for the piece are provided — use them to confirm the master told the truth and invented nothing.
+Write everything in English.`;
+
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
@@ -202,6 +268,12 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ error: 'Conversation does not belong to a trainer agent.' }, 403);
   }
 
+  // Mode dispatch: 'inventory' (The Browser), 'mentor' (roles flipped — the agent is the
+  // master seller and the human is the client), or undefined (the 4 single-product trainers).
+  const mode = (customer as { mode?: string }).mode;
+  const inventory = mode === 'inventory';
+  const mentor = mode === 'mentor';
+
   // ElevenLabs needs a few seconds after the call to finish processing.
   if (conversation.status !== 'done' && conversation.status !== 'failed') {
     return json({ status: 'processing' }, 202);
@@ -219,10 +291,14 @@ export const POST: APIRoute = async ({ request }) => {
 
   const vars: Record<string, string> =
     conversation.conversation_initiation_client_data?.dynamic_variables ?? {};
+  // For grading, label the lines. Normally agent→Customer, user→Seller. In MENTOR mode the
+  // roles are flipped: the agent IS the master seller and the human is the client.
   const transcriptText = turns
-    .map((t: { speaker: string; message: string }) =>
-      `${t.speaker === 'customer' ? 'Customer' : 'Seller'}: ${t.message}`
-    )
+    .map((t: { speaker: string; message: string }) => {
+      const isAgent = t.speaker === 'customer'; // turns map agent→'customer'
+      const label = mentor ? (isAgent ? 'Seller' : 'Customer') : (isAgent ? 'Customer' : 'Seller');
+      return `${label}: ${t.message}`;
+    })
     .join('\n');
 
   // The 5 evaluation criteria configured on the agent, graded by ElevenLabs.
@@ -248,12 +324,25 @@ export const POST: APIRoute = async ({ request }) => {
     : '(none configured)';
 
   // The Browser is an inventory-improv drill: different schema, coach, and reference.
-  const inventory = (customer as { mode?: string }).mode === 'inventory';
   const catalogRef = (products as Array<{ name: string; price: string; story?: string[] }>)
     .map((p) => `- ${p.name} (${p.price}): ${(p.story ?? []).join('; ')}`)
     .join('\n');
 
-  const userContent = inventory
+  const userContent = mentor
+    ? `Masterclass — the trainee played the CUSTOMER; the master seller (lines labeled "Seller") sold them ${vars.product_name ?? 'a piece'} (${vars.product_price ?? ''}).
+
+Reference TRUE story of the piece (the master should tell this unprompted and must never contradict it):
+${vars.product_story ?? '(not provided)'}
+
+Concerns the client might raise:
+${vars.product_objections ?? '(not provided)'}
+
+Official evaluation criteria for this session (graded separately; context only — judge the transcript yourself):
+${criteriaText}
+
+Transcript:
+${transcriptText}`
+    : inventory
     ? `Customer type: ${customer.label} — ${customer.description}
 
 This was an INVENTORY-IMPROV drill across the whole floor. The TRUE catalog (your reference for story accuracy — only grade the pieces the customer actually asked about):
@@ -287,9 +376,9 @@ ${transcriptText}`;
     thinking: { type: 'adaptive' },
     output_config: {
       effort: 'medium',
-      format: { type: 'json_schema', schema: inventory ? BROWSER_REPORT_SCHEMA : REPORT_SCHEMA },
+      format: { type: 'json_schema', schema: mentor ? MENTOR_REPORT_SCHEMA : inventory ? BROWSER_REPORT_SCHEMA : REPORT_SCHEMA },
     },
-    system: inventory ? BROWSER_SYSTEM_PROMPT : SYSTEM_PROMPT,
+    system: mentor ? MENTOR_SYSTEM_PROMPT : inventory ? BROWSER_SYSTEM_PROMPT : SYSTEM_PROMPT,
     messages: [{ role: 'user', content: userContent }],
   });
 
@@ -306,7 +395,7 @@ ${transcriptText}`;
     criteria,
     transcript: turns,
     customer: customer.label,
-    mode: inventory ? 'inventory' : 'single',
+    mode: mentor ? 'mentor' : inventory ? 'inventory' : 'single',
     product: inventory ? null : { name: vars.product_name ?? '', price: vars.product_price ?? '' },
   });
 };

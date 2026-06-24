@@ -117,7 +117,7 @@ function pickAgent(card) {
   }
   if ('mystery' in card.dataset) {
     // Mystery pools only over close-the-sale agents; The Browser (no close) would be a giveaway.
-    const pool = agents.filter((a) => isConfigured(a.agent_id) && a.mode !== 'inventory');
+    const pool = agents.filter((a) => isConfigured(a.agent_id) && a.mode !== 'inventory' && a.mode !== 'mentor');
     state.agent = pool[Math.floor(Math.random() * pool.length)];
     state.mystery = true;
   } else {
@@ -281,6 +281,25 @@ function renderCrib() {
     return;
   }
 
+  // Mentor de Ventas: roles flipped — the trainee is the CLIENT. Show the piece and its
+  // TRUE story so they can test the master against it (the master should know all of it).
+  if (state.agent?.mode === 'mentor') {
+    const { product } = state;
+    crib.classList.remove('crib--inventory');
+    $('session-roam').hidden = true;
+    $('session-customer').textContent = 'You are the client';
+    $('session-product').textContent = product.name;
+    $('session-price').textContent = product.price;
+    setPieceThumb(product);
+    fillList('session-story', product.story);
+    fillList('session-objections', product.objections);
+    document.querySelector('#session-story-wrap summary').textContent = 'The true story — test him against it';
+    document.querySelector('#session-objections-wrap summary').textContent = 'Push on these to test him';
+    $('session-story-wrap').open = false;
+    $('session-objections-wrap').open = false;
+    return;
+  }
+
   // Single-product trainers (the 4 close-the-sale agents) — unchanged behavior.
   const { product } = state;
   crib.classList.remove('crib--inventory');
@@ -290,6 +309,8 @@ function renderCrib() {
   setPieceThumb(product);
   fillList('session-story', product.story);
   fillList('session-objections', product.objections);
+  document.querySelector('#session-story-wrap summary').textContent = 'Know your piece';
+  document.querySelector('#session-objections-wrap summary').textContent = 'Objections to expect';
   $('session-story-wrap').open = true;
   $('session-objections-wrap').open = false;
 }
@@ -513,11 +534,22 @@ const OUTCOME_TITLES = {
   froze: 'Froze up.',
 };
 
+const MENTOR_OUTCOME_TITLES = {
+  bought: 'He closed it.',
+  deferred: 'You held out.',
+  walked: 'You walked.',
+  incomplete: 'Cut short.',
+};
+
 function renderReport({ report, criteria = [], transcript, customer, product, mode }) {
   const inventory = mode === 'inventory';
-  // The Browser report repurposes two cards: pieces-she-asked-about + improvisation.
-  $('report-story-title').textContent = inventory ? 'Pieces she asked about' : 'Know your piece';
-  $('report-objections-title').textContent = inventory ? 'Improvisation & eloquence' : 'Objections';
+  const mentor = mode === 'mentor';
+  // The Browser repurposes two cards (pieces + improv); the Mentor repurposes them as a
+  // masterclass breakdown (the master's moves + how he handled your pushback).
+  $('report-story-title').textContent = mentor ? 'The master’s moves' : inventory ? 'Pieces she asked about' : 'Know your piece';
+  $('report-objections-title').textContent = mentor ? 'How he handled your objections' : inventory ? 'Improvisation & eloquence' : 'Objections';
+  const improvTitle = document.getElementById('report-improvements-title');
+  if (improvTitle) improvTitle.textContent = mentor ? 'What to copy from him' : 'Next time';
 
   // The agent's evaluation criteria, graded by ElevenLabs after the call.
   $('report-criteria-wrap').hidden = criteria.length === 0;
@@ -548,7 +580,8 @@ function renderReport({ report, criteria = [], transcript, customer, product, mo
     criteriaList.appendChild(li);
   });
 
-  $('report-outcome').textContent = OUTCOME_TITLES[report.outcome] ?? 'Session results';
+  $('report-outcome').textContent =
+    (mentor ? MENTOR_OUTCOME_TITLES : OUTCOME_TITLES)[report.outcome] ?? (mentor ? 'Masterclass' : 'Session results');
   $('report-quote').textContent = report.outcome_quote || '';
   // The mystery is over: the report names who walked in.
   $('report-context').textContent = [
@@ -575,7 +608,27 @@ function renderReport({ report, criteria = [], transcript, customer, product, mo
 
   const story = $('report-story');
   story.textContent = '';
-  if (inventory) {
+  if (mentor) {
+    // The masterclass: each move the master made, with the line and why it worked.
+    (report.techniques || []).forEach(({ move, quote, why }) => {
+      const li = document.createElement('li');
+      li.className = 'told';
+      const mark = document.createElement('span');
+      mark.className = 'mark';
+      mark.textContent = '★';
+      const body = document.createElement('span');
+      const pointEl = document.createElement('span');
+      pointEl.className = 'point';
+      pointEl.textContent = move;
+      body.appendChild(pointEl);
+      const noteEl = document.createElement('span');
+      noteEl.className = 'note';
+      noteEl.textContent = (quote ? '“' + quote + '” — ' : '') + (why || '');
+      body.appendChild(noteEl);
+      li.append(mark, body);
+      story.appendChild(li);
+    });
+  } else if (inventory) {
     // Per-piece story accuracy across the pieces she actually asked about.
     const ACC = {
       strong: { cls: 'told', mark: '✓' },
@@ -662,7 +715,7 @@ function renderReport({ report, criteria = [], transcript, customer, product, mo
 
   const improvements = $('report-improvements');
   improvements.textContent = '';
-  report.improvements.forEach((tip) => {
+  ((mentor ? report.emulate : report.improvements) || []).forEach((tip) => {
     const li = document.createElement('li');
     li.textContent = tip;
     improvements.appendChild(li);
@@ -688,8 +741,9 @@ function downloadTranscript() {
   if (!data) return;
   const stamp = new Date().toISOString().slice(0, 16).replace(':', '');
   const header = `Eclectic Array — Sales Trainer\n${data.customer} · ${data.product?.name ?? ''} ${data.product?.price ?? ''}\n\n`;
+  const sellerLabel = data.mode === 'mentor' ? 'You (client)' : 'Seller';
   const lines = data.transcript
-    .map((t) => `${t.speaker === 'customer' ? data.customer : 'Seller'}: ${t.message}`)
+    .map((t) => `${t.speaker === 'customer' ? data.customer : sellerLabel}: ${t.message}`)
     .join('\n');
   const blob = new Blob([header + lines + '\n'], { type: 'text/plain' });
   const a = document.createElement('a');
@@ -704,12 +758,15 @@ function downloadTranscript() {
 function buildAnalysisText(data) {
   const { report = {}, criteria = [], transcript = [], customer = '', product = {}, mode } = data || {};
   const inventory = mode === 'inventory';
+  const mentor = mode === 'mentor';
   const rule = '='.repeat(56);
   const outcome =
-    {
-      bought: 'Sold', deferred: 'Deferred', walked: 'Walked', incomplete: 'Cut short',
-      wandered_well: 'Wandered well', went_flat: 'Went flat', froze: 'Froze up',
-    }[report.outcome] || 'Session results';
+    (mentor
+      ? { bought: 'He closed it', deferred: 'You held out', walked: 'You walked', incomplete: 'Cut short' }
+      : {
+          bought: 'Sold', deferred: 'Deferred', walked: 'Walked', incomplete: 'Cut short',
+          wandered_well: 'Wandered well', went_flat: 'Went flat', froze: 'Froze up',
+        })[report.outcome] || 'Session results';
   const L = [];
   L.push('ECLECTIC ARRAY — SALES TRAINER · COACHING REPORT');
   L.push(`${customer}${product?.name ? '  ·  ' + product.name : ''}${product?.price ? '  ·  ' + product.price : ''}`);
@@ -735,7 +792,21 @@ function buildAnalysisText(data) {
     L.push('');
   }
 
-  if (inventory) {
+  if (mentor) {
+    if (report.techniques?.length) {
+      L.push('THE MASTER’S MOVES');
+      report.techniques.forEach((t) =>
+        L.push(`  • ${t.move}${t.quote ? '  — “' + t.quote + '”' : ''}${t.why ? '  (' + t.why + ')' : ''}`)
+      );
+      L.push('');
+    }
+    L.push('HOW HE HANDLED YOUR OBJECTIONS');
+    if (!report.objection_handling?.length) L.push('  (you never really pushed back)');
+    (report.objection_handling || []).forEach((o) =>
+      L.push(`  [${String(o.rating || '').toUpperCase()}]  ${o.objection}${o.note ? '  — ' + o.note : ''}`)
+    );
+    L.push('');
+  } else if (inventory) {
     if (report.disqualifier_triggered) L.push('!! INVENTED A PRODUCT FACT — accuracy disqualified', '');
     if (report.pieces_touched?.length) {
       L.push('PIECES SHE ASKED ABOUT — story accuracy');
@@ -768,14 +839,17 @@ function buildAnalysisText(data) {
 
   if (report.best_moment) L.push('BEST MOMENT', `  "${report.best_moment}"`, '');
 
-  if (report.improvements?.length) {
-    L.push('NEXT TIME');
-    report.improvements.forEach((t, i) => L.push(`  ${i + 1}. ${t}`));
+  const tips = mentor ? report.emulate : report.improvements;
+  if (tips?.length) {
+    L.push(mentor ? 'WHAT TO COPY FROM HIM' : 'NEXT TIME');
+    tips.forEach((t, i) => L.push(`  ${i + 1}. ${t}`));
     L.push('');
   }
 
   L.push(rule, 'FULL TRANSCRIPT', '');
-  transcript.forEach((t) => L.push(`${t.speaker === 'customer' ? customer : 'Seller'}: ${t.message}`));
+  transcript.forEach((t) =>
+    L.push(`${t.speaker === 'customer' ? customer : mentor ? 'You (client)' : 'Seller'}: ${t.message}`)
+  );
   L.push('');
   return L.join('\n');
 }
