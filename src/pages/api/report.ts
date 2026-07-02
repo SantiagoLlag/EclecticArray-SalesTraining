@@ -16,6 +16,38 @@ const env = (key: string): string | undefined => {
   return typeof value === 'string' && value.trim() !== '' ? value.trim() : undefined;
 };
 
+// Sub-schemas shared by the sales (REPORT_SCHEMA) and mentor (MENTOR_REPORT_SCHEMA) shapes —
+// one definition so the outcome values, ticket shape, and rating values can't drift apart.
+const OUTCOME_ENUM = ['bought', 'deferred', 'walked', 'incomplete'];
+const TICKET_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['amount', 'note'],
+  properties: {
+    amount: {
+      type: 'string',
+      description: "Final sale total as a dollar string, e.g. '$240' or '$45.60'; '$0' if no purchase",
+    },
+    note: {
+      type: 'string',
+      description: "One short clause explaining the math: 'one pair at full price', 'two at 10% off', 'no sale — customer deferred'",
+    },
+  },
+} as const;
+const OBJECTION_HANDLING_SCHEMA = {
+  type: 'array',
+  items: {
+    type: 'object',
+    additionalProperties: false,
+    required: ['objection', 'rating', 'note'],
+    properties: {
+      objection: { type: 'string', description: 'An objection the customer actually raised' },
+      rating: { type: 'string', enum: ['strong', 'partial', 'weak'] },
+      note: { type: 'string', description: 'Max one sentence on how the seller handled it' },
+    },
+  },
+} as const;
+
 const REPORT_SCHEMA = {
   type: 'object',
   additionalProperties: false,
@@ -30,22 +62,8 @@ const REPORT_SCHEMA = {
     'improvements',
   ],
   properties: {
-    outcome: { type: 'string', enum: ['bought', 'deferred', 'walked', 'incomplete'] },
-    ticket: {
-      type: 'object',
-      additionalProperties: false,
-      required: ['amount', 'note'],
-      properties: {
-        amount: {
-          type: 'string',
-          description: "Final sale total as a dollar string, e.g. '$240' or '$45.60'; '$0' if no purchase",
-        },
-        note: {
-          type: 'string',
-          description: "One short clause explaining the math: 'one pair at full price', 'two at 10% off', 'no sale — customer deferred'",
-        },
-      },
-    },
+    outcome: { type: 'string', enum: OUTCOME_ENUM },
+    ticket: TICKET_SCHEMA,
     outcome_quote: {
       type: 'string',
       description: "The customer's closing line, verbatim from the transcript; empty if cut short",
@@ -67,19 +85,7 @@ const REPORT_SCHEMA = {
         },
       },
     },
-    objection_handling: {
-      type: 'array',
-      items: {
-        type: 'object',
-        additionalProperties: false,
-        required: ['objection', 'rating', 'note'],
-        properties: {
-          objection: { type: 'string', description: 'An objection the customer actually raised' },
-          rating: { type: 'string', enum: ['strong', 'partial', 'weak'] },
-          note: { type: 'string', description: 'Max one sentence on how the seller handled it' },
-        },
-      },
-    },
+    objection_handling: OBJECTION_HANDLING_SCHEMA,
     best_moment: { type: 'string', description: "The seller's single best line, quoted" },
     improvements: {
       type: 'array',
@@ -163,19 +169,11 @@ best_moment: the seller's single best line, quoted. improvements: 2-3 concrete, 
 const MENTOR_REPORT_SCHEMA = {
   type: 'object',
   additionalProperties: false,
-  required: ['outcome', 'outcome_quote', 'ticket', 'summary', 'techniques', 'objection_handling', 'emulate', 'best_moment'],
+  required: ['outcome', 'outcome_quote', 'ticket', 'summary', 'techniques', 'objection_handling', 'fabrication', 'emulate', 'best_moment'],
   properties: {
-    outcome: { type: 'string', enum: ['bought', 'deferred', 'walked', 'incomplete'] },
+    outcome: { type: 'string', enum: OUTCOME_ENUM },
     outcome_quote: { type: 'string', description: "The customer's (trainee's) closing line, verbatim; empty if cut short" },
-    ticket: {
-      type: 'object',
-      additionalProperties: false,
-      required: ['amount', 'note'],
-      properties: {
-        amount: { type: 'string', description: "Sale total if the master closed, e.g. '$240'; '$0' if no sale" },
-        note: { type: 'string', description: "One short clause with the math, e.g. 'one piece, full price' or 'no sale — client deferred'" },
-      },
-    },
+    ticket: TICKET_SCHEMA,
     summary: { type: 'string', description: 'Two to three plain-English sentences on how the master handled the room' },
     techniques: {
       type: 'array',
@@ -191,17 +189,14 @@ const MENTOR_REPORT_SCHEMA = {
       },
       description: "The master seller's key moves, in the order they happened — each with the exact line and why it worked. 4-8 entries.",
     },
-    objection_handling: {
-      type: 'array',
-      items: {
-        type: 'object',
-        additionalProperties: false,
-        required: ['objection', 'rating', 'note'],
-        properties: {
-          objection: { type: 'string', description: 'A pushback the customer (trainee) actually raised' },
-          rating: { type: 'string', enum: ['strong', 'partial', 'weak'] },
-          note: { type: 'string', description: 'Max one sentence on how the master handled it' },
-        },
+    objection_handling: OBJECTION_HANDLING_SCHEMA,
+    fabrication: {
+      type: 'object',
+      additionalProperties: false,
+      required: ['triggered', 'note'],
+      properties: {
+        triggered: { type: 'boolean', description: 'True if the master stated any product fact that contradicts the reference story' },
+        note: { type: 'string', description: 'The invented claim, quoted verbatim; empty string if none' },
       },
     },
     emulate: { type: 'array', items: { type: 'string' }, description: '2-3 concrete things the trainee should copy next time THEY sell, most important first' },
@@ -220,8 +215,19 @@ Rules for your report:
 - ticket: the sale total if the master closed (units × price minus any concession), else "$0", with a one-clause note.
 - best_moment: the master's single best line, quoted. outcome_quote: the customer's closing line, verbatim.
 - outcome: bought = the master closed the sale; deferred/walked = the client didn't buy; incomplete = too short to judge.
-- A reference "true story" and "concerns" for the piece are provided — use them to confirm the master told the truth and invented nothing.
+- A reference "true story" and "concerns" for the piece are provided — check every claim the master made against it.
+- fabrication: if the master stated any product fact that contradicts the reference story, set fabrication.triggered = true and quote the claim in fabrication.note (triggered false and an empty note if none). This outranks the positive framing — a masterclass must never teach an invented fact, so never list a fabricated claim among the techniques to copy.
 Write everything in English.`;
+
+// One config per trainer mode: grading schema + coach, whether the roles are flipped
+// (mentor: the agent sells, the human is the client), and whether the agent's ElevenLabs
+// criteria apply (the Mentor inherits the Haggler's seller-grading criteria via duplication;
+// they grade a role the human doesn't play there, so mentor sessions drop them).
+const MODES = {
+  single: { schema: REPORT_SCHEMA, system: SYSTEM_PROMPT, flipRoles: false, useCriteria: true },
+  inventory: { schema: BROWSER_REPORT_SCHEMA, system: BROWSER_SYSTEM_PROMPT, flipRoles: false, useCriteria: true },
+  mentor: { schema: MENTOR_REPORT_SCHEMA, system: MENTOR_SYSTEM_PROMPT, flipRoles: true, useCriteria: false },
+};
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -268,11 +274,15 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ error: 'Conversation does not belong to a trainer agent.' }, 403);
   }
 
-  // Mode dispatch: 'inventory' (The Browser), 'mentor' (roles flipped — the agent is the
-  // master seller and the human is the client), or undefined (the 4 single-product trainers).
-  const mode = (customer as { mode?: string }).mode;
-  const inventory = mode === 'inventory';
-  const mentor = mode === 'mentor';
+  // Mode dispatch: every known mode has a MODES entry; anything else is rejected here
+  // rather than silently graded as a single-product session with the wrong schema and labels.
+  const modeKey = ((customer as { mode?: string }).mode ?? 'single') as keyof typeof MODES;
+  const modeConfig = MODES[modeKey];
+  if (!modeConfig) {
+    return json({ error: `Unknown trainer mode "${modeKey}".` }, 500);
+  }
+  const inventory = modeKey === 'inventory';
+  const mentor = modeKey === 'mentor';
 
   // ElevenLabs needs a few seconds after the call to finish processing.
   if (conversation.status !== 'done' && conversation.status !== 'failed') {
@@ -282,7 +292,12 @@ export const POST: APIRoute = async ({ request }) => {
   const turns = (conversation.transcript ?? [])
     .filter((t: { message?: string }) => t?.message)
     .map((t: { role: string; message: string }) => ({
+      // speaker is the legacy agent/user axis ('customer' = the AI). role is the role-true
+      // side for consumers: in a flipped mode the AI is the seller and the human the client.
       speaker: t.role === 'agent' ? 'customer' : 'seller',
+      role: modeConfig.flipRoles
+        ? (t.role === 'agent' ? 'seller' : 'client')
+        : (t.role === 'agent' ? 'customer' : 'seller'),
       message: t.message,
     }));
   if (turns.length === 0) {
@@ -291,12 +306,12 @@ export const POST: APIRoute = async ({ request }) => {
 
   const vars: Record<string, string> =
     conversation.conversation_initiation_client_data?.dynamic_variables ?? {};
-  // For grading, label the lines. Normally agent→Customer, user→Seller. In MENTOR mode the
-  // roles are flipped: the agent IS the master seller and the human is the client.
+  // For grading, label the lines. Normally agent→Customer, user→Seller; a flipped mode
+  // (mentor) reverses them: the agent IS the seller and the human is the client.
   const transcriptText = turns
     .map((t: { speaker: string; message: string }) => {
       const isAgent = t.speaker === 'customer'; // turns map agent→'customer'
-      const label = mentor ? (isAgent ? 'Seller' : 'Customer') : (isAgent ? 'Customer' : 'Seller');
+      const label = modeConfig.flipRoles ? (isAgent ? 'Seller' : 'Customer') : (isAgent ? 'Customer' : 'Seller');
       return `${label}: ${t.message}`;
     })
     .join('\n');
@@ -307,7 +322,7 @@ export const POST: APIRoute = async ({ request }) => {
   const rawCriteria: RawCriterion[] =
     conversation.analysis?.evaluation_criteria_results_list ??
     Object.values(conversation.analysis?.evaluation_criteria_results ?? {});
-  const criteria = rawCriteria
+  const criteria = (modeConfig.useCriteria ? rawCriteria : [])
     .filter((c) => c?.criteria_id)
     .map((c) => ({
       id: c.criteria_id as string,
@@ -336,9 +351,6 @@ ${vars.product_story ?? '(not provided)'}
 
 Concerns the client might raise:
 ${vars.product_objections ?? '(not provided)'}
-
-Official evaluation criteria for this session (graded separately; context only — judge the transcript yourself):
-${criteriaText}
 
 Transcript:
 ${transcriptText}`
@@ -376,9 +388,9 @@ ${transcriptText}`;
     thinking: { type: 'adaptive' },
     output_config: {
       effort: 'medium',
-      format: { type: 'json_schema', schema: mentor ? MENTOR_REPORT_SCHEMA : inventory ? BROWSER_REPORT_SCHEMA : REPORT_SCHEMA },
+      format: { type: 'json_schema', schema: modeConfig.schema },
     },
-    system: mentor ? MENTOR_SYSTEM_PROMPT : inventory ? BROWSER_SYSTEM_PROMPT : SYSTEM_PROMPT,
+    system: modeConfig.system,
     messages: [{ role: 'user', content: userContent }],
   });
 
@@ -395,7 +407,7 @@ ${transcriptText}`;
     criteria,
     transcript: turns,
     customer: customer.label,
-    mode: mentor ? 'mentor' : inventory ? 'inventory' : 'single',
+    mode: modeKey,
     product: inventory ? null : { name: vars.product_name ?? '', price: vars.product_price ?? '' },
   });
 };

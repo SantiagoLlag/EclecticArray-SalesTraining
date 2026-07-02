@@ -74,9 +74,15 @@ const appData = JSON.stringify({ agents, products, quiz }).replace(/</g, '\\u003
 
         {(() => {
           const indexed = agents.map((agent, i) => ({ agent, i }));
-          const customers = indexed.filter((x) => x.agent.mode !== 'inventory');
+          // Track A is an explicit allow-list (no mode = the 4 personas; mentor = the flipped
+          // masterclass) so a future mode never lands under "Sell to a customer" by default.
+          const customers = indexed.filter((x) => !x.agent.mode || x.agent.mode === 'mentor');
           const inventory = indexed.filter((x) => x.agent.mode === 'inventory');
-          const readyCount = agents.filter((a) => isConfigured(a.agent_id)).length;
+          // Mystery pools only over the close-the-sale personas (see pickAgent), so its card
+          // must gate on THOSE being ready — not on any two agents.
+          const mysteryReady = agents.filter(
+            (a) => isConfigured(a.agent_id) && !a.mode
+          ).length;
           return (
             <>
               <div class="track-switch" id="track-switch">
@@ -91,7 +97,7 @@ const appData = JSON.stringify({ agents, products, quiz }).replace(/</g, '\\u003
                   </button>
                   <div class="track-cards">
                     <div class="card-list" role="listbox" aria-label="Customer types" id="agent-list">
-                      {customers.map(({ agent, i }) => {
+                      {customers.map(({ agent, i }, pos) => {
                         const ready = isConfigured(agent.agent_id);
                         return (
                           <button
@@ -103,7 +109,7 @@ const appData = JSON.stringify({ agents, products, quiz }).replace(/</g, '\\u003
                             disabled={!ready}
                           >
                             <div class="card-body">
-                              <span class="index">{String(i + 1).padStart(2, '0')}</span>
+                              <span class="index">{String(pos + 1).padStart(2, '0')}</span>
                               <h2>{agent.label}</h2>
                               <p>{agent.description}</p>
                               {!ready && <span class="badge-unavailable">Not available yet</span>}
@@ -111,7 +117,7 @@ const appData = JSON.stringify({ agents, products, quiz }).replace(/</g, '\\u003
                           </button>
                         );
                       })}
-                      {readyCount >= 2 && (
+                      {mysteryReady >= 2 && (
                         <button
                           class="card customer-card mystery-card"
                           type="button"
@@ -196,7 +202,7 @@ const appData = JSON.stringify({ agents, products, quiz }).replace(/</g, '\\u003
       <section id="view-products" class="view" aria-label="Choose the product">
         <p class="eyebrow">Step 2 of 2</p>
         <h1 class="screen-title">Choose the product</h1>
-        <p class="screen-sub">This is the piece on the counter. Know it before they ask.</p>
+        <p class="screen-sub" id="products-sub">This is the piece on the counter. Know it before they ask.</p>
 
         {categories.length > 1 && (
           <div class="chips" role="group" aria-label="Filter by category" id="category-chips">

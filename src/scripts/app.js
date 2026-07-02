@@ -116,8 +116,10 @@ function pickAgent(card) {
     return;
   }
   if ('mystery' in card.dataset) {
-    // Mystery pools only over close-the-sale agents; The Browser (no close) would be a giveaway.
-    const pool = agents.filter((a) => isConfigured(a.agent_id) && a.mode !== 'inventory' && a.mode !== 'mentor');
+    // Mystery pools only over the close-the-sale personas (the agents with no mode) — The
+    // Browser or the Mentor would be an instant giveaway. Same rule as the dashboard gate.
+    const pool = agents.filter((a) => isConfigured(a.agent_id) && !a.mode);
+    if (pool.length === 0) return; // the dashboard gate should prevent this; never crash on it
     state.agent = pool[Math.floor(Math.random() * pool.length)];
     state.mystery = true;
   } else {
@@ -130,6 +132,11 @@ function pickAgent(card) {
     show('session');
     prepareSession();
   } else {
+    // The product step reads differently when the roles flip: the Mentor sells to YOU.
+    $('products-sub').textContent =
+      state.agent && state.agent.mode === 'mentor'
+        ? 'Pick the piece he’ll sell to you. You’ll have its true story on hand to test him.'
+        : 'This is the piece on the counter. Know it before they ask.';
     show('products');
   }
 }
@@ -221,8 +228,18 @@ const STATUS = {
   },
 };
 
+// Mentor de Ventas flips the roles (the agent sells, the trainee is the client), so the
+// coaching copy flips with it; statuses not listed here read the same in both roles.
+const MENTOR_STATUS = {
+  ready: { sub: 'The seller is on the floor. Walk in as the client — browse, push on price, and make him earn it.' },
+  connecting: { title: 'The seller is coming over…' },
+  listening: { sub: 'He’s listening. Push back the way a real customer would.' },
+  speaking: { sub: 'Watch the moves: the welcome, the true story, how he holds the price.' },
+};
+
 function setStatus(name) {
-  const s = STATUS[name];
+  const s =
+    state.agent?.mode === 'mentor' ? { ...STATUS[name], ...MENTOR_STATUS[name] } : STATUS[name];
   const orb = $('orb');
   orb.className = `orb ${s.orb}`;
   $('status-title').textContent =
@@ -261,6 +278,10 @@ function setPieceThumb(product) {
 function renderCrib() {
   $('session-customer').textContent = customerLabel();
   const crib = document.querySelector('.crib');
+  // The mentor branch retitles these shared captions, so restore the defaults up front —
+  // whichever mode renders next starts from the static text.
+  document.querySelector('#session-story-wrap summary').textContent = 'Know your piece';
+  document.querySelector('#session-objections-wrap summary').textContent = 'Objections to expect';
 
   if (state.agent?.mode === 'inventory') {
     // The Browser: an empty 'current piece' panel that fills live as she points (focus_product).
@@ -281,37 +302,23 @@ function renderCrib() {
     return;
   }
 
-  // Mentor de Ventas: roles flipped — the trainee is the CLIENT. Show the piece and its
-  // TRUE story so they can test the master against it (the master should know all of it).
-  if (state.agent?.mode === 'mentor') {
-    const { product } = state;
-    crib.classList.remove('crib--inventory');
-    $('session-roam').hidden = true;
-    $('session-customer').textContent = 'You are the client';
-    $('session-product').textContent = product.name;
-    $('session-price').textContent = product.price;
-    setPieceThumb(product);
-    fillList('session-story', product.story);
-    fillList('session-objections', product.objections);
-    document.querySelector('#session-story-wrap summary').textContent = 'The true story — test him against it';
-    document.querySelector('#session-objections-wrap summary').textContent = 'Push on these to test him';
-    $('session-story-wrap').open = false;
-    $('session-objections-wrap').open = false;
-    return;
-  }
-
-  // Single-product trainers (the 4 close-the-sale agents) — unchanged behavior.
+  // Single-product trainers and the Mentor share one crib. The Mentor flips the framing:
+  // the trainee is the CLIENT and gets the TRUE story to test the master against.
+  const mentor = state.agent?.mode === 'mentor';
   const { product } = state;
   crib.classList.remove('crib--inventory');
   $('session-roam').hidden = true;
+  if (mentor) $('session-customer').textContent = 'You are the client';
   $('session-product').textContent = product.name;
   $('session-price').textContent = product.price;
   setPieceThumb(product);
   fillList('session-story', product.story);
   fillList('session-objections', product.objections);
-  document.querySelector('#session-story-wrap summary').textContent = 'Know your piece';
-  document.querySelector('#session-objections-wrap summary').textContent = 'Objections to expect';
-  $('session-story-wrap').open = true;
+  if (mentor) {
+    document.querySelector('#session-story-wrap summary').textContent = 'The true story — test him against it';
+    document.querySelector('#session-objections-wrap summary').textContent = 'Push on these to test him';
+  }
+  $('session-story-wrap').open = !mentor;
   $('session-objections-wrap').open = false;
 }
 
@@ -541,6 +548,41 @@ const MENTOR_OUTCOME_TITLES = {
   incomplete: 'Cut short.',
 };
 
+// One source for the outcome headline; the on-screen report uses it as-is and the
+// downloadable text strips the trailing period, so the two can't drift apart.
+function outcomeTitle(mode, outcome) {
+  const titles = mode === 'mentor' ? MENTOR_OUTCOME_TITLES : OUTCOME_TITLES;
+  return titles[outcome] ?? (mode === 'mentor' ? 'Masterclass' : 'Session results');
+}
+
+// One builder for every mark/point/note row in the report cards (criteria, master moves,
+// pieces, story coverage) so the markup can't drift between them.
+function markedListItem(cls, mark, point, note) {
+  const li = document.createElement('li');
+  li.className = cls;
+  const markEl = document.createElement('span');
+  markEl.className = 'mark';
+  markEl.textContent = mark;
+  const body = document.createElement('span');
+  const pointEl = document.createElement('span');
+  pointEl.className = 'point';
+  pointEl.textContent = point;
+  body.appendChild(pointEl);
+  if (note) {
+    const noteEl = document.createElement('span');
+    noteEl.className = 'note';
+    noteEl.textContent = note;
+    body.appendChild(noteEl);
+  }
+  li.append(markEl, body);
+  return li;
+}
+
+// The human side's transcript label per mode (the agent side always shows the agent's label).
+function humanSideLabel(mode) {
+  return mode === 'mentor' ? 'You (client)' : 'Seller';
+}
+
 function renderReport({ report, criteria = [], transcript, customer, product, mode }) {
   const inventory = mode === 'inventory';
   const mentor = mode === 'mentor';
@@ -560,28 +602,17 @@ function renderReport({ report, criteria = [], transcript, customer, product, mo
   const criteriaList = $('report-criteria');
   criteriaList.textContent = '';
   criteria.forEach(({ label, result, rationale }) => {
-    const li = document.createElement('li');
-    li.className = result === 'success' ? 'told' : result === 'failure' ? 'failed' : 'missed';
-    const mark = document.createElement('span');
-    mark.className = 'mark';
-    mark.textContent = result === 'success' ? '✓' : result === 'failure' ? '✗' : '?';
-    const body = document.createElement('span');
-    const pointEl = document.createElement('span');
-    pointEl.className = 'point';
-    pointEl.textContent = label;
-    body.appendChild(pointEl);
-    if (rationale) {
-      const noteEl = document.createElement('span');
-      noteEl.className = 'note';
-      noteEl.textContent = rationale;
-      body.appendChild(noteEl);
-    }
-    li.append(mark, body);
-    criteriaList.appendChild(li);
+    criteriaList.appendChild(
+      markedListItem(
+        result === 'success' ? 'told' : result === 'failure' ? 'failed' : 'missed',
+        result === 'success' ? '✓' : result === 'failure' ? '✗' : '?',
+        label,
+        rationale
+      )
+    );
   });
 
-  $('report-outcome').textContent =
-    (mentor ? MENTOR_OUTCOME_TITLES : OUTCOME_TITLES)[report.outcome] ?? (mentor ? 'Masterclass' : 'Session results');
+  $('report-outcome').textContent = outcomeTitle(mode, report.outcome);
   $('report-quote').textContent = report.outcome_quote || '';
   // The mystery is over: the report names who walked in.
   $('report-context').textContent = [
@@ -604,6 +635,8 @@ function renderReport({ report, criteria = [], transcript, customer, product, mo
   $('report-summary').textContent =
     (inventory && report.disqualifier_triggered
       ? '⚠ Invented a product fact — that disqualifies story accuracy. '
+      : mentor && report.fabrication?.triggered
+      ? `⚠ He stated something the true story contradicts${report.fabrication.note ? ` (“${report.fabrication.note}”)` : ''} — don’t copy that one. `
       : '') + report.summary;
 
   const story = $('report-story');
@@ -611,22 +644,9 @@ function renderReport({ report, criteria = [], transcript, customer, product, mo
   if (mentor) {
     // The masterclass: each move the master made, with the line and why it worked.
     (report.techniques || []).forEach(({ move, quote, why }) => {
-      const li = document.createElement('li');
-      li.className = 'told';
-      const mark = document.createElement('span');
-      mark.className = 'mark';
-      mark.textContent = '★';
-      const body = document.createElement('span');
-      const pointEl = document.createElement('span');
-      pointEl.className = 'point';
-      pointEl.textContent = move;
-      body.appendChild(pointEl);
-      const noteEl = document.createElement('span');
-      noteEl.className = 'note';
-      noteEl.textContent = (quote ? '“' + quote + '” — ' : '') + (why || '');
-      body.appendChild(noteEl);
-      li.append(mark, body);
-      story.appendChild(li);
+      story.appendChild(
+        markedListItem('told', '★', move, (quote ? '“' + quote + '” — ' : '') + (why || ''))
+      );
     });
   } else if (inventory) {
     // Per-piece story accuracy across the pieces she actually asked about.
@@ -638,45 +658,11 @@ function renderReport({ report, criteria = [], transcript, customer, product, mo
     };
     (report.pieces_touched || []).forEach(({ piece, accuracy, note }) => {
       const a = ACC[accuracy] || ACC.not_probed;
-      const li = document.createElement('li');
-      li.className = a.cls;
-      const mark = document.createElement('span');
-      mark.className = 'mark';
-      mark.textContent = a.mark;
-      const body = document.createElement('span');
-      const pointEl = document.createElement('span');
-      pointEl.className = 'point';
-      pointEl.textContent = piece;
-      body.appendChild(pointEl);
-      if (note) {
-        const noteEl = document.createElement('span');
-        noteEl.className = 'note';
-        noteEl.textContent = note;
-        body.appendChild(noteEl);
-      }
-      li.append(mark, body);
-      story.appendChild(li);
+      story.appendChild(markedListItem(a.cls, a.mark, piece, note));
     });
   } else {
     report.story_coverage.forEach(({ point, covered, note }) => {
-      const li = document.createElement('li');
-      li.className = covered ? 'told' : 'missed';
-      const mark = document.createElement('span');
-      mark.className = 'mark';
-      mark.textContent = covered ? '✓' : '—';
-      const body = document.createElement('span');
-      const pointEl = document.createElement('span');
-      pointEl.className = 'point';
-      pointEl.textContent = point;
-      body.appendChild(pointEl);
-      if (note) {
-        const noteEl = document.createElement('span');
-        noteEl.className = 'note';
-        noteEl.textContent = note;
-        body.appendChild(noteEl);
-      }
-      li.append(mark, body);
-      story.appendChild(li);
+      story.appendChild(markedListItem(covered ? 'told' : 'missed', covered ? '✓' : '—', point, note));
     });
   }
 
@@ -688,7 +674,9 @@ function renderReport({ report, criteria = [], transcript, customer, product, mo
     : (report.objection_handling || []).map(({ objection, rating, note }) => ({ label: objection, rating, note }));
   if (!inventory && items.length === 0) {
     const li = document.createElement('li');
-    li.textContent = 'The customer never pushed back — an unusually easy room.';
+    li.textContent = mentor
+      ? 'You never really pushed back — next time make him earn it.'
+      : 'The customer never pushed back — an unusually easy room.';
     objections.appendChild(li);
   }
   items.forEach(({ label, rating, note }) => {
@@ -741,9 +729,8 @@ function downloadTranscript() {
   if (!data) return;
   const stamp = new Date().toISOString().slice(0, 16).replace(':', '');
   const header = `Eclectic Array — Sales Trainer\n${data.customer} · ${data.product?.name ?? ''} ${data.product?.price ?? ''}\n\n`;
-  const sellerLabel = data.mode === 'mentor' ? 'You (client)' : 'Seller';
   const lines = data.transcript
-    .map((t) => `${t.speaker === 'customer' ? data.customer : sellerLabel}: ${t.message}`)
+    .map((t) => `${t.speaker === 'customer' ? data.customer : humanSideLabel(data.mode)}: ${t.message}`)
     .join('\n');
   const blob = new Blob([header + lines + '\n'], { type: 'text/plain' });
   const a = document.createElement('a');
@@ -760,13 +747,7 @@ function buildAnalysisText(data) {
   const inventory = mode === 'inventory';
   const mentor = mode === 'mentor';
   const rule = '='.repeat(56);
-  const outcome =
-    (mentor
-      ? { bought: 'He closed it', deferred: 'You held out', walked: 'You walked', incomplete: 'Cut short' }
-      : {
-          bought: 'Sold', deferred: 'Deferred', walked: 'Walked', incomplete: 'Cut short',
-          wandered_well: 'Wandered well', went_flat: 'Went flat', froze: 'Froze up',
-        })[report.outcome] || 'Session results';
+  const outcome = outcomeTitle(mode, report.outcome).replace(/\.$/, '');
   const L = [];
   L.push('ECLECTIC ARRAY — SALES TRAINER · COACHING REPORT');
   L.push(`${customer}${product?.name ? '  ·  ' + product.name : ''}${product?.price ? '  ·  ' + product.price : ''}`);
@@ -793,6 +774,11 @@ function buildAnalysisText(data) {
   }
 
   if (mentor) {
+    if (report.fabrication?.triggered)
+      L.push(
+        `!! HE STATED A FACT THE TRUE STORY CONTRADICTS — do not copy it${report.fabrication.note ? `: "${report.fabrication.note}"` : ''}`,
+        ''
+      );
     if (report.techniques?.length) {
       L.push('THE MASTER’S MOVES');
       report.techniques.forEach((t) =>
@@ -848,7 +834,7 @@ function buildAnalysisText(data) {
 
   L.push(rule, 'FULL TRANSCRIPT', '');
   transcript.forEach((t) =>
-    L.push(`${t.speaker === 'customer' ? customer : mentor ? 'You (client)' : 'Seller'}: ${t.message}`)
+    L.push(`${t.speaker === 'customer' ? customer : humanSideLabel(mode)}: ${t.message}`)
   );
   L.push('');
   return L.join('\n');
