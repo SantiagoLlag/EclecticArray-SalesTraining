@@ -64,6 +64,7 @@ const appData = JSON.stringify({ agents, products, quiz }).replace(/</g, '\\u003
           </button>
           <p class="footnote trainee-chip" id="trainee-chip" hidden>
             Training as <strong id="trainee-name"></strong>
+            <button class="linklike" id="btn-my-progress" type="button">My progress</button>
             <button class="linklike" id="btn-switch-seller" type="button">Switch</button>
           </p>
           <p class="footnote">Los Cabos &middot; Nevis</p>
@@ -103,6 +104,42 @@ const appData = JSON.stringify({ agents, products, quiz }).replace(/</g, '\\u003
             <button class="btn-primary" id="btn-pin-go" type="button">Enter</button>
             <button class="btn-ghost" id="btn-pin-back" type="button">Back</button>
           </div>
+        </div>
+      </section>
+
+      <!-- 1c · My progress (the signed-in seller's own record) -->
+      <section id="view-progress" class="view" aria-label="My progress">
+        <p class="eyebrow">Your record</p>
+        <h1 class="screen-title" id="prog-title">My progress</h1>
+        <p class="screen-sub" id="prog-sub">Loading&hellip;</p>
+
+        <div class="prog-stats" id="prog-stats"></div>
+
+        <div class="progress-grid">
+          <section class="report-card">
+            <h2>Practice this next</h2>
+            <p class="prog-next" id="prog-next"></p>
+          </section>
+
+          <section class="report-card">
+            <h2>From your last reports</h2>
+            <ol class="improvements" id="prog-improve"></ol>
+          </section>
+
+          <section class="report-card">
+            <h2>Recent weeks</h2>
+            <ul class="coverage" id="prog-weeks"></ul>
+          </section>
+
+          <section class="report-card">
+            <h2>Inventory quiz</h2>
+            <ul class="coverage" id="prog-quiz"></ul>
+          </section>
+
+          <section class="report-card prog-sessions-card">
+            <h2>Recent sessions <span class="score" id="prog-session-count"></span></h2>
+            <div class="prog-sessions" id="prog-sessions"></div>
+          </section>
         </div>
       </section>
 

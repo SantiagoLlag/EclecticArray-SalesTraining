@@ -1347,3 +1347,102 @@ body[data-view='report'] .topbar .back { visibility: hidden; }
   gap: 0.75rem;
   justify-content: center;
 }
+
+/* ——— My progress ——— */
+
+.prog-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.75rem;
+  max-width: 720px;
+  margin: 0 auto 1.5rem;
+}
+
+.prog-stat {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+  text-align: center;
+}
+
+.prog-stat strong {
+  display: block;
+  font-size: 1.7rem;
+  color: var(--magenta);
+  line-height: 1.15;
+}
+
+.prog-stat span {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.progress-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  max-width: 860px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.progress-grid .prog-sessions-card {
+  grid-column: 1 / -1;
+}
+
+.prog-next {
+  margin: 0;
+  font-size: 1.02rem;
+}
+
+.prog-sessions {
+  display: flex;
+  flex-direction: column;
+}
+
+.prog-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.6rem 0.25rem;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--line);
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.prog-row:hover {
+  background: var(--magenta-wash);
+}
+
+.prog-when {
+  flex: none;
+  width: 4.2rem;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+.prog-what {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prog-row .rating {
+  flex: none;
+}
+
+@media (max-width: 700px) {
+  .progress-grid {
+    grid-template-columns: 1fr;
+  }
+}

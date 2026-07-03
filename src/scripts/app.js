@@ -1331,6 +1331,212 @@ $('btn-pin-back').addEventListener('click', closePin);
 $('pin-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') submitPin();
 });
+
+// ——— My progress: the seller's own record ———
+
+const fmtMoney = (n) => `$${Number(n).toFixed(Number(n) % 1 ? 2 : 0)}`;
+const fmtDate = (iso) =>
+  new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+function progStat(value, label) {
+  const div = document.createElement('div');
+  div.className = 'prog-stat';
+  const v = document.createElement('strong');
+  v.textContent = value;
+  const l = document.createElement('span');
+  l.textContent = label;
+  div.append(v, l);
+  return div;
+}
+
+// What should this seller practice next? A persona they haven't faced, then the persona
+// that keeps getting away, then story work — in that order of urgency.
+function practiceNext(sessions, stats) {
+  const personas = ['The Haggler', 'The Collector', 'The Goldmine', 'The Hard Case'];
+  const singles = sessions.filter((s) => s.mode === 'single');
+  const byPersona = new Map(personas.map((p) => [p, { tried: 0, sold: 0 }]));
+  singles.forEach((s) => {
+    const row = byPersona.get(s.agent_label);
+    if (!row) return;
+    row.tried++;
+    if (s.outcome === 'bought') row.sold++;
+  });
+  const untried = personas.filter((p) => byPersona.get(p).tried === 0);
+  if (sessions.length === 0) {
+    return 'Run your first session — The Haggler is a good place to start.';
+  }
+  if (untried.length) {
+    return `You haven't faced ${untried[0]} yet. See how that conversation feels today.`;
+  }
+  const struggling = personas
+    .map((p) => ({ p, ...byPersona.get(p) }))
+    .filter((r) => r.tried >= 2)
+    .sort((a, b) => a.sold / a.tried - b.sold / b.tried)[0];
+  if (struggling && struggling.sold / struggling.tried < 0.5) {
+    return `${struggling.p} keeps getting away (${struggling.sold} of ${struggling.tried} closed). Run one more round and hold your ground.`;
+  }
+  if (stats && stats.story_coverage_pct !== null && Number(stats.story_coverage_pct) < 80) {
+    return 'Your story coverage has room to grow — a lap with The Browser or the quiz will firm it up.';
+  }
+  return 'Solid across the board. Try a Mystery round and read the customer cold.';
+}
+
+function renderProgress(data) {
+  const { stats, sessions, quizzes } = data;
+  $('prog-title').textContent = `${data.seller.name} — my progress`;
+  $('prog-sub').textContent = sessions.length
+    ? 'Every saved session and quiz, and what to work on next.'
+    : 'No sessions saved yet — your first coaching report will land here.';
+
+  // Stat tiles
+  const tiles = $('prog-stats');
+  tiles.textContent = '';
+  const soldRate =
+    stats && stats.sales_sessions > 0
+      ? `${Math.round((100 * stats.sold) / stats.sales_sessions)}%`
+      : '—';
+  tiles.append(
+    progStat(String(stats?.sessions ?? 0), 'sessions'),
+    progStat(soldRate, 'closed'),
+    progStat(stats?.avg_ticket_sold != null ? fmtMoney(stats.avg_ticket_sold) : '—', 'avg ticket'),
+    progStat(
+      stats?.story_coverage_pct != null ? `${stats.story_coverage_pct}%` : '—',
+      'story told'
+    )
+  );
+
+  $('prog-next').textContent = practiceNext(sessions, stats);
+
+  // Coaching threads: the latest "work on next" lines across reports, deduped.
+  const improve = $('prog-improve');
+  improve.textContent = '';
+  const seen = new Set();
+  sessions
+    .flatMap((s) => (Array.isArray(s.improvements) ? s.improvements : []))
+    .filter((tip) => {
+      const key = tip.toLowerCase().slice(0, 60);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 3)
+    .forEach((tip) => {
+      const li = document.createElement('li');
+      li.textContent = tip;
+      improve.appendChild(li);
+    });
+  if (!improve.children.length) {
+    const li = document.createElement('li');
+    li.textContent = 'Nothing yet — finish a session to get your first coaching notes.';
+    improve.appendChild(li);
+  }
+
+  // Recent weeks: sessions + avg sold ticket per calendar week (last 4 with activity).
+  const weeks = new Map();
+  sessions.forEach((s) => {
+    const d = new Date(s.created_at);
+    const monday = new Date(d);
+    monday.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    const key = monday.toISOString().slice(0, 10);
+    const w = weeks.get(key) ?? { n: 0, soldSum: 0, soldN: 0 };
+    w.n++;
+    if (s.mode === 'single' && s.outcome === 'bought') {
+      w.soldSum += Number(s.ticket_amount) || 0;
+      w.soldN++;
+    }
+    weeks.set(key, w);
+  });
+  const weeksUl = $('prog-weeks');
+  weeksUl.textContent = '';
+  [...weeks.entries()]
+    .sort((a, b) => (a[0] < b[0] ? 1 : -1))
+    .slice(0, 4)
+    .forEach(([key, w]) => {
+      const li = document.createElement('li');
+      li.className = 'told';
+      const avg = w.soldN ? ` · ${fmtMoney(w.soldSum / w.soldN)} avg ticket` : '';
+      li.textContent = `Week of ${fmtDate(key)} — ${w.n} session${w.n === 1 ? '' : 's'}${avg}`;
+      weeksUl.appendChild(li);
+    });
+  if (!weeksUl.children.length) {
+    const li = document.createElement('li');
+    li.textContent = 'Your weekly rhythm shows up here.';
+    weeksUl.appendChild(li);
+  }
+
+  // Quiz record
+  const quizUl = $('prog-quiz');
+  quizUl.textContent = '';
+  if (quizzes.length) {
+    const best = quizzes.reduce((m, q) => Math.max(m, (100 * q.score) / q.total), 0);
+    const li = document.createElement('li');
+    li.className = 'told';
+    li.textContent = `Best: ${Math.round(best)}% · last ${quizzes.length} run${quizzes.length === 1 ? '' : 's'}: ${quizzes
+      .map((q) => `${q.score}/${q.total}`)
+      .join(', ')}`;
+    quizUl.appendChild(li);
+  } else {
+    const li = document.createElement('li');
+    li.textContent = 'No quiz runs yet — the photo quiz is a fast way to learn the floor.';
+    quizUl.appendChild(li);
+  }
+
+  // Session history → tap to reopen the full report
+  $('prog-session-count').textContent = sessions.length ? `${sessions.length}` : '';
+  const list = $('prog-sessions');
+  list.textContent = '';
+  sessions.slice(0, 20).forEach((s) => {
+    const row = document.createElement('button');
+    row.type = 'button';
+    row.className = 'prog-row';
+    const when = document.createElement('span');
+    when.className = 'prog-when';
+    when.textContent = fmtDate(s.created_at);
+    const what = document.createElement('span');
+    what.className = 'prog-what';
+    what.textContent = `${s.mystery ? 'Mystery — ' : ''}${s.agent_label}${s.product_name ? ` · ${s.product_name}` : ''}`;
+    const result = document.createElement('span');
+    result.className = `rating ${s.outcome === 'bought' || s.outcome === 'wandered_well' ? 'strong' : s.outcome === 'walked' || s.outcome === 'froze' ? 'weak' : 'partial'}`;
+    result.textContent =
+      s.mode === 'single' && s.outcome === 'bought'
+        ? fmtMoney(s.ticket_amount)
+        : (s.outcome ?? '').replaceAll('_', ' ');
+    row.append(when, what, result);
+    row.addEventListener('click', () => openPastSession(s.id));
+    list.appendChild(row);
+  });
+}
+
+async function openProgress() {
+  playTap();
+  show('progress');
+  $('prog-sub').textContent = 'Loading…';
+  try {
+    const res = await fetch('/api/my-progress');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    renderProgress(await res.json());
+  } catch (err) {
+    console.error('[trainer] progress failed:', err);
+    $('prog-sub').textContent = 'Could not load your progress — check the connection and try again.';
+  }
+}
+
+async function openPastSession(id) {
+  playTap();
+  try {
+    const res = await fetch(`/api/my-session?id=${id}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    state.mystery = false; // a saved report is already revealed
+    state.lastReport = data;
+    renderReport(data);
+    show('report');
+  } catch (err) {
+    console.error('[trainer] session replay failed:', err);
+  }
+}
+
+$('btn-my-progress').addEventListener('click', openProgress);
 $('btn-begin').addEventListener('click', startSession);
 $('btn-end').addEventListener('click', async () => {
   await teardown();
@@ -1354,7 +1560,7 @@ $('btn-quiz-home').addEventListener('click', endAndGoHome);
 $('btn-back').addEventListener('click', () => {
   const view = document.body.dataset.view;
   if (view === 'products') show('agents');
-  else if (view === 'agents' || view === 'who') show('start');
+  else if (view === 'agents' || view === 'who' || view === 'progress') show('start');
   else if (view === 'quiz') show('quiz-setup');
   else if (view === 'quiz-setup' || view === 'quiz-results') show('agents');
 });
