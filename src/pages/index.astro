@@ -62,7 +62,47 @@ const appData = JSON.stringify({ agents, products, quiz }).replace(/</g, '\\u003
           <button class="btn-tutorial" id="btn-tutorial" type="button">
             First time? Watch the tutorial
           </button>
+          <p class="footnote trainee-chip" id="trainee-chip" hidden>
+            Training as <strong id="trainee-name"></strong>
+            <button class="linklike" id="btn-switch-seller" type="button">Switch</button>
+          </p>
           <p class="footnote">Los Cabos &middot; Nevis</p>
+        </div>
+      </section>
+
+      <!-- 1b · Who's training (kiosk roster + PIN) -->
+      <section id="view-who" class="view" aria-label="Who is training">
+        <p class="eyebrow">Before you start</p>
+        <h1 class="screen-title">Who&rsquo;s training?</h1>
+        <p class="screen-sub">
+          Tap your name and enter your PIN. Your sessions and progress are saved to your
+          record &mdash; visible to you and to management.
+        </p>
+
+        <div id="who-pick">
+          <div class="card-list who-list" role="listbox" aria-label="Sellers" id="who-list"></div>
+          <button class="btn-ghost" id="btn-who-guest" type="button">
+            Continue as guest &mdash; nothing gets saved
+          </button>
+        </div>
+
+        <div id="who-pin" class="pin-panel" hidden>
+          <p class="screen-sub" id="who-pin-name"></p>
+          <input
+            id="pin-input"
+            class="pin-input"
+            type="password"
+            inputmode="numeric"
+            autocomplete="off"
+            maxlength="8"
+            placeholder="PIN"
+            aria-label="PIN"
+          />
+          <p class="pin-error" id="pin-error" hidden>Wrong PIN &mdash; try again.</p>
+          <div class="pin-actions">
+            <button class="btn-primary" id="btn-pin-go" type="button">Enter</button>
+            <button class="btn-ghost" id="btn-pin-back" type="button">Back</button>
+          </div>
         </div>
       </section>
 

@@ -21,6 +21,9 @@ const state = {
   conversationId: null, // ElevenLabs id of the last call, used to fetch the report
   lastReport: null,
   analyzing: false,
+  seller: null, // { id, name } — who's training on this device (kiosk session cookie)
+  roster: null, // cached /api/roster response; null until first fetch
+  lastActiveAt: Date.now(),
 };
 
 // What the seller sees while the session runs — the real agent stays hidden in
@@ -32,6 +35,7 @@ const $ = (id) => document.getElementById(id);
 // ——— Views ———
 
 function show(view) {
+  state.lastActiveAt = Date.now(); // feeds the kiosk auto-lock
   document.querySelectorAll('.view').forEach((v) => {
     v.classList.toggle('is-active', v.id === `view-${view}`);
   });
@@ -506,7 +510,7 @@ async function analyze() {
       const res = await fetch('/api/report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ conversationId: state.conversationId }),
+        body: JSON.stringify({ conversationId: state.conversationId, mystery: state.mystery }),
       });
       if (res.status === 202) {
         await sleep(3000);
@@ -1110,6 +1114,21 @@ function renderQuizResults() {
   $('quiz-result-score').textContent = `${s.correct} of ${total} correct · ${pct}%`;
 
   const missed = s.results.filter((r) => !r.correct);
+
+  // Save the run to the signed-in seller's record (guests aren't tracked; failures never
+  // interrupt the quiz).
+  if (state.seller) {
+    fetch('/api/quiz-result', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        score: s.correct,
+        total,
+        missed: missed.map(({ q }) => ({ product: q.product.name, answer: q.answer })),
+      }),
+    }).catch(() => {});
+  }
+
   $('quiz-weak-wrap').hidden = missed.length === 0;
   const ul = $('quiz-weak');
   ul.textContent = '';
@@ -1161,7 +1180,157 @@ document.addEventListener(
   true
 );
 
-$('btn-start').addEventListener('click', () => show('agents'));
+// ——— Kiosk: who's training ———
+// The store tablet is shared; the seller taps their name + PIN before training so every
+// session and quiz lands on their record. Guests can still train — nothing is saved.
+
+function updateTraineeChip() {
+  const chip = $('trainee-chip');
+  if (!chip) return;
+  chip.hidden = !state.seller;
+  if (state.seller) $('trainee-name').textContent = state.seller.name;
+}
+
+async function fetchRoster() {
+  if (state.roster) return state.roster;
+  try {
+    const res = await fetch('/api/roster');
+    state.roster = await res.json();
+  } catch {
+    state.roster = { configured: false, sellers: [] };
+  }
+  return state.roster;
+}
+
+function renderWhoList(sellers) {
+  const list = $('who-list');
+  list.textContent = '';
+  sellers.forEach((s) => {
+    const btn = document.createElement('button');
+    btn.className = 'card customer-card who-card';
+    btn.type = 'button';
+    btn.setAttribute('role', 'option');
+    btn.setAttribute('aria-selected', 'false');
+    const body = document.createElement('div');
+    body.className = 'card-body';
+    const h = document.createElement('h2');
+    h.textContent = s.name;
+    body.appendChild(h);
+    btn.appendChild(body);
+    btn.addEventListener('click', () => openPinFor(s));
+    list.appendChild(btn);
+  });
+}
+
+function openPinFor(seller) {
+  playTap();
+  $('who-pick').hidden = true;
+  $('who-pin').hidden = false;
+  $('who-pin-name').textContent = `${seller.name} — enter your PIN`;
+  $('pin-error').hidden = true;
+  const input = $('pin-input');
+  input.value = '';
+  input.dataset.sellerId = seller.id;
+  input.focus();
+}
+
+function closePin() {
+  $('who-pin').hidden = true;
+  $('who-pick').hidden = false;
+  $('pin-input').value = '';
+  $('pin-error').hidden = true;
+}
+
+async function submitPin() {
+  const input = $('pin-input');
+  const pin = input.value.trim();
+  if (!/^\d{4,8}$/.test(pin)) {
+    $('pin-error').hidden = false;
+    return;
+  }
+  $('btn-pin-go').disabled = true;
+  try {
+    const res = await fetch('/api/seller-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ seller_id: input.dataset.sellerId, pin }),
+    });
+    if (!res.ok) {
+      $('pin-error').hidden = false;
+      input.value = '';
+      input.focus();
+      return;
+    }
+    const { seller } = await res.json();
+    state.seller = seller;
+    updateTraineeChip();
+    closePin();
+    show('agents');
+  } catch {
+    $('pin-error').hidden = false;
+  } finally {
+    $('btn-pin-go').disabled = false;
+  }
+}
+
+// Start Training: if the roster is configured and nobody is signed in, ask who's training
+// first; otherwise go straight to the dashboard. If the database is down, train as guest.
+async function startFlow() {
+  if (state.seller) {
+    show('agents');
+    return;
+  }
+  const roster = await fetchRoster();
+  if (roster.configured && roster.sellers.length) {
+    renderWhoList(roster.sellers);
+    closePin();
+    show('who');
+  } else {
+    show('agents');
+  }
+}
+
+async function signOutSeller() {
+  try {
+    await fetch('/api/seller-session', { method: 'DELETE' });
+  } catch {
+    /* cookie expires on its own */
+  }
+  state.seller = null;
+  updateTraineeChip();
+}
+
+// Shared tablet: if nobody touched the app for 30 minutes, drop the seller session so the
+// next person doesn't train on someone else's record.
+setInterval(() => {
+  if (state.seller && Date.now() - state.lastActiveAt > 30 * 60_000) {
+    signOutSeller();
+  }
+}, 60_000);
+
+// On load: restore the seller session carried by the kiosk cookie (if any).
+fetch('/api/seller-session')
+  .then((r) => r.json())
+  .then(({ seller }) => {
+    state.seller = seller;
+    updateTraineeChip();
+  })
+  .catch(() => {});
+
+$('btn-start').addEventListener('click', startFlow);
+$('btn-switch-seller').addEventListener('click', async () => {
+  await signOutSeller();
+  startFlow();
+});
+$('btn-who-guest').addEventListener('click', () => {
+  playTap();
+  show('agents');
+});
+$('btn-pin-go').addEventListener('click', submitPin);
+$('btn-pin-back').addEventListener('click', closePin);
+$('pin-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') submitPin();
+});
 $('btn-begin').addEventListener('click', startSession);
 $('btn-end').addEventListener('click', async () => {
   await teardown();
@@ -1185,7 +1354,7 @@ $('btn-quiz-home').addEventListener('click', endAndGoHome);
 $('btn-back').addEventListener('click', () => {
   const view = document.body.dataset.view;
   if (view === 'products') show('agents');
-  else if (view === 'agents') show('start');
+  else if (view === 'agents' || view === 'who') show('start');
   else if (view === 'quiz') show('quiz-setup');
   else if (view === 'quiz-setup' || view === 'quiz-results') show('agents');
 });

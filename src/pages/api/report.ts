@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import Anthropic from '@anthropic-ai/sdk';
 import agents from '../../data/agents.json';
 import products from '../../data/products.json';
+import { dbEnv, dbFetch, readSellerToken, SELLER_COOKIE } from '../../lib/results-db';
 
 export const prerender = false;
 
@@ -235,7 +236,7 @@ const json = (body: unknown, status = 200) =>
     headers: { 'Content-Type': 'application/json' },
   });
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
   const elevenKey = env('ELEVENLABS_API_KEY');
   const anthropicKey = env('ANTHROPIC_API_KEY');
   if (!elevenKey || !anthropicKey) {
@@ -250,8 +251,9 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   let conversationId: unknown;
+  let mysteryFlag: unknown;
   try {
-    ({ conversationId } = await request.json());
+    ({ conversationId, mystery: mysteryFlag } = await request.json());
   } catch {
     return json({ error: 'Invalid JSON body.' }, 400);
   }
@@ -400,6 +402,60 @@ ${transcriptText}`;
     report = JSON.parse(text);
   } catch {
     return json({ error: 'The analysis came back malformed. Try again.' }, 502);
+  }
+
+  // Persist the analyzed session for the signed-in seller (kiosk cookie). Guests and an
+  // unconfigured database are both fine — persistence must never break the report itself.
+  // conversation_id is unique, so re-analyzing the same call updates instead of duplicating.
+  try {
+    const seller = readSellerToken(cookies.get(SELLER_COOKIE)?.value);
+    if (seller && dbEnv()) {
+      const r = report as Record<string, any>;
+      const story = mentor
+        ? []
+        : inventory
+          ? ((r.pieces_touched ?? []) as Array<{ accuracy?: string }>).map(
+              (p) => p?.accuracy === 'strong'
+            )
+          : ((r.story_coverage ?? []) as Array<{ covered?: boolean }>).map((s) => !!s?.covered);
+      const row = {
+        seller_id: seller.sid,
+        conversation_id: conversationId,
+        mode: modeKey,
+        mystery: mysteryFlag === true,
+        agent_label: customer.label,
+        product_id: inventory
+          ? null
+          : ((products as Array<{ id: string; name: string }>).find(
+              (p) => p.name === vars.product_name
+            )?.id ?? null),
+        product_name: inventory ? null : (vars.product_name ?? null),
+        outcome: typeof r.outcome === 'string' ? r.outcome : null,
+        ticket_amount: Number(String(r.ticket?.amount ?? '').replace(/[^0-9.]/g, '')) || 0,
+        ticket_note: typeof r.ticket?.note === 'string' ? r.ticket.note : null,
+        story_covered: story.length ? story.filter(Boolean).length : null,
+        story_total: story.length || null,
+        criteria_passed: criteria.length
+          ? criteria.filter((c) => c.result === 'success').length
+          : null,
+        criteria_total: criteria.length || null,
+        duration_secs:
+          typeof conversation.metadata?.call_duration_secs === 'number'
+            ? Math.round(conversation.metadata.call_duration_secs)
+            : null,
+        report,
+        criteria,
+        transcript: turns,
+      };
+      const saved = await dbFetch('/training_sessions?on_conflict=conversation_id', {
+        method: 'POST',
+        headers: { Prefer: 'resolution=merge-duplicates' },
+        body: JSON.stringify(row),
+      });
+      if (!saved.ok) console.error('[report] persist failed:', saved.status, await saved.text());
+    }
+  } catch (err) {
+    console.error('[report] persist error:', err);
   }
 
   return json({
