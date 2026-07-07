@@ -58,6 +58,7 @@ const REPORT_SCHEMA = {
     'ticket',
     'summary',
     'story_coverage',
+    'product_knowledge',
     'objection_handling',
     'best_moment',
     'improvements',
@@ -72,6 +73,20 @@ const REPORT_SCHEMA = {
     summary: {
       type: 'string',
       description: 'Two to three plain-English sentences on how the session went',
+    },
+    // Per-piece knowledge verdict, judged against THIS piece's reference story (not a fixed
+    // keyword list). Overrides the agent's static ElevenLabs criterion in the report.
+    product_knowledge: {
+      type: 'object',
+      additionalProperties: false,
+      required: ['rating', 'rationale'],
+      properties: {
+        rating: { type: 'string', enum: ['strong', 'partial', 'weak'] },
+        rationale: {
+          type: 'string',
+          description: 'One sentence on what the seller conveyed about THIS piece vs its reference story',
+        },
+      },
     },
     story_coverage: {
       type: 'array',
@@ -103,6 +118,7 @@ What good selling looks like here: a warm, genuine welcome; discovery (understan
 Rules for your report:
 - ticket: the final sale total in dollars, computed from the transcript — units bought × the product price, minus any discount or extras the seller granted. If the customer did not buy, amount is "$0". The note is one short clause with the math ("two pairs at full price", "one pair with the 5% cash discount", "no sale — customer walked").
 - story_coverage: one entry per bullet in the reference "Know your piece" story. covered = true only if the seller actually said it (a paraphrase counts).
+- product_knowledge: judge whether the seller demonstrated real, accurate knowledge of THE PIECE IN FOCUS, measured ONLY against that piece's reference story above — never a fixed keyword list, and never penalize a piece for being unlike some other piece. rating "strong" = conveyed the piece's origin/tradition AND its technique, unprompted and accurate; "partial" = only one of those, or thin/prompted, or an honest "I'm not sure" with no invented facts; "weak" = vague filler with no real specifics, OR any claim that contradicts the reference story (a fabrication is always weak). The rationale is one sentence tied to what was actually said about this piece.
 - objection_handling: one entry per objection the customer actually raised in the transcript — not the reference list. strong = answered with substance and honesty; partial = answered but thin or partly missed; weak = dodged, caved on price, or invented facts.
 - best_moment: the seller's single best line, quoted verbatim.
 - improvements: 2-3 concrete, actionable changes for the next session, most important first, referencing what was actually said.
@@ -402,6 +418,30 @@ ${transcriptText}`;
     report = JSON.parse(text);
   } catch {
     return json({ error: 'The analysis came back malformed. Try again.' }, 502);
+  }
+
+  // Product-knowledge is the one criterion that must be judged against THIS piece's
+  // knowledge base, which only Claude has (the agent's static ElevenLabs criterion only
+  // knows a few hardcoded products and fails every other piece by default). Replace that
+  // criterion's verdict with Claude's per-piece rating so the report and admin — which both
+  // just render `criteria` — show the accurate call for all 28 pieces with no UI change.
+  if (!inventory && !mentor) {
+    const pk = (report as Record<string, any>).product_knowledge as
+      | { rating?: string; rationale?: string }
+      | undefined;
+    if (pk?.rating) {
+      const result =
+        pk.rating === 'strong' ? 'success' : pk.rating === 'weak' ? 'failure' : 'unknown';
+      const entry = {
+        id: 'product_knowledge_demonstrated',
+        label: 'Product knowledge demonstrated',
+        result,
+        rationale: pk.rationale ?? '',
+      };
+      const i = criteria.findIndex((c) => c.id === 'product_knowledge_demonstrated');
+      if (i >= 0) criteria[i] = entry;
+      else if (criteria.length) criteria.push(entry);
+    }
   }
 
   // Persist the analyzed session for the signed-in seller (kiosk cookie). Guests and an
