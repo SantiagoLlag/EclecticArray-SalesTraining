@@ -1446,3 +1446,55 @@ body[data-view='report'] .topbar .back { visibility: hidden; }
     grid-template-columns: 1fr;
   }
 }
+
+/* ——— Store: corner chip + picker ——— */
+
+.store-chip {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.store-here {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.store-chip .store-dot {
+  color: var(--magenta);
+  font-size: 0.7em;
+}
+
+.store-chip strong {
+  font-weight: 600;
+}
+
+.store-chip .linklike {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.store-list {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.store-card .card-body {
+  padding: 0.2rem 0;
+}
+
+.store-card .card-body h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+@media (max-width: 560px) {
+  .store-chip .store-here { max-width: 42vw; overflow: hidden; text-overflow: ellipsis; }
+}

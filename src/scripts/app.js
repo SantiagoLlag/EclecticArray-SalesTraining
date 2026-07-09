@@ -3,9 +3,10 @@ import { playTap, startReadyMusic, stopReadyMusic } from './audio.js';
 
 // ——— Data (rendered into the page at build time from agents.json / products.json) ———
 
-const { agents, products, quiz = [] } = JSON.parse(
+const { agents, products, quiz = [], stores = [] } = JSON.parse(
   document.getElementById('app-data').textContent
 );
+const storeById = Object.fromEntries(stores.map((s) => [s.id, s]));
 
 // Same rule the server uses to disable cards: a real ElevenLabs id, not a placeholder.
 const isConfigured = (id) =>
@@ -24,6 +25,8 @@ const state = {
   seller: null, // { id, name } — who's training on this device (kiosk session cookie)
   roster: null, // cached /api/roster response; null until first fetch
   lastActiveAt: Date.now(),
+  store: null, // the store whose floor we're practicing (device-level; localStorage)
+  categoryFilter: 'all', // product-picker category chip, composed with the store filter
 };
 
 // What the seller sees while the session runs — the real agent stays hidden in
@@ -58,15 +61,28 @@ function show(view) {
 
 // ——— Category filter (UI-only metadata; never sent to the agent) ———
 
-function resetCategoryFilter() {
-  const chips = $('category-chips');
-  if (!chips) return;
-  chips
-    .querySelectorAll('.chip')
-    .forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.category === 'all')));
+// A product card shows only when it passes BOTH the category chip and the current store.
+// A card with no store list is carried everywhere (honest default until the catalog is
+// curated), so filtering is a no-op until pieces get a `stores` field in products.json.
+function updateProductVisibility() {
+  const cat = state.categoryFilter || 'all';
   document.querySelectorAll('#product-list [role="option"]').forEach((card) => {
-    card.hidden = false;
+    const inCategory = cat === 'all' || card.dataset.category === cat;
+    const cardStores = (card.dataset.stores || '').split(',').filter(Boolean);
+    const inStore = !state.store || cardStores.length === 0 || cardStores.includes(state.store);
+    card.hidden = !(inCategory && inStore);
   });
+}
+
+function resetCategoryFilter() {
+  state.categoryFilter = 'all';
+  const chips = $('category-chips');
+  if (chips) {
+    chips
+      .querySelectorAll('.chip')
+      .forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.category === 'all')));
+  }
+  updateProductVisibility();
 }
 
 const categoryChips = $('category-chips');
@@ -77,10 +93,8 @@ if (categoryChips) {
     categoryChips
       .querySelectorAll('.chip')
       .forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
-    const category = chip.dataset.category;
-    document.querySelectorAll('#product-list [role="option"]').forEach((card) => {
-      card.hidden = category !== 'all' && card.dataset.category !== category;
-    });
+    state.categoryFilter = chip.dataset.category;
+    updateProductVisibility();
   });
 }
 
@@ -971,8 +985,14 @@ function buildQuizSet(mode) {
   });
   const seen = new Set(quizSeen());
 
+  // The quiz tests only the pieces on this store's floor (same rule as the product picker).
+  const inStore = (pid) => {
+    const st = productById[pid]?.stores;
+    return !state.store || !Array.isArray(st) || st.length === 0 || st.includes(state.store);
+  };
+
   // Choose the products for this round.
-  let productIds = shuffled(Object.keys(byProduct), rnd);
+  let productIds = shuffled(Object.keys(byProduct).filter(inStore), rnd);
   if (mode !== 'full') {
     const usedGroups = new Set();
     const picked = [];
@@ -1265,7 +1285,7 @@ async function submitPin() {
     state.seller = seller;
     updateTraineeChip();
     closePin();
-    show('agents');
+    proceedToTraining();
   } catch {
     $('pin-error').hidden = false;
   } finally {
@@ -1277,7 +1297,7 @@ async function submitPin() {
 // first; otherwise go straight to the dashboard. If the database is down, train as guest.
 async function startFlow() {
   if (state.seller) {
-    show('agents');
+    proceedToTraining();
     return;
   }
   const roster = await fetchRoster();
@@ -1286,9 +1306,58 @@ async function startFlow() {
     closePin();
     show('who');
   } else {
-    show('agents');
+    proceedToTraining();
   }
 }
+
+// The store is a property of the tablet's location — remembered on the device, asked once,
+// switchable from the corner chip. Training always runs against one store's floor.
+const STORE_KEY = 'ea_store';
+
+function updateStoreChip() {
+  const chip = $('store-chip');
+  if (!chip) return;
+  const s = state.store && storeById[state.store];
+  chip.hidden = !s;
+  if (s) $('store-name').textContent = s.name;
+}
+
+function setStore(id) {
+  if (!storeById[id]) return;
+  state.store = id;
+  try {
+    localStorage.setItem(STORE_KEY, id);
+  } catch {
+    /* private mode — the choice just won't persist across reloads */
+  }
+  updateStoreChip();
+  updateProductVisibility();
+}
+
+// After sign-in (or as a guest): pick the store once, then straight to the dashboard.
+function proceedToTraining() {
+  if (state.store && storeById[state.store]) show('agents');
+  else show('store');
+}
+
+bindOptionList('store-list', (card) => {
+  setStore(card.dataset.storeId);
+  show('agents');
+});
+$('btn-switch-store').addEventListener('click', () => {
+  playTap();
+  show('store');
+});
+
+// Restore the device's store on load, before any training screen can open.
+try {
+  const saved = localStorage.getItem(STORE_KEY);
+  if (saved && storeById[saved]) state.store = saved;
+} catch {
+  /* ignore */
+}
+updateStoreChip();
+updateProductVisibility();
 
 async function signOutSeller() {
   try {
@@ -1324,7 +1393,7 @@ $('btn-switch-seller').addEventListener('click', async () => {
 });
 $('btn-who-guest').addEventListener('click', () => {
   playTap();
-  show('agents');
+  proceedToTraining();
 });
 $('btn-pin-go').addEventListener('click', submitPin);
 $('btn-pin-back').addEventListener('click', closePin);
@@ -1560,7 +1629,8 @@ $('btn-quiz-home').addEventListener('click', endAndGoHome);
 $('btn-back').addEventListener('click', () => {
   const view = document.body.dataset.view;
   if (view === 'products') show('agents');
-  else if (view === 'agents' || view === 'who' || view === 'progress') show('start');
+  else if (view === 'agents' || view === 'who' || view === 'progress' || view === 'store')
+    show('start');
   else if (view === 'quiz') show('quiz-setup');
   else if (view === 'quiz-setup' || view === 'quiz-results') show('agents');
 });

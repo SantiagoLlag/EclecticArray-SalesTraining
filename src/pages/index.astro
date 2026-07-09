@@ -2,6 +2,7 @@
 import agents from '../data/agents.json';
 import products from '../data/products.json';
 import quiz from '../data/quiz-questions.json';
+import stores from '../data/stores.json';
 import '../styles/global.css';
 
 // An agent is usable only when the composer has written a real ElevenLabs id.
@@ -21,7 +22,7 @@ const categories = [...new Set(products.map((p) => p.category).filter(Boolean))]
 const tutFootwear = products.find((p) => p.category === 'Footwear') ?? products[0];
 const tutJewelry = products.find((p) => p.category === 'Jewelry') ?? products[0];
 
-const appData = JSON.stringify({ agents, products, quiz }).replace(/</g, '\\u003c');
+const appData = JSON.stringify({ agents, products, quiz, stores }).replace(/</g, '\\u003c');
 ---
 
 <!doctype html>
@@ -49,6 +50,13 @@ const appData = JSON.stringify({ agents, products, quiz }).replace(/</g, '\\u003
       <header class="topbar">
         <button class="back" id="btn-back" type="button">&larr; Back</button>
         <span class="wordmark">Eclectic Array <span>&mdash;</span> Sales Trainer</span>
+        <div class="store-chip" id="store-chip" hidden>
+          <span class="store-here">
+            <span class="store-dot" aria-hidden="true">&#9673;</span>
+            <strong id="store-name"></strong>
+          </span>
+          <button class="linklike" id="btn-switch-store" type="button">Switch</button>
+        </div>
       </header>
 
       <!-- 1 · Start -->
@@ -104,6 +112,29 @@ const appData = JSON.stringify({ agents, products, quiz }).replace(/</g, '\\u003
             <button class="btn-primary" id="btn-pin-go" type="button">Enter</button>
             <button class="btn-ghost" id="btn-pin-back" type="button">Back</button>
           </div>
+        </div>
+      </section>
+
+      <!-- 1b2 · Which store (sets the floor: only this store's pieces show) -->
+      <section id="view-store" class="view" aria-label="Choose your store">
+        <p class="eyebrow">One more thing</p>
+        <h1 class="screen-title">Which store are you in?</h1>
+        <p class="screen-sub">
+          You&rsquo;ll practice with the pieces on this store&rsquo;s floor. You can switch
+          anytime from the top corner.
+        </p>
+        <div class="card-list store-list" role="listbox" aria-label="Stores" id="store-list">
+          {stores.map((s) => (
+            <button
+              class="card customer-card store-card"
+              type="button"
+              role="option"
+              aria-selected="false"
+              data-store-id={s.id}
+            >
+              <div class="card-body"><h2>{s.name}</h2></div>
+            </button>
+          ))}
         </div>
       </section>
 
@@ -300,6 +331,7 @@ const appData = JSON.stringify({ agents, products, quiz }).replace(/</g, '\\u003
                 aria-selected="false"
                 data-product-index={i}
                 data-category={product.category}
+                data-stores={((product as { stores?: string[] }).stores ?? []).join(',')}
               >
                 <figure>
                   <img
