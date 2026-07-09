@@ -15,6 +15,10 @@
       "“$240 for sandals?”",
       "“I saw similar ones at the market for $40”",
       "“What if they get wet?” — they shouldn't get wet; answer honestly"
+    ],
+    "stores": [
+      "flora-farms",
+      "san-jose"
     ]
   },
   {
@@ -34,6 +38,10 @@
       "“$240 for sandals?”",
       "“I saw similar ones at the market for $40”",
       "“Do you have this exact pattern in another size?” — straps are hand-woven; patterns vary, turn it into value"
+    ],
+    "stores": [
+      "flora-farms",
+      "san-jose"
     ]
   },
   {
@@ -52,6 +60,10 @@
       "“$252 for fabric sandals?”",
       "“Will the woven fabric hold up?”",
       "“I've seen Guatemalan textiles cheaper at the market”"
+    ],
+    "stores": [
+      "flora-farms",
+      "san-jose"
     ]
   },
   {
@@ -70,6 +82,10 @@
       "“$329 for Birkenstocks I can buy anywhere?”",
       "“Won't the paint chip or fade?”",
       "“How do I know it's really hand-painted?”"
+    ],
+    "stores": [
+      "flora-farms",
+      "san-jose"
     ]
   },
   {
@@ -88,6 +104,10 @@
       "“$179 for simple sandals?”",
       "“Will they need breaking in?”",
       "“How do I care for the leather at the beach?”"
+    ],
+    "stores": [
+      "flora-farms",
+      "san-jose"
     ]
   },
   {
@@ -106,6 +126,10 @@
       "“$179 for canvas sneakers?”",
       "“Can I wash them?”",
       "“They look like regular sneakers with a stripe”"
+    ],
+    "stores": [
+      "flora-farms",
+      "san-jose"
     ]
   },
   {
@@ -124,6 +148,10 @@
       "“Is this a real skull? Was an animal hurt?”",
       "“$1,624 is a lot for a decoration”",
       "“How would I even ship this home safely?”"
+    ],
+    "stores": [
+      "flora-farms",
+      "san-jose"
     ]
   },
   {
@@ -143,6 +171,10 @@
       "“Is this a real skull?”",
       "“What do the symbols mean?” — every symbol represents their culture and nature",
       "“Why does this one cost the same as the smaller one?”"
+    ],
+    "stores": [
+      "flora-farms",
+      "san-jose"
     ]
   },
   {
@@ -161,6 +193,10 @@
       "“They look simple for $48”",
       "“Do you have two exactly alike?” — no; each pair is unique, turn variation into value",
       "“Will the thread fray?”"
+    ],
+    "stores": [
+      "flora-farms",
+      "san-jose"
     ]
   },
   {
@@ -180,6 +216,10 @@
       "“Is the pearl real?”",
       "“$64 for thread and a pearl?”",
       "“Will the knots loosen?”"
+    ],
+    "stores": [
+      "flora-farms",
+      "san-jose"
     ]
   },
   {
@@ -197,6 +237,10 @@
     "objections": [
       "“Are these the same as the $48 ones?” — different design, same maker; answer honestly",
       "“Will they tarnish?”"
+    ],
+    "stores": [
+      "flora-farms",
+      "san-jose"
     ]
   },
   {
@@ -215,6 +259,10 @@
       "“Aren't these just for Day of the Dead?”",
       "“Will the palm fiber break?”",
       "“$40 for palm?”"
+    ],
+    "stores": [
+      "flora-farms",
+      "san-jose"
     ]
   },
   {
@@ -233,6 +281,10 @@
       "“Will the gold plating wear off?” — remove before swimming/showering; answer honestly",
       "“$124 for a small pendant?”",
       "“Is the pearl real?” — yes, freshwater"
+    ],
+    "stores": [
+      "flora-farms",
+      "san-jose"
     ]
   },
   {
@@ -251,6 +303,10 @@
       "“$255 for gold-plated?”",
       "“Are the stones emeralds?” — no, green zirconias; answer honestly",
       "“Won't the plating rub off?”"
+    ],
+    "stores": [
+      "flora-farms",
+      "san-jose"
     ]
   },
   {
@@ -269,6 +325,10 @@
       "“How do I even wear this?”",
       "“$255 for plated silver?”",
       "“Will it fit my hand?” — adjustable"
+    ],
+    "stores": [
+      "san-lucas",
+      "cabo-del-sol"
     ]
   },
   {
@@ -287,6 +347,10 @@
       "“$242 for brass?”",
       "“Will the plating wear off?”",
       "“Do you have it in silver color?” — yes, rhodium-plated"
+    ],
+    "stores": [
+      "san-lucas",
+      "cabo-del-sol"
     ]
   },
   {
@@ -305,6 +369,10 @@
       "“$144 for a small bag?”",
       "“I saw similar bags at the market”",
       "“Is it sturdy enough for daily use?”"
+    ],
+    "stores": [
+      "san-lucas",
+      "cabo-del-sol"
     ]
   },
   {
@@ -323,6 +391,10 @@
       "“$270 for a clutch?”",
       "“Is it machine-embroidered?” — no, hand-stitched, up to a month of work",
       "“Will the colors bleed?”"
+    ],
+    "stores": [
+      "san-lucas",
+      "cabo-del-sol"
     ]
   },
   {
@@ -341,6 +413,10 @@
       "“$218 for a cotton dress?”",
       "“Won't it shrink or wrinkle?”",
       "“It looks oversized — will it fit me?”"
+    ],
+    "stores": [
+      "san-lucas",
+      "cabo-del-sol"
     ]
   },
   {
@@ -360,6 +436,10 @@
       "“One size fits all — really?”",
       "“$188 for a simple dress?”",
       "“Is it actually made here?” — yes, by Los Cabos seamstresses"
+    ],
+    "stores": [
+      "san-lucas",
+      "cabo-del-sol"
     ]
   },
   {
@@ -379,6 +459,10 @@
       "“$238 for a crop top?”",
       "“Why do the figures look different from the photo?” — handmade; variation is the signature",
       "“How do I wash it?”"
+    ],
+    "stores": [
+      "san-lucas",
+      "cabo-del-sol"
     ]
   },
   {
@@ -398,6 +482,10 @@
       "“$40 for a kids' hat?”",
       "“Is the embroidery machine-made?” — no, hand-embroidered",
       "“Can I throw it in the washer?” — no, hand wash only; answer honestly"
+    ],
+    "stores": [
+      "san-lucas",
+      "cabo-del-sol"
     ]
   },
   {
@@ -416,6 +504,10 @@
       "“Will the colors really wash out?” — yes, with soap and water",
       "“Do markers come with it?”",
       "“Is it durable enough for daily play?”"
+    ],
+    "stores": [
+      "san-lucas",
+      "cabo-del-sol"
     ]
   },
   {
@@ -434,6 +526,10 @@
       "“$30 for paper?”",
       "“Is it fragile?”",
       "“What's it for?” — altars, décor, folk-art collections"
+    ],
+    "stores": [
+      "san-lucas",
+      "cabo-del-sol"
     ]
   },
   {
@@ -452,6 +548,10 @@
       "“It's just a gourd — why $24?”",
       "“Will it crack?”",
       "“Do you have matching sets?” — each is unique"
+    ],
+    "stores": [
+      "san-lucas",
+      "cabo-del-sol"
     ]
   },
   {
@@ -470,6 +570,10 @@
       "“$42 for a notebook?”",
       "“How do I care for the cowhide?”",
       "“Can I get refills?”"
+    ],
+    "stores": [
+      "san-lucas",
+      "cabo-del-sol"
     ]
   },
   {
@@ -488,6 +592,10 @@
       "“$76 for a dog collar?”",
       "“Will the beads fall off with use?”",
       "“Do you have it for a small/large dog?”"
+    ],
+    "stores": [
+      "san-lucas",
+      "cabo-del-sol"
     ]
   },
   {
@@ -507,6 +615,10 @@
       "“$43 for a leash?”",
       "“Is the macramé strong enough for a big dog?”",
       "“Why is the matching collar separate?” — collar pairs get 50% off the leash; a natural bundle"
+    ],
+    "stores": [
+      "san-lucas",
+      "cabo-del-sol"
     ]
   }
 ]
