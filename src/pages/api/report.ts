@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import Anthropic from '@anthropic-ai/sdk';
 import agents from '../../data/agents.json';
 import products from '../../data/products.json';
+import stores from '../../data/stores.json';
 import { dbEnv, dbFetch, readSellerToken, SELLER_COOKIE } from '../../lib/results-db';
 
 export const prerender = false;
@@ -268,11 +269,18 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   let conversationId: unknown;
   let mysteryFlag: unknown;
+  let storeFlag: unknown;
   try {
-    ({ conversationId, mystery: mysteryFlag } = await request.json());
+    ({ conversationId, mystery: mysteryFlag, store: storeFlag } = await request.json());
   } catch {
     return json({ error: 'Invalid JSON body.' }, 400);
   }
+  // The tablet's selected store rides along for analytics; only known ids are kept.
+  const sessionStore =
+    typeof storeFlag === 'string' &&
+    (stores as Array<{ id: string }>).some((s) => s.id === storeFlag)
+      ? storeFlag
+      : null;
   if (typeof conversationId !== 'string' || !/^[A-Za-z0-9_-]{8,128}$/.test(conversationId)) {
     return json({ error: 'Invalid conversationId.' }, 400);
   }
@@ -463,6 +471,7 @@ ${transcriptText}`;
         conversation_id: conversationId,
         mode: modeKey,
         mystery: mysteryFlag === true,
+        store: sessionStore,
         agent_label: customer.label,
         product_id: inventory
           ? null

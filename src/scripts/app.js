@@ -524,7 +524,11 @@ async function analyze() {
       const res = await fetch('/api/report', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ conversationId: state.conversationId, mystery: state.mystery }),
+        body: JSON.stringify({
+          conversationId: state.conversationId,
+          mystery: state.mystery,
+          store: state.store,
+        }),
       });
       if (res.status === 202) {
         await sleep(3000);
