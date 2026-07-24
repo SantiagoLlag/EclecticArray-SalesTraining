@@ -50,5 +50,19 @@
     "variants": 6,
     "opens": true,
     "photo": "thumb"
+  },
+  {
+    "id": "improv",
+    "agent_id": "agent_7901kyajar6kfgx9rttde988dj7n",
+    "label": "Improv Practice",
+    "tagline": "A piece that doesn't exist. Sell it anyway.",
+    "trains": "Improvising when you don't know the story — a customer asks about a piece you've never seen. Keep the conversation alive with a story that flows, sparkles, and holds together. It's a game: the piece is invented.",
+    "pass_line": "Pass when your story flows without freezing, carries specific vivid detail, and stays consistent under follow-ups — even though it's improvised.",
+    "icon": "✦",
+    "turn_budget": 5,
+    "variants": 6,
+    "opens": true,
+    "photo": "none",
+    "no_product": true
   }
 ]

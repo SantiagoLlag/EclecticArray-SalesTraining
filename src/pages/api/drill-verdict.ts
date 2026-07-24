@@ -48,6 +48,23 @@ const VERDICT_SCHEMA = {
 // form under repetition; a fabricated product fact never passes.
 const GRADER_PHILOSOPHY = `You grade ONE short sales-rehearsal drill for Eclectic Array, a fair-trade B-Corp boutique selling handcrafted Mexican pieces. The AI played the customer; grade ONLY the seller's lines (labeled "Seller"), never the customer's. This is a two-minute rehearsal rep, not an exam — reward good FORM under repetition; a clean, well-formed attempt passes even if brief. Judge against the pass line and the piece's TRUE story provided; a fabricated product fact never passes. Return: result ('pass' or 'retry'), fix (one imperative coaching line, <=220 chars), and quote (the single most telling seller line verbatim — or, on a retry, the moment to fix; empty quote allowed).`;
 
+// The improv drill deliberately INVERTS the no-fabrication rule the other four live by. The
+// piece is fictional by construction, so invented detail is the whole point — there is no
+// "true story" to check against and no product vars to read. It therefore does NOT reuse
+// GRADER_PHILOSOPHY (which anchors to a true story and fails any fabricated fact); it carries
+// its own framing and grades three FORM dimensions instead. Keeping it separate leaves the
+// four product-drill prompts untouched.
+const IMPROV_PROMPT = `You grade ONE short sales-IMPROVISATION drill for Eclectic Array, a fair-trade B-Corp boutique selling handcrafted Mexican pieces. The AI played a delighted, curious customer asking about a piece that DOES NOT EXIST; grade ONLY the seller's lines (labeled "Seller"), never the customer's. This is a two-minute rehearsal rep, not an exam.
+
+THE PIECE IS FICTIONAL BY DESIGN. The customer invented it on the spot and asked the seller to improvise its story. Invented facts are EXPECTED here and are NEVER a failure — do NOT penalize the seller for fabrication, and do NOT check any claim against a "true story" (there is none). What DOES fail is a story that is absent, generic, or self-contradicting.
+
+Grade the seller on THREE dimensions:
+- FLUIDITY — momentum and composure: no freezing, no dead-air spirals, and no breaking the game. Saying "we don't have that" or "I don't actually know this piece" AFTER the customer's warm nudge is breaking the game and counts as a FLUIDITY failure. The seller should recover smoothly on every probe.
+- CREATIVITY — specific, vivid, original detail: a named maker or place, a real technique, a reason why — never generic mush like "it's handmade, very special."
+- CREDIBILITY — INTERNAL coherence of the invented story: origin, maker, price, and technique must not self-contradict across follow-ups (the customer runs a deliberate echo-check, repeating a detail back to test it), and the register must stay plausible for a Mexican artisan boutique.
+
+result: 'pass' ONLY when all three dimensions land at conversational quality; 'retry' otherwise. fix: one imperative coaching line (<=220 chars) that names the WEAKEST dimension and the moment it cracked. quote: the single most telling seller line, verbatim (empty allowed).`;
+
 // Per-drill grading instruction, keyed by drillId. Each anchored to the drill's pass_line.
 const DRILL_PROMPTS: Record<string, string> = {
   objection: `${GRADER_PHILOSOPHY}
@@ -62,6 +79,8 @@ This is the STORY-SPRINT drill. Pass when, in a roughly 60-90 second telling, th
   close: `${GRADER_PHILOSOPHY}
 
 This is the CLOSE drill. Pass when the seller made a clear, natural ask for the sale — an unambiguous invitation to buy, ring it up, or take it home — after acknowledging the customer's hesitation, delivered without pushiness, and invented no product facts. Retry if they never asked, only hinted, asked in a forced or aggressive way, or fabricated a claim to push the sale.`,
+  // The improv drill is graded by its own inverted framing — see IMPROV_PROMPT above.
+  improv: IMPROV_PROMPT,
 };
 
 const json = (body: unknown, status = 200) =>
@@ -154,7 +173,21 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     .map((c) => `- ${c.criteria_id}: ${(c.result ?? 'unknown').toUpperCase()} — ${c.rationale ?? ''}`)
     .join('\n') || '(none configured)';
 
-  const userContent = `Drill: ${drill.label}. What passes: ${drill.pass_line}
+  // The improv drill runs WITHOUT a real product: no product_story / product_objections vars
+  // are ever sent (the app posts only drill_seed), so its context is the transcript + the
+  // agent's evaluation-criteria results alone. Do NOT read product vars on this path.
+  const userContent =
+    drill.id === 'improv'
+      ? `Drill: ${drill.label}. What passes: ${drill.pass_line}
+
+The piece is FICTIONAL — invented by the customer in the moment and improvised by the seller. There is no reference story and no fixed facts; judge fluidity, creativity, and internal credibility from the transcript alone.
+
+Automated evaluation criteria for this rep (corroborating signal — judge the transcript yourself):
+${criteriaText}
+
+Transcript:
+${transcriptText}`
+      : `Drill: ${drill.label}. What passes: ${drill.pass_line}
 
 Reference TRUE story of the piece (the seller must not contradict it or invent beyond it):
 ${vars.product_story ?? '(not provided)'}
@@ -195,10 +228,15 @@ ${transcriptText}`;
   try {
     const seller = readSellerToken(cookies.get(SELLER_COOKIE)?.value);
     if (seller && dbEnv()) {
+      // The improv drill has no real product, so product_id is always null (the column is
+      // nullable; drill_id='improv' is just a new text value). Other drills resolve it from
+      // the piece's name as before.
       const product_id =
-        (products as Array<{ id: string; name: string }>).find(
-          (p) => p.name === vars.product_name
-        )?.id ?? null;
+        drill.id === 'improv'
+          ? null
+          : (products as Array<{ id: string; name: string }>).find(
+              (p) => p.name === vars.product_name
+            )?.id ?? null;
       const duration_secs =
         typeof conversation.metadata?.call_duration_secs === 'number'
           ? Math.round(conversation.metadata.call_duration_secs)

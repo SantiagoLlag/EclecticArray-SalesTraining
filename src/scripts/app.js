@@ -401,6 +401,21 @@ function renderDrillCrib() {
   $('session-roam').hidden = true;
   document.querySelector('#session-story-wrap summary').textContent = 'Know your piece';
   document.querySelector('#session-objections-wrap summary').textContent = 'Objections to expect';
+  if (product === null) {
+    // Improv: there is no real piece. Hide the thumb + name/price line and show a cue instead;
+    // both reference wraps collapse (nothing real to reveal). photo:'none' matches no CSS rule.
+    $('session-product').textContent = 'An invented piece — they’ll describe it. Improvise.';
+    $('session-price').textContent = '';
+    const thumb = $('session-thumb');
+    thumb.removeAttribute('src');
+    thumb.alt = '';
+    thumb.classList.add('is-empty');
+    fillList('session-story', []);
+    fillList('session-objections', []);
+    $('session-story-wrap').open = false;
+    $('session-objections-wrap').open = false;
+    return;
+  }
   $('session-product').textContent = product.name;
   $('session-price').textContent = product.price;
   setPieceThumb(product);
@@ -509,6 +524,7 @@ const DRILL_VARIANTS = {
   price: ['flat-20', 'cash-now', 'round-down', 'only-if-bundle', 'competitor-quote', 'walk-threat'],
   story: ['who-made', 'technique', 'materials', 'time-effort', 'meaning', 'why-this-one'],
   close: ['price-hesitation', 'ask-partner', 'not-today', 'will-i-use', 'look-around', 'gift-doubt'],
+  improv: ['textile-weave', 'clay-ceramic', 'jewelry-stone', 'wood-carving', 'glass-mirror', 'leather-fiber'],
 };
 function makeDrillSeed(drill) {
   const table = DRILL_VARIANTS[drill.id] || [];
@@ -561,13 +577,16 @@ async function startSession() {
   // else is a single/mentor product session.
   let dynamicVariables;
   if (agent.mode === 'drill') {
-    dynamicVariables = {
-      product_name: product.name,
-      product_price: product.price,
-      product_story: product.story.map((s) => `- ${s}`).join('\n'),
-      product_objections: product.objections.map((s) => `- ${s}`).join('\n'),
-      drill_seed: state.drillSeed,
-    };
+    // Improv (no_product) has no piece on the counter: send the seed only, never touch product.
+    dynamicVariables = state.drill?.no_product
+      ? { drill_seed: state.drillSeed }
+      : {
+          product_name: product.name,
+          product_price: product.price,
+          product_story: product.story.map((s) => `- ${s}`).join('\n'),
+          product_objections: product.objections.map((s) => `- ${s}`).join('\n'),
+          drill_seed: state.drillSeed,
+        };
   } else if (inventory) {
     dynamicVariables = { roam_seed: makeRoamSeed() };
   } else {
@@ -662,7 +681,8 @@ function beginDrill() {
   closeDrillIntro();
   state.sessionType = 'drill';
   state.mystery = false;
-  state.product = drawDrillProduct();
+  // Improv runs without a real product: no draw, null piece, seed-only dynamic variables.
+  state.product = drill.no_product ? null : drawDrillProduct();
   state.agent = { agent_id: drill.agent_id, label: drill.label, mode: 'drill' };
   state.drillSeed = makeDrillSeed(drill);
   show('session');
