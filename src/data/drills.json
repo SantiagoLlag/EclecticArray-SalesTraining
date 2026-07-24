@@ -1,0 +1,54 @@
+[
+  {
+    "id": "objection",
+    "agent_id": "agent_7401ky61f8zzfvzrped2abvss4f7",
+    "label": "Objection Rep",
+    "tagline": "One real objection. Answer it with substance.",
+    "trains": "Meeting a genuine objection about the piece in front of you with true facts — not a reflex discount, not something you made up.",
+    "pass_line": "Pass when you answer with real substance: true facts, no knee-jerk discount, nothing invented.",
+    "icon": "⚔",
+    "turn_budget": 4,
+    "variants": 6,
+    "opens": true,
+    "photo": "thumb"
+  },
+  {
+    "id": "price",
+    "agent_id": "agent_7301ky61fcgxe23rz2jbca9bdz0a",
+    "label": "Price Defense",
+    "tagline": "They want 20% off. Hold the line with value.",
+    "trains": "Holding your price under pressure — leading with value instead of caving. Ten percent is the calibration ceiling.",
+    "pass_line": "Pass when you concede nothing past 10% and make the value land.",
+    "icon": "▮",
+    "turn_budget": 5,
+    "variants": 6,
+    "opens": true,
+    "photo": "thumb"
+  },
+  {
+    "id": "story",
+    "agent_id": "agent_9701ky61fg57engb9zjppqyarjhx",
+    "label": "Story Sprint",
+    "tagline": "60–90 seconds. Tell this piece's true story.",
+    "trains": "Telling a piece's story cleanly in a minute — covering what matters and inventing nothing.",
+    "pass_line": "Pass when the key story beats land in 60–90s with zero invented facts.",
+    "icon": "❋",
+    "turn_budget": 3,
+    "variants": 6,
+    "opens": false,
+    "photo": "hero"
+  },
+  {
+    "id": "close",
+    "agent_id": "agent_4601ky61fkeafj1vz4hd6r0adhez",
+    "label": "The Close",
+    "tagline": "They're already sold. Ask for it — naturally.",
+    "trains": "Reaching a clean, natural ask when the customer is already warm. No stalling, no pushiness.",
+    "pass_line": "Pass when you ask for the sale, and it lands naturally.",
+    "icon": "✓",
+    "turn_budget": 4,
+    "variants": 6,
+    "opens": true,
+    "photo": "thumb"
+  }
+]

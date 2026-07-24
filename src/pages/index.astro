@@ -3,6 +3,7 @@ import agents from '../data/agents.json';
 import products from '../data/products.json';
 import quiz from '../data/quiz-questions.json';
 import stores from '../data/stores.json';
+import drills from '../data/drills.json';
 import '../styles/global.css';
 
 // An agent is usable only when the composer has written a real ElevenLabs id.
@@ -22,7 +23,7 @@ const categories = [...new Set(products.map((p) => p.category).filter(Boolean))]
 const tutFootwear = products.find((p) => p.category === 'Footwear') ?? products[0];
 const tutJewelry = products.find((p) => p.category === 'Jewelry') ?? products[0];
 
-const appData = JSON.stringify({ agents, products, quiz, stores }).replace(/</g, '\\u003c');
+const appData = JSON.stringify({ agents, products, quiz, stores, drills }).replace(/</g, '\\u003c');
 ---
 
 <!doctype html>
@@ -167,6 +168,11 @@ const appData = JSON.stringify({ agents, products, quiz, stores }).replace(/</g,
             <ul class="coverage" id="prog-quiz"></ul>
           </section>
 
+          <section class="report-card">
+            <h2>Drills <span class="score" id="prog-drill-streak"></span></h2>
+            <ul class="coverage" id="prog-drill"></ul>
+          </section>
+
           <section class="report-card prog-sessions-card">
             <h2>Recent sessions <span class="score" id="prog-session-count"></span></h2>
             <div class="prog-sessions" id="prog-sessions"></div>
@@ -179,6 +185,35 @@ const appData = JSON.stringify({ agents, products, quiz, stores }).replace(/</g,
         <p class="eyebrow">Training dashboard</p>
         <h1 class="screen-title">What do you want to practice?</h1>
         <p class="screen-sub">Two ways to train: face a customer and close the sale, or roam the floor and master your inventory.</p>
+
+        <div class="drill-rail-wrap">
+          <div class="drill-rail-head">
+            <span class="eyebrow">&#9889; Drills &middot; 2 min</span>
+            <span class="drill-dotd-chip" id="drill-dotd-chip" hidden>Drill of the day</span>
+          </div>
+          <div class="drill-rail" id="drill-rail" role="listbox" aria-label="Two-minute drills">
+            {drills.map((d, i) => {
+              const ready = isConfigured(d.agent_id);
+              return (
+                <button
+                  class="card customer-card drill-card"
+                  type="button"
+                  role="option"
+                  aria-selected="false"
+                  data-drill-index={i}
+                  disabled={!ready}
+                >
+                  <div class="card-body">
+                    <span class="index">{d.icon}</span>
+                    <h2>{d.label}</h2>
+                    <p>{d.tagline}</p>
+                    {!ready && <span class="badge-unavailable">Coming soon</span>}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         {(() => {
           const indexed = agents.map((agent, i) => ({ agent, i }));
@@ -469,6 +504,22 @@ const appData = JSON.stringify({ agents, products, quiz, stores }).replace(/</g,
         </div>
       </section>
 
+      <!-- 5b · Drill verdict -->
+      <section class="view" id="view-drill-verdict" aria-label="Drill result">
+        <p class="eyebrow">Drill result</p>
+        <h1 class="screen-title" id="drill-verdict-title">&mdash;</h1>
+        <span class="rating" id="drill-verdict-badge">&mdash;</span>
+        <p class="report-quote serif" id="drill-verdict-quote" hidden></p>
+        <div class="report-grid">
+          <section class="report-card"><h2>The fix</h2><p id="drill-verdict-fix">&mdash;</p></section>
+          <section class="report-card"><h2>What passes</h2><p id="drill-verdict-sub">&mdash;</p></section>
+        </div>
+        <div class="report-actions">
+          <button class="btn-primary" id="btn-drill-retry" type="button">Try again</button>
+          <button class="btn-ghost" id="btn-drill-done" type="button">Back to start</button>
+        </div>
+      </section>
+
       <!-- 4 · Session -->
       <section id="view-session" class="view" aria-label="Training session">
         <div class="session-grid">
@@ -496,6 +547,7 @@ const appData = JSON.stringify({ agents, products, quiz, stores }).replace(/</g,
             <div class="orb is-idle" id="orb" aria-hidden="true"></div>
             <p class="status-title" id="status-title" role="status" aria-live="polite"></p>
             <p class="status-sub" id="status-sub"></p>
+            <p class="drill-countdown serif" id="drill-countdown" hidden aria-live="off">2:00</p>
             <div class="actions">
               <button class="btn-primary" id="btn-begin" type="button" hidden>Start Training</button>
               <button class="btn-end" id="btn-end" type="button" hidden>End session</button>
@@ -646,6 +698,30 @@ const appData = JSON.stringify({ agents, products, quiz, stores }).replace(/</g,
           </div>
           <button class="btn-end tut-nav" id="tut-next" type="button">Next</button>
           <button class="btn-primary tut-nav" id="tut-cta" type="button" hidden>Start Training</button>
+        </footer>
+      </div>
+    </div>
+
+    <!-- Drill intro: a focused brief before a 2-minute rep -->
+    <div class="tutorial drill-intro" id="drill-intro" role="dialog" aria-modal="true" aria-label="Drill brief" hidden>
+      <div class="tut-frame">
+        <header class="tut-top">
+          <span class="tut-brand">Drill</span>
+          <button class="tut-close" id="drill-intro-close" type="button" aria-label="Close drill">&times;</button>
+        </header>
+        <section class="tut-step is-active">
+          <div class="tut-stage drill-intro-stage">
+            <span class="drill-intro-icon" id="drill-intro-icon">&#9889;</span>
+          </div>
+          <h2 id="drill-intro-title">&mdash;</h2>
+          <p class="drill-intro-label">Trains</p>
+          <p id="drill-intro-trains">&mdash;</p>
+          <p class="drill-intro-label">Passes when</p>
+          <p id="drill-intro-pass">&mdash;</p>
+        </section>
+        <footer class="tut-controls">
+          <button class="btn-ghost tut-nav" id="drill-intro-back" type="button">Back</button>
+          <button class="btn-primary tut-nav" id="drill-intro-go" type="button">Start &middot; 2 min</button>
         </footer>
       </div>
     </div>

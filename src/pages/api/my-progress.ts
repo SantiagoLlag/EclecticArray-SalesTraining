@@ -14,7 +14,7 @@ export const GET: APIRoute = async ({ cookies }) => {
   if (!dbEnv()) return json({ error: 'Results database not configured.' }, 503);
 
   try {
-    const [statsRes, sessionsRes, quizzesRes] = await Promise.all([
+    const [statsRes, sessionsRes, quizzesRes, drillsRes] = await Promise.all([
       dbFetch(`/seller_stats?seller_id=eq.${seller.sid}`),
       dbFetch(
         `/training_sessions?seller_id=eq.${seller.sid}` +
@@ -26,18 +26,32 @@ export const GET: APIRoute = async ({ cookies }) => {
       dbFetch(
         `/quiz_runs?seller_id=eq.${seller.sid}&select=score,total,created_at&order=created_at.desc&limit=10`
       ),
+      dbFetch(
+        `/drill_runs?seller_id=eq.${seller.sid}` +
+          `&select=drill_id,product_id,result,fix,duration_secs,created_at` +
+          `&order=created_at.desc&limit=20`
+      ),
     ]);
-    if (!statsRes.ok || !sessionsRes.ok || !quizzesRes.ok) {
+    if (!statsRes.ok || !sessionsRes.ok || !quizzesRes.ok || !drillsRes.ok) {
       throw new Error(
-        `progress queries failed: ${statsRes.status}/${sessionsRes.status}/${quizzesRes.status}`
+        `progress queries failed: ${statsRes.status}/${sessionsRes.status}/${quizzesRes.status}/${drillsRes.status}`
       );
     }
     const stats = ((await statsRes.json()) as unknown[])[0] ?? null;
+    // Streak: consecutive passes from the most recent rep backwards.
+    const drillRows = (await drillsRes.json()) as Array<{ result?: string }>;
+    let drill_streak = 0;
+    for (const r of drillRows) {
+      if (r.result === 'pass') drill_streak++;
+      else break;
+    }
     return json({
       seller: { id: seller.sid, name: seller.name },
       stats,
       sessions: await sessionsRes.json(),
       quizzes: await quizzesRes.json(),
+      drills: drillRows,
+      drill_streak,
     });
   } catch (err) {
     console.error('[my-progress]', err);

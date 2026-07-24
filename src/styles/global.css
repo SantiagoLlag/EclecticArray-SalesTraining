@@ -1498,3 +1498,42 @@ body[data-view='report'] .topbar .back { visibility: hidden; }
 @media (max-width: 560px) {
   .store-chip .store-here { max-width: 42vw; overflow: hidden; text-overflow: ellipsis; }
 }
+
+/* ——— Drills · 2 min ——— */
+
+.drill-rail-wrap { margin-bottom: clamp(20px, 4vw, 32px); }
+.drill-rail-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+.drill-dotd-chip {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--magenta);
+  border: 1px solid var(--magenta);
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+.drill-rail { display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
+.drill-rail::-webkit-scrollbar { display: none; }
+.drill-card { flex: 0 0 min(240px, 72vw); }
+.drill-card.is-dotd { border-color: var(--magenta); box-shadow: 0 0 0 1px var(--magenta) inset; }
+.drill-card .card-body { padding: 16px 18px 18px; }
+
+.drill-intro-stage { display: grid; place-items: center; }
+.drill-intro-icon { font-size: 3.2rem; color: var(--magenta); }
+.drill-intro-label {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  color: var(--magenta);
+  margin-top: 14px;
+}
+
+.drill-countdown { font-size: 1.9rem; color: var(--magenta); margin-bottom: 14px; letter-spacing: 0.02em; }
+.drill-countdown.is-over { color: var(--magenta-deep); animation: orb-pulse 1.4s ease-in-out infinite; }
+
+#view-drill-verdict .rating { margin: 4px 0 10px; display: inline-block; }
+
+/* story drill: enlarge the piece on screen (focus_product-style hero) */
+.session-grid[data-drill-photo='hero'] .thumb { width: min(320px, 60vw); height: auto; aspect-ratio: 1 / 1; }
+
+@media (prefers-reduced-motion: reduce) { .drill-countdown.is-over { animation: none; } }

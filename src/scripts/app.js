@@ -3,7 +3,7 @@ import { playTap, startReadyMusic, stopReadyMusic } from './audio.js';
 
 // ——— Data (rendered into the page at build time from agents.json / products.json) ———
 
-const { agents, products, quiz = [], stores = [] } = JSON.parse(
+const { agents, products, quiz = [], stores = [], drills = [] } = JSON.parse(
   document.getElementById('app-data').textContent
 );
 const storeById = Object.fromEntries(stores.map((s) => [s.id, s]));
@@ -27,6 +27,15 @@ const state = {
   lastActiveAt: Date.now(),
   store: null, // the store whose floor we're practicing (device-level; localStorage)
   categoryFilter: 'all', // product-picker category chip, composed with the store filter
+  sessionType: null, // 'drill' while a drill runs, else null → discriminates start / end / status
+  drill: null, // selected drills.json object
+  drillSeed: null, // current makeDrillSeed() value
+  lastVerdict: null, // last {result,fix,quote}
+  drillVerdicting: false, // reentrancy guard for runDrillVerdict()
+  drillDeadlineAt: null, // Date.now()+FORCE_MS, for the 2:30 hard stop
+  drillTick: null, // setInterval id (countdown)
+  drillForce: null, // setTimeout id (force-end)
+  progressCache: null, // last /api/my-progress json, cached to feed Drill-of-day weakest-dim pick
 };
 
 // What the seller sees while the session runs — the real agent stays hidden in
@@ -54,6 +63,7 @@ function show(view) {
       sw.classList.remove('has-selection');
       sw.querySelectorAll('.track-panel').forEach((p) => p.classList.remove('is-active'));
     }
+    stampDrillOfDay();
   }
   document.body.dataset.view = view;
   window.scrollTo(0, 0);
@@ -162,6 +172,35 @@ function pickAgent(card) {
 bindOptionList('agent-list', pickAgent);
 bindOptionList('inventory-list', pickAgent);
 
+// The drills rail is a horizontal strip of 2-minute reps, not a persona list.
+$('drill-rail')?.addEventListener('click', (e) => {
+  const c = e.target.closest('[data-drill-index]');
+  if (!c || c.disabled) return;
+  onPickDrill(drills[Number(c.dataset.drillIndex)]);
+});
+
+function onPickDrill(drill) {
+  if (!drill || !isConfigured(drill.agent_id)) return; // coming-soon cards are .disabled; belt-and-suspenders
+  openDrillIntro(drill);
+}
+
+function openDrillIntro(drill) {
+  state.drill = drill;
+  $('drill-intro-icon').textContent = drill.icon;
+  $('drill-intro-title').textContent = drill.label;
+  $('drill-intro-trains').textContent = drill.trains;
+  $('drill-intro-pass').textContent = drill.pass_line;
+  const ov = $('drill-intro');
+  ov.hidden = false;
+  document.body.style.overflow = 'hidden';
+  $('drill-intro-go').focus();
+}
+
+function closeDrillIntro() {
+  $('drill-intro').hidden = true;
+  document.body.style.overflow = '';
+}
+
 // Two side-by-side track panels: clicking one expands it (revealing its options) and shrinks the other.
 function selectTrack(name) {
   const sw = $('track-switch');
@@ -255,9 +294,20 @@ const MENTOR_STATUS = {
   speaking: { sub: 'Watch the moves: the welcome, the true story, how he holds the price.' },
 };
 
+// A drill is one tight rep, not a full encounter — the copy narrows to that.
+const DRILL_STATUS = {
+  ready: { title: 'Piece is up.', sub: 'Two minutes. One rep. Begin when ready.' },
+  listening: { title: 'Your floor.', sub: 'Work the rep.' },
+  analyzing: { title: 'Grading the rep…', sub: 'One moment.' },
+};
+
 function setStatus(name) {
   const s =
-    state.agent?.mode === 'mentor' ? { ...STATUS[name], ...MENTOR_STATUS[name] } : STATUS[name];
+    state.agent?.mode === 'mentor'
+      ? { ...STATUS[name], ...MENTOR_STATUS[name] }
+      : state.agent?.mode === 'drill'
+      ? { ...STATUS[name], ...(DRILL_STATUS[name] || {}) }
+      : STATUS[name];
   const orb = $('orb');
   orb.className = `orb ${s.orb}`;
   $('status-title').textContent =
@@ -340,6 +390,27 @@ function renderCrib() {
   $('session-objections-wrap').open = false;
 }
 
+// A drill shows the same piece crib, but the customer label is the drill and the reference
+// details fold away — rehearsal must not spoon-feed the answer. The Story Sprint is the one
+// exception: its story stays open to read while telling (recall is the quiz's job).
+function renderDrillCrib() {
+  const { product, drill } = state;
+  $('session-customer').textContent = drill.label;
+  const crib = document.querySelector('.crib');
+  crib.classList.remove('crib--inventory');
+  $('session-roam').hidden = true;
+  document.querySelector('#session-story-wrap summary').textContent = 'Know your piece';
+  document.querySelector('#session-objections-wrap summary').textContent = 'Objections to expect';
+  $('session-product').textContent = product.name;
+  $('session-price').textContent = product.price;
+  setPieceThumb(product);
+  fillList('session-story', product.story);
+  fillList('session-objections', product.objections);
+  const isStory = drill.id === 'story';
+  $('session-story-wrap').open = isStory;
+  $('session-objections-wrap').open = false;
+}
+
 // Driven live by the agent's focus_product client tool: show the piece she's now on.
 function showCurrentPiece(productId) {
   const product = products.find((p) => p.id === productId);
@@ -377,6 +448,8 @@ function appendTranscript(source, message) {
 // Entering the Session screen shows the crib sheet first — the agent
 // only connects when the seller taps Start Training.
 function prepareSession() {
+  state.sessionType = null;
+  state.drill = null;
   renderCrib();
   $('transcript').textContent = '';
   const ready = isConfigured(state.agent.agent_id);
@@ -408,6 +481,58 @@ function makeRoamSeed() {
   return picks.join(', ');
 }
 
+// A drill remembers the last variant it ran per drill so a Reintentar never re-throws the
+// same opening. Every access try/catch-wrapped, degrades silently in private mode.
+const DRILL_SEEN_KEY = 'eclectic_drill_variant';
+function drillLastVariant(id) {
+  try {
+    return (JSON.parse(localStorage.getItem(DRILL_SEEN_KEY)) || {})[id];
+  } catch {
+    return undefined;
+  }
+}
+function drillMarkVariant(id, idx) {
+  try {
+    const m = JSON.parse(localStorage.getItem(DRILL_SEEN_KEY)) || {};
+    m[id] = idx;
+    localStorage.setItem(DRILL_SEEN_KEY, JSON.stringify(m));
+  } catch {
+    /* storage off — the "never repeat last" guard degrades to pure random */
+  }
+}
+
+// The variant tables live here for anti-repeat bookkeeping + dev readability; the semantics
+// live in the agent profiles. Order is the contract shared with those profiles — do not
+// renumber without changing both.
+const DRILL_VARIANTS = {
+  objection: ['price-vs-alt', 'authenticity', 'durability-care', 'suitability', 'need-to-think', 'online-cheaper'],
+  price: ['flat-20', 'cash-now', 'round-down', 'only-if-bundle', 'competitor-quote', 'walk-threat'],
+  story: ['who-made', 'technique', 'materials', 'time-effort', 'meaning', 'why-this-one'],
+  close: ['price-hesitation', 'ask-partner', 'not-today', 'will-i-use', 'look-around', 'gift-doubt'],
+};
+function makeDrillSeed(drill) {
+  const table = DRILL_VARIANTS[drill.id] || [];
+  const n = Math.max(drill.variants || table.length || 6, 1);
+  const buf = crypto.getRandomValues(new Uint32Array(3));
+  let idx = buf[0] % n;
+  const last = drillLastVariant(drill.id);
+  if (n > 1 && idx === last) idx = (idx + 1) % n; // never repeat the immediately-previous variant
+  drillMarkVariant(drill.id, idx);
+  const entropy = (buf[1] >>> 0).toString(36) + (buf[2] >>> 0).toString(36);
+  return idx.toString(36) + entropy; // first char = variant index (base36), rest = per-run entropy
+}
+
+// Same store semantics as the product picker / quiz — but inlined, since there is no
+// module-level inStore helper.
+function drawDrillProduct() {
+  const fits = (p) =>
+    !state.store || !Array.isArray(p.stores) || p.stores.length === 0 || p.stores.includes(state.store);
+  const pool = products.filter(fits);
+  const src = pool.length ? pool : products;
+  const b = crypto.getRandomValues(new Uint32Array(1))[0] >>> 0;
+  return src[b % src.length];
+}
+
 async function startSession() {
   const { agent, product } = state;
   stopReadyMusic();
@@ -431,22 +556,36 @@ async function startSession() {
 
   const inventory = agent.mode === 'inventory';
 
+  // A drill sends the same four product variables as a single-product session, but with
+  // drill_seed (NEVER session_seed); The Browser roams with a fresh entropy seed; everyone
+  // else is a single/mentor product session.
+  let dynamicVariables;
+  if (agent.mode === 'drill') {
+    dynamicVariables = {
+      product_name: product.name,
+      product_price: product.price,
+      product_story: product.story.map((s) => `- ${s}`).join('\n'),
+      product_objections: product.objections.map((s) => `- ${s}`).join('\n'),
+      drill_seed: state.drillSeed,
+    };
+  } else if (inventory) {
+    dynamicVariables = { roam_seed: makeRoamSeed() };
+  } else {
+    dynamicVariables = {
+      product_name: product.name,
+      product_price: product.price,
+      product_story: product.story.map((s) => `- ${s}`).join('\n'),
+      product_objections: product.objections.map((s) => `- ${s}`).join('\n'),
+      session_seed: makeSessionSeed(),
+    };
+  }
+
   try {
     state.conversation = await Conversation.startSession({
       agentId: agent.agent_id,
       connectionType: 'webrtc',
 
-      // The Browser roams the whole (baked-in) catalog and gets a fresh entropy seed;
-      // the four single-product trainers get exactly their four product variables.
-      dynamicVariables: inventory
-        ? { roam_seed: makeRoamSeed() }
-        : {
-            product_name: product.name,
-            product_price: product.price,
-            product_story: product.story.map((s) => `- ${s}`).join('\n'),
-            product_objections: product.objections.map((s) => `- ${s}`).join('\n'),
-            session_seed: makeSessionSeed(),
-          },
+      dynamicVariables,
 
       // The Browser drives the on-screen reference by calling focus_product on each pivot.
       // Harmless for the other agents (they never call it).
@@ -459,12 +598,18 @@ async function startSession() {
       onConnect: ({ conversationId }) => {
         state.conversationId = conversationId ?? null;
         setStatus('listening');
+        if (state.sessionType === 'drill') startDrillCountdown();
       },
       onDisconnect: () => {
         // Agent hung up (e.g. after deciding) — not an End-session tap.
         if (state.conversation) {
           state.conversation = null;
-          analyze();
+          if (state.sessionType === 'drill') {
+            clearDrillTimers();
+            runDrillVerdict();
+          } else {
+            analyze();
+          }
         }
       },
       onModeChange: ({ mode }) => {
@@ -483,6 +628,7 @@ async function startSession() {
 }
 
 async function teardown() {
+  clearDrillTimers(); // safe for persona sessions (no-op when no drill timers are live)
   const conversation = state.conversation;
   state.conversation = null; // flag first so onDisconnect knows this was deliberate
   if (conversation) {
@@ -500,8 +646,70 @@ async function endAndGoHome() {
   state.agent = null;
   state.product = null;
   state.mystery = false;
+  clearDrillTimers();
+  state.sessionType = null;
+  state.drill = null;
   $('transcript').textContent = '';
   show('start');
+}
+
+// ——— Drills: one tight 2-minute rep, graded by /api/drill-verdict ———
+
+// Begin is chained inside the intro-CTA click so the user gesture carries into getUserMedia +
+// WebRTC + audio (iPad Safari requires it).
+function beginDrill() {
+  const drill = state.drill;
+  closeDrillIntro();
+  state.sessionType = 'drill';
+  state.mystery = false;
+  state.product = drawDrillProduct();
+  state.agent = { agent_id: drill.agent_id, label: drill.label, mode: 'drill' };
+  state.drillSeed = makeDrillSeed(drill);
+  show('session');
+  const grid = $('view-session').querySelector('.session-grid');
+  grid.dataset.drill = drill.id;
+  grid.dataset.drillPhoto = drill.photo; // CSS hooks (hero photo, etc.)
+  renderDrillCrib();
+  startSession();
+}
+
+// The countdown recomputes remaining time from wall-clock deltas (not a decrement) so a
+// throttled/backgrounded iPad tab shows a stale number then snaps correct on refocus; the
+// 2:30 hard stop is enforced both by the in-interval check and a belt-and-suspenders timeout.
+const DRILL_VISIBLE_MS = 120000; // 2:00 shown
+const DRILL_FORCE_MS = 150000; // 2:30 hard stop
+function startDrillCountdown() {
+  const start = Date.now();
+  state.drillDeadlineAt = start + DRILL_FORCE_MS;
+  const el = $('drill-countdown');
+  el.hidden = false;
+  const paint = () => {
+    const remain = Math.max(0, DRILL_VISIBLE_MS - (Date.now() - start));
+    const s = Math.ceil(remain / 1000);
+    el.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    el.classList.toggle('is-over', remain === 0);
+    if (Date.now() >= state.drillDeadlineAt && state.conversation) forceEndDrill();
+  };
+  paint();
+  state.drillTick = setInterval(paint, 500);
+  state.drillForce = setTimeout(() => {
+    if (state.conversation) forceEndDrill();
+  }, DRILL_FORCE_MS);
+}
+function clearDrillTimers() {
+  clearInterval(state.drillTick);
+  clearTimeout(state.drillForce);
+  state.drillTick = state.drillForce = null;
+  const el = $('drill-countdown');
+  if (el) {
+    el.hidden = true;
+    el.classList.remove('is-over');
+  }
+}
+async function forceEndDrill() {
+  clearDrillTimers();
+  await teardown();
+  runDrillVerdict();
 }
 
 // ——— Results: fetch the transcript + Claude's coaching report ———
@@ -551,6 +759,70 @@ async function analyze() {
   } finally {
     state.analyzing = false;
   }
+}
+
+// The drill's own verdict path: a lean /api/drill-verdict (not /api/report), same 202 polling.
+async function runDrillVerdict() {
+  if (!state.conversationId) {
+    setStatus('ended');
+    return;
+  }
+  if (state.drillVerdicting) return;
+  state.drillVerdicting = true;
+  setStatus('analyzing');
+  try {
+    for (let i = 0; i < 25; i++) {
+      if (document.body.dataset.view !== 'session') return; // user bailed
+      const res = await fetch('/api/drill-verdict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          conversationId: state.conversationId,
+          drillId: state.drill.id,
+          store: state.store,
+        }),
+      });
+      if (res.status === 202) {
+        await sleep(3000);
+        continue;
+      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+      state.lastVerdict = data;
+      renderDrillVerdict(data);
+      show('drill-verdict');
+      return;
+    }
+    throw new Error('timeout');
+  } catch (err) {
+    console.error('[drill-verdict]', err);
+    setStatus('report-error'); // reuse report-error status + its retry button (rebound below)
+  } finally {
+    state.drillVerdicting = false;
+  }
+}
+
+function renderDrillVerdict({ result, fix, quote }) {
+  const pass = result === 'pass';
+  $('drill-verdict-badge').className = `rating ${pass ? 'strong' : 'weak'}`;
+  $('drill-verdict-badge').textContent = pass ? 'Pass' : 'Retry';
+  $('drill-verdict-title').textContent = pass ? 'Clean rep.' : 'Run it again.';
+  $('drill-verdict-fix').textContent = fix || '';
+  const q = $('drill-verdict-quote');
+  q.textContent = quote || '';
+  q.hidden = !quote;
+  $('drill-verdict-sub').textContent = state.drill.pass_line;
+}
+
+// Same piece (rehearsal convergence), fresh seed (a different variant is guaranteed). No intro.
+function retryDrill() {
+  state.drillSeed = makeDrillSeed(state.drill);
+  show('session');
+  const grid = $('view-session').querySelector('.session-grid');
+  grid.dataset.drill = state.drill.id;
+  grid.dataset.drillPhoto = state.drill.photo;
+  renderDrillCrib();
+  startSession();
 }
 
 const OUTCOME_TITLES = {
@@ -921,6 +1193,7 @@ $('tut-dots').addEventListener('click', (e) => {
 });
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && !tutorial.hidden) closeTutorial();
+  if (e.key === 'Escape' && !$('drill-intro').hidden) closeDrillIntro();
   if (document.body.dataset.view === 'quiz') handleQuizKey(e);
 });
 
@@ -1405,6 +1678,53 @@ $('pin-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') submitPin();
 });
 
+// ——— Drill of the day: the weakest dimension, stamped onto the rail ———
+
+// Lowest pass-rate among drills that have runs; ties broken by most-recent order. Falls back
+// to a weekday rotation before the seller has any drill history cached.
+function pickDrillOfDay(configured) {
+  const d = state.progressCache?.drills;
+  if (Array.isArray(d) && d.length) {
+    const rate = {};
+    for (const r of d) {
+      const k = r.drill_id;
+      (rate[k] ??= { p: 0, n: 0 });
+      rate[k].n++;
+      if (r.result === 'pass') rate[k].p++;
+    }
+    const scored = configured.filter((x) => rate[x.id]).map((x) => ({ x, r: rate[x.id].p / rate[x.id].n }));
+    if (scored.length) {
+      scored.sort((a, b) => a.r - b.r);
+      return scored[0].x;
+    }
+  }
+  return configured[new Date().getDay() % configured.length];
+}
+
+// Stamp the "Drill of the day" chip onto its card whenever the dashboard opens; if no drill
+// is configured yet (all coming-soon), hide the whole rail.
+function stampDrillOfDay() {
+  const rail = $('drill-rail');
+  if (!rail) return;
+  const wrap = document.querySelector('.drill-rail-wrap');
+  const cfg = drills.filter((d) => isConfigured(d.agent_id));
+  if (!cfg.length) {
+    if (wrap) wrap.hidden = true;
+    return;
+  }
+  if (wrap) wrap.hidden = false;
+  const dod = pickDrillOfDay(cfg);
+  rail.querySelectorAll('[data-drill-index]').forEach((card) => {
+    const d = drills[Number(card.dataset.drillIndex)];
+    const on = !!dod && !!d && d.id === dod.id;
+    card.classList.toggle('is-dotd', on);
+    if (on) card.setAttribute('aria-label', `${d.label} — drill of the day`);
+    else card.removeAttribute('aria-label');
+  });
+  const chip = $('drill-dotd-chip');
+  if (chip) chip.hidden = !dod;
+}
+
 // ——— My progress: the seller's own record ———
 
 const fmtMoney = (n) => `$${Number(n).toFixed(Number(n) % 1 ? 2 : 0)}`;
@@ -1475,7 +1795,8 @@ function renderProgress(data) {
     progStat(
       stats?.story_coverage_pct != null ? `${stats.story_coverage_pct}%` : '—',
       'story told'
-    )
+    ),
+    progStat(String(data.drill_streak ?? 0), 'drill streak')
   );
 
   $('prog-next').textContent = practiceNext(sessions, stats);
@@ -1554,6 +1875,38 @@ function renderProgress(data) {
     quizUl.appendChild(li);
   }
 
+  // Drill record: the current streak (also shown as a stat tile) + the last reps.
+  const streakEl = $('prog-drill-streak');
+  if (streakEl) streakEl.textContent = String(data.drill_streak ?? 0);
+  const drillUl = $('prog-drill');
+  if (drillUl) {
+    drillUl.textContent = '';
+    const rows = Array.isArray(data.drills) ? data.drills : [];
+    if (rows.length) {
+      rows.slice(0, 10).forEach((r) => {
+        const li = document.createElement('li');
+        const when = document.createElement('span');
+        when.className = 'prog-when';
+        when.textContent = fmtDate(r.created_at);
+        const what = document.createElement('span');
+        what.className = 'prog-what';
+        const label = drills.find((d) => d.id === r.drill_id)?.label || r.drill_id;
+        const pname = products.find((p) => p.id === r.product_id)?.name;
+        what.textContent = pname ? `${label} · ${pname}` : label;
+        const pass = r.result === 'pass';
+        const chip = document.createElement('span');
+        chip.className = `rating ${pass ? 'strong' : 'weak'}`;
+        chip.textContent = pass ? 'pass' : 'retry';
+        li.append(when, what, chip);
+        drillUl.appendChild(li);
+      });
+    } else {
+      const li = document.createElement('li');
+      li.textContent = 'No drills yet — a 2-minute rep is the fastest way to sharpen one move.';
+      drillUl.appendChild(li);
+    }
+  }
+
   // Session history → tap to reopen the full report
   $('prog-session-count').textContent = sessions.length ? `${sessions.length}` : '';
   const list = $('prog-sessions');
@@ -1587,7 +1940,9 @@ async function openProgress() {
   try {
     const res = await fetch('/api/my-progress');
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    renderProgress(await res.json());
+    const json = await res.json();
+    state.progressCache = json; // feeds the Drill-of-day weakest-dimension pick
+    renderProgress(json);
   } catch (err) {
     console.error('[trainer] progress failed:', err);
     $('prog-sub').textContent = 'Could not load your progress — check the connection and try again.';
@@ -1613,14 +1968,23 @@ $('btn-my-progress').addEventListener('click', openProgress);
 $('btn-begin').addEventListener('click', startSession);
 $('btn-end').addEventListener('click', async () => {
   await teardown();
-  analyze();
+  state.sessionType === 'drill' ? runDrillVerdict() : analyze();
 });
 $('btn-home').addEventListener('click', endAndGoHome);
 $('btn-retry').addEventListener('click', startSession);
-$('btn-retry-report').addEventListener('click', analyze);
+$('btn-retry-report').addEventListener('click', () => {
+  state.sessionType === 'drill' ? runDrillVerdict() : analyze();
+});
 $('btn-report-done').addEventListener('click', endAndGoHome);
 $('btn-download').addEventListener('click', downloadTranscript);
 $('btn-download-analysis').addEventListener('click', downloadAnalysis);
+
+// Drill wiring: intro overlay + the verdict card's retry/done.
+$('drill-intro-close')?.addEventListener('click', closeDrillIntro);
+$('drill-intro-back')?.addEventListener('click', closeDrillIntro);
+$('drill-intro-go')?.addEventListener('click', beginDrill);
+$('btn-drill-retry')?.addEventListener('click', retryDrill);
+$('btn-drill-done')?.addEventListener('click', endAndGoHome);
 
 // Inventory quiz wiring
 document.querySelectorAll('[data-quiz-mode]').forEach((b) =>
@@ -1637,17 +2001,32 @@ $('btn-back').addEventListener('click', () => {
     show('start');
   else if (view === 'quiz') show('quiz-setup');
   else if (view === 'quiz-setup' || view === 'quiz-results') show('agents');
+  else if (view === 'drill-verdict') show('agents');
 });
 
 // Dev-only hook so the report screen can be exercised without a live call;
 // stripped from production builds.
 if (import.meta.env.DEV) {
-  window.__trainer = { state, show, renderReport, analyze, setStatus, buildAnalysisText, downloadAnalysis, showCurrentPiece };
+  window.__trainer = {
+    state,
+    show,
+    renderReport,
+    analyze,
+    setStatus,
+    buildAnalysisText,
+    downloadAnalysis,
+    showCurrentPiece,
+    startDrill: beginDrill,
+    makeDrillSeed,
+    runDrillVerdict,
+    renderDrillVerdict,
+  };
 }
 
 // Leaving the page mid-call: close the conversation cleanly.
 window.addEventListener('pagehide', () => {
   stopReadyMusic(0);
+  clearDrillTimers();
   if (state.conversation) {
     const c = state.conversation;
     state.conversation = null;
