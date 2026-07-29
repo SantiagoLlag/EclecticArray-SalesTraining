@@ -325,6 +325,12 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   if (conversation.status !== 'done' && conversation.status !== 'failed') {
     return json({ status: 'processing' }, 202);
   }
+  // A platform-killed call (quota exceeded, infra error) must never be graded as if the
+  // seller failed — the session didn't happen. Surface it plainly instead.
+  if (conversation.status === 'failed') {
+    console.error('[report] call failed:', conversation.metadata?.termination_reason);
+    return json({ error: 'The call dropped mid-session — not your fault. Start a new session.' }, 422);
+  }
 
   const turns = (conversation.transcript ?? [])
     .filter((t: { message?: string }) => t?.message)

@@ -164,6 +164,12 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   if (conversation.status !== 'done' && conversation.status !== 'failed') {
     return json({ status: 'processing' }, 202);
   }
+  // A platform-killed call (quota exceeded, infra error) must never be graded as if the
+  // seller failed — the rep didn't happen. Surface it plainly instead.
+  if (conversation.status === 'failed') {
+    console.error('[drill-verdict] call failed:', conversation.metadata?.termination_reason);
+    return json({ error: 'The call dropped mid-rep — not your fault. Run the rep again.' }, 422);
+  }
 
   // Transcript: the agent is the customer in every drill, the human is the seller.
   const turns = (conversation.transcript ?? [])
