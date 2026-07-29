@@ -52,110 +52,6 @@
     "grounding": "they shouldn't get wet; answer honestly"
   },
   {
-    "id": "chiapas-sandals-harmonic-tan__price",
-    "productId": "chiapas-sandals-harmonic-tan",
-    "dimension": "price",
-    "prompt": "What is the price of these sandals?",
-    "answer": "$240",
-    "distractors": [
-      "$144",
-      "$218",
-      "$270"
-    ],
-    "grounding": "Priced at $240."
-  },
-  {
-    "id": "chiapas-sandals-harmonic-tan__material",
-    "productId": "chiapas-sandals-harmonic-tan",
-    "dimension": "material",
-    "prompt": "What kind of insole do these sandals have?",
-    "answer": "A light, cork-like insole for all-day comfort",
-    "distractors": [
-      "A memory-foam insole",
-      "A solid leather insole",
-      "A woven palm-fiber insole"
-    ],
-    "grounding": "Light, cork-like insole for all-day comfort"
-  },
-  {
-    "id": "chiapas-sandals-harmonic-tan__ethics",
-    "productId": "chiapas-sandals-harmonic-tan",
-    "dimension": "ethics",
-    "prompt": "What ethical sourcing claim is made for these sandals?",
-    "answer": "Fair-trade; each purchase supports artisan communities",
-    "distractors": [
-      "Profits support a Venezuelan family",
-      "Funded by an Eclectic Array microloan",
-      "Made by a company employing women with home-based work"
-    ],
-    "grounding": "Fair-trade; each purchase supports artisan communities"
-  },
-  {
-    "id": "chiapas-sandals-harmonic-tan__technique",
-    "productId": "chiapas-sandals-harmonic-tan",
-    "dimension": "technique",
-    "prompt": "How are the straps of these sandals produced?",
-    "answer": "Hand-woven, taking up to 8 hours each",
-    "distractors": [
-      "Woven on a backstrap loom over nearly a week",
-      "Hand-painted by two sisters from Oaxaca",
-      "Woven in the traditional Jipijapa palm technique"
-    ],
-    "grounding": "Each strap takes up to 8 hours to weave by hand"
-  },
-  {
-    "id": "puffy-sandals-guatemalteco-beige-azul-turquesa__price",
-    "productId": "puffy-sandals-guatemalteco-beige-azul-turquesa",
-    "dimension": "price",
-    "prompt": "What is the price of these sandals?",
-    "answer": "$252",
-    "distractors": [
-      "$240",
-      "$329",
-      "$179"
-    ],
-    "grounding": "Priced at $252."
-  },
-  {
-    "id": "puffy-sandals-guatemalteco-beige-azul-turquesa__technique",
-    "productId": "puffy-sandals-guatemalteco-beige-azul-turquesa",
-    "dimension": "technique",
-    "prompt": "How is the fabric of these sandals made?",
-    "answer": "Woven by hand on a backstrap loom",
-    "distractors": [
-      "Hand-stitched Otomi embroidery",
-      "Hand-threaded macramé",
-      "Hand-painted alebrije art"
-    ],
-    "grounding": "The fabric is woven by hand on a backstrap loom — nearly a week of work per piece"
-  },
-  {
-    "id": "puffy-sandals-guatemalteco-beige-azul-turquesa__time",
-    "productId": "puffy-sandals-guatemalteco-beige-azul-turquesa",
-    "dimension": "time",
-    "prompt": "About how long does the fabric for one pair of these sandals take to weave?",
-    "answer": "Nearly a week of work per piece",
-    "distractors": [
-      "Up to 8 hours",
-      "Up to 6 hours",
-      "About a month"
-    ],
-    "grounding": "nearly a week of work per piece"
-  },
-  {
-    "id": "puffy-sandals-guatemalteco-beige-azul-turquesa__symbolism",
-    "productId": "puffy-sandals-guatemalteco-beige-azul-turquesa",
-    "dimension": "uniqueness",
-    "prompt": "What does the catalog say about how each of these pairs compares to the others?",
-    "answer": "No two pairs are alike",
-    "distractors": [
-      "Each pair is woven to a single fixed house pattern",
-      "The fabric is loom-matched so pairs come in coordinated sets",
-      "Each pair is dyed to one of three set colorways"
-    ],
-    "grounding": "No two pairs are alike"
-  },
-  {
     "id": "alebrije-birkenstock-blue__price",
     "productId": "alebrije-birkenstock-blue",
     "dimension": "price",
@@ -206,45 +102,6 @@
       "One pair per color, not per size"
     ],
     "grounding": "Only one pair is made per size"
-  },
-  {
-    "id": "olfe-sandals-for-men-nude__price",
-    "productId": "olfe-sandals-for-men-nude",
-    "dimension": "price",
-    "prompt": "What is the price of these sandals?",
-    "answer": "$179",
-    "distractors": [
-      "$240",
-      "$252",
-      "$144"
-    ],
-    "grounding": "Priced at $179."
-  },
-  {
-    "id": "olfe-sandals-for-men-nude__material",
-    "productId": "olfe-sandals-for-men-nude",
-    "dimension": "material",
-    "prompt": "What material are these sandals made from?",
-    "answer": "High-quality, locally sourced leather",
-    "distractors": [
-      "Backstrap-loom textile",
-      "Australian rayon",
-      "Natural palm fiber"
-    ],
-    "grounding": "Handmade in Mexico with high-quality, locally sourced leather (QUERO Collection)"
-  },
-  {
-    "id": "olfe-sandals-for-men-nude__origin",
-    "productId": "olfe-sandals-for-men-nude",
-    "dimension": "origin",
-    "prompt": "Where is this piece handmade?",
-    "answer": "Mexico",
-    "distractors": [
-      "Guatemala",
-      "Venezuela",
-      "Colombia"
-    ],
-    "grounding": "Handmade in Mexico with high-quality, locally sourced leather (QUERO Collection)"
   },
   {
     "id": "tennis-shoe-green-olive__price",
@@ -1454,19 +1311,6 @@
       "Free shipping on the bundle"
     ],
     "grounding": "50% off when purchased with its matching dog collar"
-  },
-  {
-    "id": "olfe-sandals-for-men-nude__ethics",
-    "productId": "olfe-sandals-for-men-nude",
-    "dimension": "ethics",
-    "prompt": "What does the catalog say about how this piece is made?",
-    "answer": "Ethically made by skilled artisans, built to last",
-    "distractors": [
-      "Funded through an Eclectic Array artisan microloan",
-      "Made by a fair-trade cooperative in Chiapas",
-      "Profits go to support a maker's family in Venezuela"
-    ],
-    "grounding": "Ethically made by skilled artisans, built to last"
   },
   {
     "id": "world-long-ring__finish",

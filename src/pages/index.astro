@@ -491,6 +491,12 @@ const appData = JSON.stringify({ agents, products, quiz, stores, drills }).repla
             <ol class="improvements" id="report-improvements"></ol>
           </section>
 
+          <section class="report-card" id="report-verify-card" hidden>
+            <h2>Verify before using it</h2>
+            <p class="verify-note">You said these and they're not in our sheet — could well be true. Confirm them, and if they check out, tell us so we add them to the story.</p>
+            <ul class="coverage" id="report-verify"></ul>
+          </section>
+
           <details class="report-transcript">
             <summary>Full transcript</summary>
             <div class="transcript-lines" id="report-transcript"></div>
@@ -513,6 +519,15 @@ const appData = JSON.stringify({ agents, products, quiz, stores, drills }).repla
         <div class="report-grid">
           <section class="report-card"><h2>The fix</h2><p id="drill-verdict-fix">&mdash;</p></section>
           <section class="report-card"><h2>What passes</h2><p id="drill-verdict-sub">&mdash;</p></section>
+          <section class="report-card" id="drill-verdict-missing-card" hidden>
+            <h2>Story you left unused</h2>
+            <ul class="coverage" id="drill-verdict-missing"></ul>
+          </section>
+          <section class="report-card" id="drill-verdict-verify-card" hidden>
+            <h2>Verify before using it</h2>
+            <p class="verify-note">Not in our sheet — could well be true. Confirm it, and if it checks out, tell us so we add it.</p>
+            <ul class="coverage" id="drill-verdict-verify"></ul>
+          </section>
         </div>
         <div class="report-actions">
           <button class="btn-primary" id="btn-drill-retry" type="button">Try again</button>

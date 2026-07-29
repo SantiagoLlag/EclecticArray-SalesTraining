@@ -1537,3 +1537,6 @@ body[data-view='report'] .topbar .back { visibility: hidden; }
 .session-grid[data-drill-photo='hero'] .thumb { width: min(320px, 60vw); height: auto; aspect-ratio: 1 / 1; }
 
 @media (prefers-reduced-motion: reduce) { .drill-countdown.is-over { animation: none; } }
+
+/* Drill/report verify block: gentle explainer above the claims-to-verify list */
+.verify-note { font-size: 0.85rem; color: var(--ink-soft); margin: -2px 0 10px; }

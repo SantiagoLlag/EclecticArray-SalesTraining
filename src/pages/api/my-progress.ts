@@ -28,7 +28,7 @@ export const GET: APIRoute = async ({ cookies }) => {
       ),
       dbFetch(
         `/drill_runs?seller_id=eq.${seller.sid}` +
-          `&select=drill_id,product_id,result,fix,duration_secs,created_at` +
+          `&select=drill_id,product_id,result,fix,missing,verify,duration_secs,created_at` +
           `&order=created_at.desc&limit=20`
       ),
     ]);

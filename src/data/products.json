@@ -22,51 +22,6 @@
     ]
   },
   {
-    "id": "chiapas-sandals-harmonic-tan",
-    "name": "Chiapas Sandals — Harmonic Tan",
-    "price": "$240",
-    "category": "Footwear",
-    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/1_da056151-874a-4a20-8573-ae5b3a22cbb4.png",
-    "description": "The signature Chiapas sandal in warm tan — hand-woven straps on a light, cork-like insole.",
-    "story": [
-      "Each strap takes up to 8 hours to weave by hand",
-      "Crafted by artisans in Chiapas",
-      "Light, cork-like insole for all-day comfort",
-      "Fair-trade; each purchase supports artisan communities"
-    ],
-    "objections": [
-      "“$240 for sandals?”",
-      "“I saw similar ones at the market for $40”",
-      "“Do you have this exact pattern in another size?” — straps are hand-woven; patterns vary, turn it into value"
-    ],
-    "stores": [
-      "flora-farms",
-      "san-jose"
-    ]
-  },
-  {
-    "id": "puffy-sandals-guatemalteco-beige-azul-turquesa",
-    "name": "Puffy Sandals Guatemalteco — Beige/Azul Turquesa",
-    "price": "$252",
-    "category": "Footwear",
-    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/18_175d317c-50f1-461e-a2b7-8a6a8bf7c4b8.png",
-    "description": "Statement sandals built on hand-woven backstrap-loom fabric — no two pairs alike.",
-    "story": [
-      "The fabric is woven by hand on a backstrap loom — nearly a week of work per piece",
-      "No two pairs are alike",
-      "100% handmade, then carefully assembled into the sandal"
-    ],
-    "objections": [
-      "“$252 for fabric sandals?”",
-      "“Will the woven fabric hold up?”",
-      "“I've seen Guatemalan textiles cheaper at the market”"
-    ],
-    "stores": [
-      "flora-farms",
-      "san-jose"
-    ]
-  },
-  {
     "id": "alebrije-birkenstock-blue",
     "name": "Alebrije Birkenstock — Blue",
     "price": "$329",
@@ -82,28 +37,6 @@
       "“$329 for Birkenstocks I can buy anywhere?”",
       "“Won't the paint chip or fade?”",
       "“How do I know it's really hand-painted?”"
-    ],
-    "stores": [
-      "flora-farms",
-      "san-jose"
-    ]
-  },
-  {
-    "id": "olfe-sandals-for-men-nude",
-    "name": "Olfe Sandals for Men — Nude",
-    "price": "$179",
-    "category": "Footwear",
-    "image": "https://cdn.shopify.com/s/files/1/1041/4984/files/Quero_Olfe.png",
-    "description": "Men's leather sandals from the QUERO Collection, handmade in Mexico with locally sourced leather.",
-    "story": [
-      "Handmade in Mexico with high-quality, locally sourced leather (QUERO Collection)",
-      "Soft leather straps that mold to your foot over time",
-      "Ethically made by skilled artisans, built to last"
-    ],
-    "objections": [
-      "“$179 for simple sandals?”",
-      "“Will they need breaking in?”",
-      "“How do I care for the leather at the beach?”"
     ],
     "stores": [
       "flora-farms",

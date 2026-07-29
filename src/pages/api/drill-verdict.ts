@@ -32,21 +32,40 @@ const DRILL_AGENT_IDS = new Set(
   (drills as Drill[]).filter((d) => isConfigured(d.agent_id)).map((d) => d.agent_id)
 );
 
-// Strict, minimal output — the whole product of a rep is these three fields.
+// Strict, minimal output. Beyond the original three fields, two coaching lists ride along:
+// what documented story the seller left unused, and what she claimed that our sheet can't
+// confirm (to verify — NOT to punish; see the philosophy below).
 const VERDICT_SCHEMA = {
   type: 'object',
   additionalProperties: false,
-  required: ['result', 'fix', 'quote'],
+  required: ['result', 'fix', 'quote', 'missing', 'verify'],
   properties: {
     result: { type: 'string', enum: ['pass', 'retry'] },
     fix: { type: 'string', maxLength: 220 },
     quote: { type: 'string', maxLength: 220 },
+    missing: {
+      type: 'array',
+      items: { type: 'string', maxLength: 120 },
+      description: 'Documented story beats the seller did NOT use — short phrases; empty if she used them all',
+    },
+    verify: {
+      type: 'array',
+      items: { type: 'string', maxLength: 160 },
+      description: "Product claims the seller made that are NOT in the documented story and don't contradict it — phrased for her to verify; empty if none",
+    },
   },
 } as const;
 
-// Shared grading philosophy: this is a two-minute REHEARSAL rep, not an exam. Reward good
-// form under repetition; a fabricated product fact never passes.
-const GRADER_PHILOSOPHY = `You grade ONE short sales-rehearsal drill for Eclectic Array, a fair-trade B-Corp boutique selling handcrafted Mexican pieces. The AI played the customer; grade ONLY the seller's lines (labeled "Seller"), never the customer's. This is a two-minute rehearsal rep, not an exam — reward good FORM under repetition; a clean, well-formed attempt passes even if brief. Judge against the pass line and the piece's TRUE story provided; a fabricated product fact never passes. Return: result ('pass' or 'retry'), fix (one imperative coaching line, <=220 chars), and quote (the single most telling seller line verbatim — or, on a retry, the moment to fix; empty quote allowed).`;
+// Shared grading philosophy: this is a two-minute REHEARSAL rep, not an exam. The documented
+// story is a REFERENCE, not the complete truth — sellers live with these pieces and often know
+// true facts we haven't written down yet. So: a claim that CONTRADICTS the documented story, or
+// a story that collapses into vague, incoherent filler, fails; a plausible, coherent claim
+// beyond the documented story does NOT fail — it goes to the "verify" list instead.
+const GRADER_PHILOSOPHY = `You grade ONE short sales-rehearsal drill for Eclectic Array, a fair-trade B-Corp boutique selling handcrafted Mexican pieces. The AI played the customer; grade ONLY the seller's lines (labeled "Seller"), never the customer's. This is a two-minute rehearsal rep, not an exam — reward good FORM under repetition; a clean, well-formed attempt passes even if brief.
+
+THE DOCUMENTED STORY IS A REFERENCE, NOT THE COMPLETE TRUTH. Sellers work with these pieces daily and may truthfully know facts our sheet doesn't list. Judge the seller's story on COHERENCE and CREDIBILITY: it must hold together, stay specific, and never CONTRADICT the documented story. A plausible claim beyond the documented story is NOT a fabrication and must NOT cause a retry — record it in "verify" so the seller can confirm it before using it with real customers. What DOES fail: contradicting a documented fact (that we know is wrong), or a story that is vague, generic, or self-contradicting.
+
+Return: result ('pass' or 'retry'); fix (one imperative coaching line, <=220 chars); quote (the single most telling seller line verbatim — or, on a retry, the moment to fix; empty allowed); missing (documented story beats she did NOT use, as short phrases — empty if none); verify (claims she made that are beyond the documented story, phrased so she can check them — empty if none).`;
 
 // The improv drill deliberately INVERTS the no-fabrication rule the other four live by. The
 // piece is fictional by construction, so invented detail is the whole point — there is no
@@ -63,22 +82,22 @@ Grade the seller on THREE dimensions:
 - CREATIVITY — specific, vivid, original detail: a named maker or place, a real technique, a reason why — never generic mush like "it's handmade, very special."
 - CREDIBILITY — INTERNAL coherence of the invented story: origin, maker, price, and technique must not self-contradict across follow-ups (the customer runs a deliberate echo-check, repeating a detail back to test it), and the register must stay plausible for a Mexican artisan boutique.
 
-result: 'pass' ONLY when all three dimensions land at conversational quality; 'retry' otherwise. fix: one imperative coaching line (<=220 chars) that names the WEAKEST dimension and the moment it cracked. quote: the single most telling seller line, verbatim (empty allowed).`;
+result: 'pass' ONLY when all three dimensions land at conversational quality; 'retry' otherwise. fix: one imperative coaching line (<=220 chars) that names the WEAKEST dimension and the moment it cracked. quote: the single most telling seller line, verbatim (empty allowed). missing and verify: ALWAYS return empty arrays in this drill — there is no documented story to miss or verify.`;
 
 // Per-drill grading instruction, keyed by drillId. Each anchored to the drill's pass_line.
 const DRILL_PROMPTS: Record<string, string> = {
   objection: `${GRADER_PHILOSOPHY}
 
-This is the OBJECTION drill. Pass when the seller answered the specific objection the customer raised with concrete, TRUE substance — real facts, specifics, comparisons, or genuine reassurance consistent with the piece's true story — and did NOT reach for a reflex or unprompted discount as the answer, and invented nothing. Retry if they deflected, dismissed, or ignored the objection, answered with a discount instead of substance, or stated anything that contradicts or fabricates beyond the true story.`,
+This is the OBJECTION drill. Pass when the seller answered the specific objection the customer raised with a coherent, credible story: concrete substance — facts, specifics, comparisons, or genuine reassurance — that never contradicts the documented story, and did NOT reach for a reflex or unprompted discount as the answer. Substance beyond the documented story counts, and goes to "verify". Retry if they deflected, dismissed, or ignored the objection, answered with a discount instead of substance, contradicted a documented fact, or gave only vague, generic filler.`,
   price: `${GRADER_PHILOSOPHY}
 
-This is the PRICE-DEFENSE drill. Pass when the seller conceded NOTHING beyond 10% off AND made a concrete value case for THIS piece (craft, provenance, rarity, quality — grounded in the true story) rather than defending with a bare "that's the price." Retry on any concession past 10%, an invented authority or giveaway to close, or caving to the customer's number without a value case.`,
+This is the PRICE-DEFENSE drill. Pass when the seller conceded NOTHING beyond 10% off AND made a concrete, credible value case for THIS piece (craft, provenance, rarity, quality) that never contradicts the documented story, rather than defending with a bare "that's the price." Retry on any concession past 10%, caving to the customer's number without a value case, contradicting a documented fact, or a value case made of pure generic filler.`,
   story: `${GRADER_PHILOSOPHY}
 
-This is the STORY-SPRINT drill. Pass when, in a roughly 60-90 second telling, the seller covered the piece's key beats (what it is, where/who it comes from, and what makes it special) grounded in the true story, answered the customer's single probe, and invented NOTHING (paraphrase is fine; an honest "I'm not sure" is fine). Retry if a key beat is missing, the probe was dodged, or any stated fact contradicts or fabricates beyond the true story.`,
+This is the STORY-SPRINT drill. This drill IS about the documented story: pass when, in a roughly 60-90 second telling that holds together, the seller covered the piece's key documented beats (what it is, where/who it comes from, and what makes it special) and answered the customer's single probe (paraphrase is fine; an honest "I'm not sure" is fine; credible additions beyond the sheet go to "verify", never against her). Retry if a key documented beat is missing, the probe was dodged, a stated fact contradicts the documented story, or the telling is generic mush.`,
   close: `${GRADER_PHILOSOPHY}
 
-This is the CLOSE drill. Pass when the seller made a clear, natural ask for the sale — an unambiguous invitation to buy, ring it up, or take it home — after acknowledging the customer's hesitation, delivered without pushiness, and invented no product facts. Retry if they never asked, only hinted, asked in a forced or aggressive way, or fabricated a claim to push the sale.`,
+This is the CLOSE drill. Pass when the seller made a clear, natural ask for the sale — an unambiguous invitation to buy, ring it up, or take it home — after acknowledging the customer's hesitation, delivered without pushiness and without contradicting the documented story. Retry if they never asked, only hinted, asked in a forced or aggressive way, or leaned on a claim that contradicts the documented story to push the sale.`,
   // The improv drill is graded by its own inverted framing — see IMPROV_PROMPT above.
   improv: IMPROV_PROMPT,
 };
@@ -189,7 +208,7 @@ Transcript:
 ${transcriptText}`
       : `Drill: ${drill.label}. What passes: ${drill.pass_line}
 
-Reference TRUE story of the piece (the seller must not contradict it or invent beyond it):
+DOCUMENTED story of the piece (the reference — the seller must never contradict it; credible knowledge beyond it goes to "verify", and documented beats she didn't use go to "missing"):
 ${vars.product_story ?? '(not provided)'}
 
 Known customer concerns for this piece:
@@ -214,13 +233,16 @@ ${transcriptText}`;
   });
 
   const text = message.content.find((b) => b.type === 'text')?.text ?? '';
-  let verdict: { result: string; fix: string; quote: string };
+  let verdict: { result: string; fix: string; quote: string; missing?: string[]; verify?: string[] };
   try {
     verdict = JSON.parse(text);
   } catch {
     return json({ error: 'The verdict came back malformed. Try again.' }, 502);
   }
   const { result, fix, quote } = verdict;
+  // Coaching lists (empty for improv by design). Clamp defensively; render-side hides empties.
+  const missing = Array.isArray(verdict.missing) ? verdict.missing.slice(0, 4).map((s) => String(s).slice(0, 120)) : [];
+  const verify = Array.isArray(verdict.verify) ? verdict.verify.slice(0, 4).map((s) => String(s).slice(0, 160)) : [];
 
   // Persist the rep for the signed-in seller (kiosk cookie). Guests and an unconfigured
   // database are both fine — persistence must never break the verdict, which we always
@@ -250,6 +272,9 @@ ${transcriptText}`;
         result,
         fix: String(fix ?? '').slice(0, 220),
         duration_secs,
+        // Coaching lists (jsonb): what documented story went unused, what to verify.
+        missing,
+        verify,
       };
       const saved = await dbFetch('/drill_runs?on_conflict=conversation_id', {
         method: 'POST',
@@ -262,5 +287,5 @@ ${transcriptText}`;
     console.error('[drill-verdict] persist error:', err);
   }
 
-  return json({ result, fix, quote });
+  return json({ result, fix, quote, missing, verify });
 };

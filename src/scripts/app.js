@@ -822,7 +822,7 @@ async function runDrillVerdict() {
   }
 }
 
-function renderDrillVerdict({ result, fix, quote }) {
+function renderDrillVerdict({ result, fix, quote, missing = [], verify = [] }) {
   const pass = result === 'pass';
   $('drill-verdict-badge').className = `rating ${pass ? 'strong' : 'weak'}`;
   $('drill-verdict-badge').textContent = pass ? 'Pass' : 'Retry';
@@ -832,6 +832,18 @@ function renderDrillVerdict({ result, fix, quote }) {
   q.textContent = quote || '';
   q.hidden = !quote;
   $('drill-verdict-sub').textContent = state.drill.pass_line;
+  // Coaching lists: documented story she left unused, and claims to verify (never a penalty —
+  // the sheet is a reference, not the complete truth). Cards hide when empty.
+  const fillList = (cardId, listId, items, mark, cls) => {
+    const card = $(cardId);
+    if (!card) return;
+    const list = $(listId);
+    list.textContent = '';
+    (items || []).forEach((point) => list.appendChild(markedListItem(cls, mark, point, '')));
+    card.hidden = !(items && items.length);
+  };
+  fillList('drill-verdict-missing-card', 'drill-verdict-missing', missing, '—', 'missed');
+  fillList('drill-verdict-verify-card', 'drill-verdict-verify', verify, '?', 'told');
 }
 
 // Same piece (rehearsal convergence), fresh seed (a different variant is guaranteed). No intro.
@@ -1022,6 +1034,17 @@ function renderReport({ report, criteria = [], transcript, customer, product, mo
     li.textContent = tip;
     improvements.appendChild(li);
   });
+
+  // Claims beyond the documented story (single-customer sessions only): shown to verify,
+  // never as errors — the sheet is a reference, not the complete truth.
+  const verifyCard = $('report-verify-card');
+  if (verifyCard) {
+    const claims = (!mentor && !inventory && Array.isArray(report.verify_claims)) ? report.verify_claims : [];
+    const list = $('report-verify');
+    list.textContent = '';
+    claims.forEach((c) => list.appendChild(markedListItem('told', '?', c, '')));
+    verifyCard.hidden = claims.length === 0;
+  }
 
   const feed = $('report-transcript');
   feed.textContent = '';
@@ -1917,6 +1940,11 @@ function renderProgress(data) {
         const chip = document.createElement('span');
         chip.className = `rating ${pass ? 'strong' : 'weak'}`;
         chip.textContent = pass ? 'pass' : 'retry';
+        // Hover detail: the fix, plus any claims flagged to verify on that rep.
+        const tipParts = [];
+        if (r.fix) tipParts.push(r.fix);
+        if (Array.isArray(r.verify) && r.verify.length) tipParts.push(`Verify: ${r.verify.join(' · ')}`);
+        if (tipParts.length) li.title = tipParts.join('\n');
         li.append(when, what, chip);
         drillUl.appendChild(li);
       });
