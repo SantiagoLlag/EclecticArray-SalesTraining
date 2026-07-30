@@ -680,6 +680,7 @@ async function startSession() {
     dynamicVariables = {
       product_name: product.name,
       product_price: product.price,
+      product_spoken: spokenName(product),
       product_story: product.story.map((s) => `- ${s}`).join('\n'),
       product_objections: product.objections.map((s) => `- ${s}`).join('\n'),
       session_seed: makeSessionSeed(),
