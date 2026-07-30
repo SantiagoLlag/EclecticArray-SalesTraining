@@ -30,6 +30,7 @@ const state = {
   sessionType: null, // 'drill' while a drill runs, else null → discriminates start / end / status
   drill: null, // selected drills.json object
   drillSeed: null, // current makeDrillSeed() value
+  drillVariant: null, // variant name chosen by makeDrillSeed — sent to the agent as drill_variant
   lastVerdict: null, // last {result,fix,quote}
   drillVerdicting: false, // reentrancy guard for runDrillVerdict()
   drillDeadlineAt: null, // Date.now()+FORCE_MS, for the 2:30 hard stop
@@ -520,11 +521,12 @@ function drillMarkVariant(id, idx) {
   }
 }
 
-// The variant tables live here for anti-repeat bookkeeping + dev readability; the semantics
-// live in the agent profiles. Order is the contract shared with those profiles — do not
-// renumber without changing both.
+// The variant tables live here for anti-repeat bookkeeping; the semantics live in the agent
+// profiles. The NAMES are the contract — each must match a variant line in its drill's
+// profile exactly (the chosen name travels to the agent as the drill_variant dynamic
+// variable; the agent never parses the seed).
 const DRILL_VARIANTS = {
-  objection: ['price-vs-alt', 'authenticity', 'durability-care', 'suitability', 'need-to-think', 'online-cheaper'],
+  objection: ['price-vs-alt', 'authenticity', 'durability-care', 'suitability', 'need-to-think', 'online-cheaper', 'color-style', 'size-fit', 'spotted-imperfection', 'quality-doubt'],
   price: ['flat-20', 'cash-now', 'round-down', 'only-if-bundle', 'competitor-quote', 'walk-threat'],
   story: ['who-made', 'technique', 'materials', 'time-effort', 'meaning', 'why-this-one'],
   close: ['price-hesitation', 'ask-partner', 'not-today', 'will-i-use', 'look-around', 'gift-doubt'],
@@ -538,6 +540,7 @@ function makeDrillSeed(drill) {
   const last = drillLastVariant(drill.id);
   if (n > 1 && idx === last) idx = (idx + 1) % n; // never repeat the immediately-previous variant
   drillMarkVariant(drill.id, idx);
+  state.drillVariant = table[idx] || ''; // sent as drill_variant — the agent reads this, never the seed
   const entropy = (buf[1] >>> 0).toString(36) + (buf[2] >>> 0).toString(36);
   return idx.toString(36) + entropy; // first char = variant index (base36), rest = per-run entropy
 }
@@ -582,15 +585,16 @@ async function startSession() {
   // else is a single/mentor product session.
   let dynamicVariables;
   if (agent.mode === 'drill') {
-    // Improv (no_product) has no piece on the counter: send the seed only, never touch product.
+    // Improv (no_product) has no piece on the counter: seed + variant only, never touch product.
     dynamicVariables = state.drill?.no_product
-      ? { drill_seed: state.drillSeed }
+      ? { drill_seed: state.drillSeed, drill_variant: state.drillVariant || '' }
       : {
           product_name: product.name,
           product_price: product.price,
           product_story: product.story.map((s) => `- ${s}`).join('\n'),
           product_objections: product.objections.map((s) => `- ${s}`).join('\n'),
           drill_seed: state.drillSeed,
+          drill_variant: state.drillVariant || '',
         };
   } else if (inventory) {
     dynamicVariables = { roam_seed: makeRoamSeed() };
