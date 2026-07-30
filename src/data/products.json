@@ -145,7 +145,11 @@
       "“$1,624 is a lot for a decoration”",
       "“How would I even ship this home safely?”"
     ],
-    "spoken": "this skull"
+    "locked": true,
+    "stores": [
+      "flora-farms",
+      "san-jose"
+    ]
   },
   {
     "id": "beaded-huichol-skull-n64",
@@ -165,11 +169,7 @@
       "“What do the symbols mean?” — every symbol represents their culture and nature",
       "“Why does this one cost the same as the smaller one?”"
     ],
-    "stores": [
-      "flora-farms",
-      "san-jose"
-    ],
-    "locked": true
+    "spoken": "this skull"
   },
   {
     "id": "tribal-macrame-earrings",
