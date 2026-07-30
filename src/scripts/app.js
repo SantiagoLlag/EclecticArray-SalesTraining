@@ -479,9 +479,13 @@ function makeSessionSeed() {
   return (b[0] >>> 0).toString(36) + (b[1] >>> 0).toString(36);
 }
 
+// Only unlocked pieces are in play — locked ones stay visible in the picker but never
+// reach a session, a drill, the quiz, or The Browser's roam.
+const unlockedProducts = () => products.filter((p) => !p.locked);
+
 // Fresh real-entropy seed each session so The Browser's roam varies session-to-session.
 function makeRoamSeed() {
-  const ids = products.map((p) => p.id);
+  const ids = unlockedProducts().map((p) => p.id);
   const buf = new Uint32Array(8);
   crypto.getRandomValues(buf);
   const picks = [];
@@ -543,8 +547,9 @@ function makeDrillSeed(drill) {
 function drawDrillProduct() {
   const fits = (p) =>
     !state.store || !Array.isArray(p.stores) || p.stores.length === 0 || p.stores.includes(state.store);
-  const pool = products.filter(fits);
-  const src = pool.length ? pool : products;
+  const unlocked = unlockedProducts();
+  const pool = unlocked.filter(fits);
+  const src = pool.length ? pool : unlocked.length ? unlocked : products;
   const b = crypto.getRandomValues(new Uint32Array(1))[0] >>> 0;
   return src[b % src.length];
 }
@@ -1305,9 +1310,11 @@ function buildQuizSet(mode) {
   });
   const seen = new Set(quizSeen());
 
-  // The quiz tests only the pieces on this store's floor (same rule as the product picker).
+  // The quiz tests only the unlocked pieces on this store's floor (same rule as the picker).
   const inStore = (pid) => {
-    const st = productById[pid]?.stores;
+    const p = productById[pid];
+    if (!p || p.locked) return false;
+    const st = p.stores;
     return !state.store || !Array.isArray(st) || st.length === 0 || st.includes(state.store);
   };
 

@@ -18,6 +18,9 @@ const cdn = (url: string, width: number) =>
 // it never travels to the agent).
 const categories = [...new Set(products.map((p) => p.category).filter(Boolean))];
 
+// Pieces in play (not locked) — drives the quiz-mode counts so they never overpromise.
+const playableCount = products.filter((p) => !(p as { locked?: boolean }).locked).length;
+
 // Pieces shown inside the tutorial's animated mini-screens (real catalog data,
 // so the tutorial never drifts from the shop).
 const tutFootwear = products.find((p) => p.category === 'Footwear') ?? products[0];
@@ -360,10 +363,11 @@ const appData = JSON.stringify({ agents, products, quiz, stores, drills }).repla
           {
             products.map((product, i) => (
               <button
-                class="card product-card"
+                class={`card product-card${(product as { locked?: boolean }).locked ? ' is-locked' : ''}`}
                 type="button"
                 role="option"
                 aria-selected="false"
+                disabled={(product as { locked?: boolean }).locked || undefined}
                 data-product-index={i}
                 data-category={product.category}
                 data-stores={((product as { stores?: string[] }).stores ?? []).join(',')}
@@ -377,6 +381,7 @@ const appData = JSON.stringify({ agents, products, quiz, stores, drills }).repla
                     loading="lazy"
                     onerror={`this.onerror=null;this.src='/products/${product.id}.png'`}
                   />
+                  {(product as { locked?: boolean }).locked && <span class="locked-badge">Locked</span>}
                 </figure>
                 <div class="card-body">
                   <h2>{product.name}</h2>
@@ -397,16 +402,16 @@ const appData = JSON.stringify({ agents, products, quiz, stores, drills }).repla
         <div class="card-list quiz-modes" role="listbox" aria-label="Quiz length">
           <button class="card customer-card" type="button" role="option" aria-selected="false" data-quiz-mode="quick">
             <div class="card-body">
-              <span class="index">10</span>
+              <span class="index">{Math.min(10, playableCount)}</span>
               <h2>Quick round</h2>
-              <p>Ten questions across the floor. About two minutes.</p>
+              <p>A fast mixed round across the pieces in play.</p>
             </div>
           </button>
           <button class="card customer-card" type="button" role="option" aria-selected="false" data-quiz-mode="full">
             <div class="card-body">
-              <span class="index">28</span>
+              <span class="index">{playableCount}</span>
               <h2>Full floor</h2>
-              <p>One question per piece — every item in the shop. About six minutes.</p>
+              <p>One question per piece — every piece in play.</p>
             </div>
           </button>
         </div>

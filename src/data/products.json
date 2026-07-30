@@ -1,5 +1,62 @@
 [
   {
+    "id": "hand-embroidered-otomi-shirt-blue",
+    "name": "Hand Embroidered Otomi Shirt — Blue",
+    "price": "$294",
+    "category": "Clothing",
+    "image": "https://eclecticarray.com/cdn/shop/products/13_5e9f717b-2529-4411-b13a-2f41217bcb17.png",
+    "description": "A wide-cut, 100% cotton shirt with vibrant hand-embroidered Otomi motifs across the back.",
+    "story": [
+      "Vibrant Otomi embroidery across the back — hand-embroidered with care",
+      "Wide-cut, 100% cotton; wear it oversized with shorts or trousers, or as a beach coverup",
+      "Every purchase supports the artisans behind each stitch, helping preserve the craft and sustain their community",
+      "Handmade: embroidery figures vary piece to piece (sizes XS–XL)"
+    ],
+    "objections": [
+      "“$294 for a shirt?”",
+      "“Is it machine-embroidered?” — no, hand-embroidered; that's why the figures vary",
+      "“It doesn't match the photo exactly” — handmade; variation is the signature"
+    ]
+  },
+  {
+    "id": "multi-wrap-gemstone-necklace",
+    "name": "Multi-Wrap Gemstone Necklace",
+    "price": "$339",
+    "category": "Jewelry",
+    "image": "https://eclecticarray.com/cdn/shop/files/Dinorah_necklace10.png",
+    "description": "One necklace, three effortless ways to wear it — natural stones handcrafted in Mexico by local artisan Karla.",
+    "story": [
+      "Handcrafted in Mexico by local artisan Karla — each piece is assembled by hand",
+      "Extra-long design: wear it fully extended, double-wrapped, or triple-wrapped",
+      "Natural stones and gemstone details with a gold-plated brass clasp; lightweight",
+      "Three stone combinations: Gray Pearl & Labradorite, Lepidolite & Amethyst, Lapis Lazuli & Turquoise"
+    ],
+    "objections": [
+      "“$339 for a necklace?”",
+      "“Are the stones real?” — yes, natural stones; slight variation in color, shape, and finish is part of each piece",
+      "“Is the clasp real gold?” — gold-plated brass; answer honestly"
+    ]
+  },
+  {
+    "id": "wide-leg-linen-pants-nudo",
+    "name": "Wide Leg Linen Pants — Nudo",
+    "price": "$224",
+    "category": "Clothing",
+    "image": "https://eclecticarray.com/cdn/shop/files/9_453e0084-193c-4f2e-87ee-127451823970.jpg",
+    "description": "Wide-leg pants in 100% premium Turkish linen — about 4 hours of handwork in every pair.",
+    "story": [
+      "100% premium Turkish linen; each pair takes about 4 hours to make by hand",
+      "Sewn by women seamstresses through Social Factory — a rural design school founded in 2007 that provides education and consistent income for artisan women",
+      "High elastic waist with front pockets; one size fits S–L",
+      "Care: wash inside-out on a gentle cycle in cool water; dry on medium heat"
+    ],
+    "objections": [
+      "“$224 for linen pants?”",
+      "“One size fits S–L — will they really fit me?”",
+      "“Is linen hard to care for?” — inside-out, gentle cycle, cool water; medium-heat dry"
+    ]
+  },
+  {
     "id": "chiapas-sandals-dark-magenta",
     "name": "Chiapas Sandals — Dark Magenta",
     "price": "$240",
@@ -19,7 +76,8 @@
     "stores": [
       "flora-farms",
       "san-jose"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "alebrije-birkenstock-blue",
@@ -41,7 +99,8 @@
     "stores": [
       "flora-farms",
       "san-jose"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "tennis-shoe-green-olive",
@@ -63,7 +122,8 @@
     "stores": [
       "flora-farms",
       "san-jose"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "threaded-huichol-skull",
@@ -85,7 +145,8 @@
     "stores": [
       "flora-farms",
       "san-jose"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "beaded-huichol-skull-n64",
@@ -108,7 +169,8 @@
     "stores": [
       "flora-farms",
       "san-jose"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "tribal-macrame-earrings",
@@ -130,7 +192,8 @@
     "stores": [
       "flora-farms",
       "san-jose"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "macrame-pearl-necklace",
@@ -153,7 +216,8 @@
     "stores": [
       "flora-farms",
       "san-jose"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "pearl-baja-earrings",
@@ -174,7 +238,8 @@
     "stores": [
       "flora-farms",
       "san-jose"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "skeleton-earrings",
@@ -196,7 +261,8 @@
     "stores": [
       "flora-farms",
       "san-jose"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "collar-doble-perla-blanca-cola-sirena",
@@ -218,7 +284,8 @@
     "stores": [
       "flora-farms",
       "san-jose"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "ring-snake-infinity",
@@ -240,7 +307,8 @@
     "stores": [
       "flora-farms",
       "san-jose"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "palm-cuff-right-place-r",
@@ -262,7 +330,8 @@
     "stores": [
       "san-lucas",
       "cabo-del-sol"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "world-long-ring",
@@ -284,7 +353,8 @@
     "stores": [
       "san-lucas",
       "cabo-del-sol"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "cable-bag-irma",
@@ -306,7 +376,8 @@
     "stores": [
       "san-lucas",
       "cabo-del-sol"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "multi-color-otomi-clutch-red-tassels",
@@ -328,7 +399,8 @@
     "stores": [
       "san-lucas",
       "cabo-del-sol"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "shirt-dress-helsol-flirty-long-yellow",
@@ -350,7 +422,8 @@
     "stores": [
       "san-lucas",
       "cabo-del-sol"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "shift-dress-chelle-design-2",
@@ -373,7 +446,8 @@
     "stores": [
       "san-lucas",
       "cabo-del-sol"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "crop-top-otomi-halter-sleeves",
@@ -396,7 +470,8 @@
     "stores": [
       "san-lucas",
       "cabo-del-sol"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "hand-embroidered-cactus-hat-kids",
@@ -419,7 +494,8 @@
     "stores": [
       "san-lucas",
       "cabo-del-sol"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "amigo-lavable-whale",
@@ -441,7 +517,8 @@
     "stores": [
       "san-lucas",
       "cabo-del-sol"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "small-paper-mache-devil-figurine",
@@ -463,7 +540,8 @@
     "stores": [
       "san-lucas",
       "cabo-del-sol"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "ornament-ball-jicara",
@@ -485,7 +563,8 @@
     "stores": [
       "san-lucas",
       "cabo-del-sol"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "islas-journal-briso-black",
@@ -507,7 +586,8 @@
     "stores": [
       "san-lucas",
       "cabo-del-sol"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "rainbow-beaded-dog-collar",
@@ -529,7 +609,8 @@
     "stores": [
       "san-lucas",
       "cabo-del-sol"
-    ]
+    ],
+    "locked": true
   },
   {
     "id": "brick-leather-dog-leash",
@@ -552,6 +633,7 @@
     "stores": [
       "san-lucas",
       "cabo-del-sol"
-    ]
+    ],
+    "locked": true
   }
 ]

@@ -1337,5 +1337,161 @@
       "To a women’s home-based work program"
     ],
     "grounding": "Profits support her family in Venezuela"
+  },
+  {
+    "id": "hand-embroidered-otomi-shirt-blue__price",
+    "productId": "hand-embroidered-otomi-shirt-blue",
+    "dimension": "price",
+    "prompt": "What is the price of this hand-embroidered Otomi shirt?",
+    "answer": "$294",
+    "distractors": [
+      "$238",
+      "$270",
+      "$318"
+    ],
+    "grounding": "Priced at $294."
+  },
+  {
+    "id": "hand-embroidered-otomi-shirt-blue__technique",
+    "productId": "hand-embroidered-otomi-shirt-blue",
+    "dimension": "technique",
+    "prompt": "How are the Otomi motifs on the back of this shirt made?",
+    "answer": "Hand-embroidered",
+    "distractors": [
+      "Machine-embroidered",
+      "Screen-printed",
+      "Iron-on appliqué"
+    ],
+    "grounding": "Vibrant Otomi embroidery across the back — hand-embroidered with care"
+  },
+  {
+    "id": "hand-embroidered-otomi-shirt-blue__material",
+    "productId": "hand-embroidered-otomi-shirt-blue",
+    "dimension": "material",
+    "prompt": "What fabric is this shirt made of?",
+    "answer": "100% cotton",
+    "distractors": [
+      "100% linen",
+      "Australian rayon",
+      "A cotton-polyester blend"
+    ],
+    "grounding": "Wide-cut, 100% cotton"
+  },
+  {
+    "id": "hand-embroidered-otomi-shirt-blue__versatility",
+    "productId": "hand-embroidered-otomi-shirt-blue",
+    "dimension": "versatility",
+    "prompt": "Besides wearing it as an oversized shirt, how else is this piece meant to be worn?",
+    "answer": "As a coverup for beach days",
+    "distractors": [
+      "Belted as a dress",
+      "Knotted as a crop top",
+      "Layered as a light jacket"
+    ],
+    "grounding": "wear it oversized with shorts or trousers, or as a beach coverup"
+  },
+  {
+    "id": "multi-wrap-gemstone-necklace__price",
+    "productId": "multi-wrap-gemstone-necklace",
+    "dimension": "price",
+    "prompt": "What is the price of this multi-wrap necklace?",
+    "answer": "$339",
+    "distractors": [
+      "$294",
+      "$255",
+      "$364"
+    ],
+    "grounding": "Priced at $339."
+  },
+  {
+    "id": "multi-wrap-gemstone-necklace__maker",
+    "productId": "multi-wrap-gemstone-necklace",
+    "dimension": "maker",
+    "prompt": "Who makes this necklace?",
+    "answer": "Karla, a local Mexican artisan",
+    "distractors": [
+      "Joanna, a Venezuelan artisan in Los Cabos",
+      "Two sisters from Oaxaca",
+      "Women artisans in Campeche"
+    ],
+    "grounding": "Handcrafted in Mexico by local artisan Karla — each piece is assembled by hand"
+  },
+  {
+    "id": "multi-wrap-gemstone-necklace__versatility",
+    "productId": "multi-wrap-gemstone-necklace",
+    "dimension": "versatility",
+    "prompt": "How can this extra-long necklace be worn?",
+    "answer": "Long, double-wrapped, or triple-wrapped",
+    "distractors": [
+      "Only at full length",
+      "As a choker only",
+      "Doubled as a bracelet only"
+    ],
+    "grounding": "wear it fully extended, double-wrapped, or triple-wrapped"
+  },
+  {
+    "id": "multi-wrap-gemstone-necklace__material",
+    "productId": "multi-wrap-gemstone-necklace",
+    "dimension": "material",
+    "prompt": "What is the clasp of this necklace made of?",
+    "answer": "Gold-plated brass",
+    "distractors": [
+      "Solid 14k gold",
+      "Sterling silver",
+      "Stainless steel"
+    ],
+    "grounding": "Natural stones and gemstone details with a gold-plated brass clasp"
+  },
+  {
+    "id": "wide-leg-linen-pants-nudo__price",
+    "productId": "wide-leg-linen-pants-nudo",
+    "dimension": "price",
+    "prompt": "What is the price of these wide-leg linen pants?",
+    "answer": "$224",
+    "distractors": [
+      "$218",
+      "$188",
+      "$242"
+    ],
+    "grounding": "Priced at $224."
+  },
+  {
+    "id": "wide-leg-linen-pants-nudo__time",
+    "productId": "wide-leg-linen-pants-nudo",
+    "dimension": "time",
+    "prompt": "How long does it take to make each pair of these pants by hand?",
+    "answer": "About 4 hours",
+    "distractors": [
+      "About 45 minutes",
+      "About 8 hours",
+      "About a month"
+    ],
+    "grounding": "each pair takes about 4 hours to make by hand"
+  },
+  {
+    "id": "wide-leg-linen-pants-nudo__material",
+    "productId": "wide-leg-linen-pants-nudo",
+    "dimension": "material",
+    "prompt": "What are these pants made of?",
+    "answer": "100% premium Turkish linen",
+    "distractors": [
+      "100% Baby Cotton",
+      "A linen-cotton blend",
+      "Handwoven backstrap-loom fabric"
+    ],
+    "grounding": "100% premium Turkish linen"
+  },
+  {
+    "id": "wide-leg-linen-pants-nudo__ethics",
+    "productId": "wide-leg-linen-pants-nudo",
+    "dimension": "ethics",
+    "prompt": "Who sews these pants?",
+    "answer": "Women seamstresses through Social Factory, a rural design school",
+    "distractors": [
+      "Local Los Cabos seamstresses",
+      "A family workshop in Oaxaca",
+      "Huichol artisans of the Sierra Madre"
+    ],
+    "grounding": "Sewn by women seamstresses through Social Factory — a rural design school founded in 2007 that provides education and consistent income for artisan women"
   }
 ]
