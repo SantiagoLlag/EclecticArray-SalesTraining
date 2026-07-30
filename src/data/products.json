@@ -16,7 +16,8 @@
       "“$294 for a shirt?”",
       "“Is it machine-embroidered?” — no, hand-embroidered; that's why the figures vary",
       "“It doesn't match the photo exactly” — handmade; variation is the signature"
-    ]
+    ],
+    "spoken": "this embroidered shirt"
   },
   {
     "id": "multi-wrap-gemstone-necklace",
@@ -35,7 +36,8 @@
       "“$339 for a necklace?”",
       "“Are the stones real?” — yes, natural stones; slight variation in color, shape, and finish is part of each piece",
       "“Is the clasp real gold?” — gold-plated brass; answer honestly"
-    ]
+    ],
+    "spoken": "this necklace"
   },
   {
     "id": "wide-leg-linen-pants-nudo",
@@ -54,7 +56,8 @@
       "“$224 for linen pants?”",
       "“One size fits S–L — will they really fit me?”",
       "“Is linen hard to care for?” — inside-out, gentle cycle, cool water; medium-heat dry"
-    ]
+    ],
+    "spoken": "these linen pants"
   },
   {
     "id": "chiapas-sandals-dark-magenta",

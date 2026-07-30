@@ -545,6 +545,83 @@ function makeDrillSeed(drill) {
   return idx.toString(36) + entropy; // first char = variant index (base36), rest = per-run entropy
 }
 
+// How a shopper actually says the piece out loud (products.json `spoken`) — the catalog
+// name is written data, and its dashes read as TTS pauses. Fallback trims at the dash.
+const spokenName = (p) =>
+  (p && (p.spoken || `this ${String(p.name || 'piece').split('—')[0].trim()}`)) || 'this piece';
+
+// Five opening lines per drill; one is drawn each rep and sent as a first-message override
+// so no two reps in a row open with the same sentence. {product} → spokenName. Each line
+// keeps its drill's contract (objection promises to state the concern, price opens the
+// price thread, story invites the story, close shows warm hesitation, improv sets the game).
+const DRILL_OPENERS = {
+  objection: [
+    "Okay, I'll be honest with you. I keep coming back to {product}, but there's one thing holding me back. Can I tell you what it is?",
+    "Hi. So I've circled back to {product} twice now, and there's still one thing stopping me. Want to hear it?",
+    "Can I be straight with you? I really like {product}, but one thing keeps giving me pause. Should I just say it?",
+    "Sorry, quick question. I've been eyeing {product} for a while, but there's one thing I can't get past. Can I lay it on you?",
+    "You know what, I almost walked out with {product} earlier. One thing stopped me. Want me to tell you?",
+  ],
+  price: [
+    "Alright, I'll be straight with you. I like {product}, but that price is a lot. Work with me and I'll take it right now. What can you do?",
+    "Okay, real talk. I want {product}, today even. Just not at that number. What can you do for me?",
+    "So, I love {product}. The price, not so much. Meet me somewhere reasonable and I'll take it right now. What are we saying?",
+    "Let me save us both some time. I'm taking {product} home today if the number makes sense. So what can you do?",
+    "I keep looking at the tag on {product} and wincing. Help me out here and we close this right now. What can you do?",
+  ],
+  story: [
+    "Oh, I keep coming back to {product}. What's the story?",
+    "Okay, I have to ask about {product}. What's the story there?",
+    "{product} caught my eye the second I walked in. Go on, tell me everything.",
+    "There's something about {product}. What am I really looking at?",
+    "I've been staring at {product} for five minutes now. Talk to me. Where does it all come from?",
+  ],
+  close: [
+    "Oh, I love this. I really do. I just… hm.",
+    "Okay, I've been holding this for five minutes. I love it. And still, something makes me pause.",
+    "Honestly? This is exactly my taste. I just… you know.",
+    "I really do love {product}. And yet here I am, still thinking.",
+    "So I love this, I want it, and I still haven't said yes. That's where I am.",
+  ],
+  improv: [
+    "Hi, there's a piece I saw earlier that I can't stop thinking about. Let me describe it, and you tell me all about it?",
+    "Okay, help me out. I saw something here earlier and I can't let it go. Can I describe it to you?",
+    "You're going to have to help me. There was this piece, over on that side I think. Let me tell you what it looked like?",
+    "Quick one. I spotted something on my way in and it's been stuck in my head since. Mind if I describe it?",
+    "So I've been wandering around, and one piece keeps pulling me back. Let me paint it for you, and you fill in the rest?",
+  ],
+};
+
+// Same anti-repeat pattern as drill variants, separate ledger.
+const OPENER_SEEN_KEY = 'eclectic_drill_opener';
+function openerLast(id) {
+  try {
+    return (JSON.parse(localStorage.getItem(OPENER_SEEN_KEY)) || {})[id];
+  } catch {
+    return undefined;
+  }
+}
+function openerMark(id, idx) {
+  try {
+    const m = JSON.parse(localStorage.getItem(OPENER_SEEN_KEY)) || {};
+    m[id] = idx;
+    localStorage.setItem(OPENER_SEEN_KEY, JSON.stringify(m));
+  } catch {
+    /* storage off — degrades to pure random */
+  }
+}
+
+function pickDrillOpener(drill, product) {
+  const pool = DRILL_OPENERS[drill?.id];
+  if (!pool || !pool.length) return null;
+  let idx = crypto.getRandomValues(new Uint32Array(1))[0] % pool.length;
+  const last = openerLast(drill.id);
+  if (pool.length > 1 && idx === last) idx = (idx + 1) % pool.length;
+  openerMark(drill.id, idx);
+  const line = pool[idx].replaceAll('{product}', spokenName(product));
+  return line.charAt(0).toUpperCase() + line.slice(1);
+}
+
 // Same store semantics as the product picker / quiz — but inlined, since there is no
 // module-level inStore helper.
 function drawDrillProduct() {
@@ -591,6 +668,7 @@ async function startSession() {
       : {
           product_name: product.name,
           product_price: product.price,
+          product_spoken: spokenName(product),
           product_story: product.story.map((s) => `- ${s}`).join('\n'),
           product_objections: product.objections.map((s) => `- ${s}`).join('\n'),
           drill_seed: state.drillSeed,
@@ -608,12 +686,18 @@ async function startSession() {
     };
   }
 
+  // Drills override the fixed first line with a fresh opener each rep (agents have the
+  // first-message override enabled; the stored line is the fallback for stale clients).
+  const drillOpener = agent.mode === 'drill' ? pickDrillOpener(state.drill, product) : null;
+
   try {
     state.conversation = await Conversation.startSession({
       agentId: agent.agent_id,
       connectionType: 'webrtc',
 
       dynamicVariables,
+
+      ...(drillOpener ? { overrides: { agent: { firstMessage: drillOpener } } } : {}),
 
       // The Browser drives the on-screen reference by calling focus_product on each pivot.
       // Harmless for the other agents (they never call it).
@@ -2077,6 +2161,8 @@ if (import.meta.env.DEV) {
     showCurrentPiece,
     startDrill: beginDrill,
     makeDrillSeed,
+    pickDrillOpener,
+    spokenName,
     runDrillVerdict,
     renderDrillVerdict,
   };
