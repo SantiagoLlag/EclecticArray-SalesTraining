@@ -334,6 +334,18 @@ const appData = JSON.stringify({ agents, products, quiz, stores, drills }).repla
                     </div>
                   </div>
                 )}
+
+                <!-- Track C · coming soon — visible but locked until the processes track is built -->
+                <div class="track-panel is-locked" data-track="processes">
+                  <button class="track-toggle" type="button" disabled>
+                    <span class="track-num">C</span>
+                    <span class="track-toggle-text">
+                      <span class="track-title">Explain the store's processes</span>
+                      <span class="track-sub">A customer with real logistics questions — payments, shipping a piece home, returns and exchanges, special orders. Practice answering from the store's actual playbook.</span>
+                    </span>
+                    <span class="track-lock" aria-hidden="true">Locked</span>
+                  </button>
+                </div>
               </div>
 
               {agents.length === 0 && (

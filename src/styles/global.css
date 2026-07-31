@@ -209,6 +209,32 @@ body[data-view='report'] .topbar .back { visibility: hidden; }
 .inventory-card { border-color: var(--line-strong); }
 .inventory-card .index { color: var(--magenta); font-size: 1.2rem; }
 
+/* Locked track — on the wall, clearly out of play (same language as locked product cards). */
+.track-panel.is-locked { position: relative; border-style: dashed; }
+.track-panel.is-locked:hover { border-color: var(--line); }
+.track-panel.is-locked .track-toggle { cursor: not-allowed; padding-top: clamp(38px, 4.6vw, 52px); }
+.track-panel.is-locked .track-num,
+.track-panel.is-locked .track-toggle-text {
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+.track-lock {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(34, 27, 21, 0.72);
+  color: #fbf6ef;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.track-lock::before { content: '🔒 '; font-size: 0.75rem; }
+.track-switch.has-selection .track-panel:not(.is-active) .track-lock { display: none; }
+
 @media (max-width: 720px) {
   .track-switch { flex-direction: column; }
   /* In a column, flex-basis:0 + flex-grow collapses panels to ~0 height; size to content instead. */
