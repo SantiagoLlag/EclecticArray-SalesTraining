@@ -141,11 +141,12 @@ body[data-view='report'] .topbar .back { visibility: hidden; }
 /* ——— Training dashboard: two side-by-side, expandable tracks ——— */
 .track-switch {
   display: flex;
+  flex-wrap: wrap; /* four panels read as a 2×2 grid; selection pulls them back into one row */
   gap: 16px;
   align-items: stretch;
 }
 .track-panel {
-  flex: 1 1 0;
+  flex: 1 1 44%;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -199,8 +200,8 @@ body[data-view='report'] .topbar .back { visibility: hidden; }
 .track-cards { display: none; padding: 0 clamp(16px, 2.4vw, 22px) clamp(18px, 2.4vw, 24px); }
 
 /* expanded / collapsed states (after a track is chosen) */
-.track-switch.has-selection .track-panel.is-active { flex-grow: 4; border-color: var(--magenta); }
-.track-switch.has-selection .track-panel:not(.is-active) { flex-grow: 0; flex-basis: clamp(150px, 22%, 280px); }
+.track-switch.has-selection .track-panel.is-active { flex-grow: 4; flex-basis: 0; border-color: var(--magenta); }
+.track-switch.has-selection .track-panel:not(.is-active) { flex-grow: 0; flex-basis: clamp(120px, 14%, 190px); }
 .track-panel.is-active .track-cards { display: block; }
 .track-panel.is-active .track-cue { display: none; }
 .track-switch.has-selection .track-panel:not(.is-active) .track-sub,
