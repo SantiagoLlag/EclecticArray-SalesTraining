@@ -76,11 +76,7 @@
       "“I saw similar ones at the market for $40”",
       "“What if they get wet?” — they shouldn't get wet; answer honestly"
     ],
-    "stores": [
-      "flora-farms",
-      "san-jose"
-    ],
-    "locked": true
+    "spoken": "these sandals"
   },
   {
     "id": "alebrije-birkenstock-blue",
