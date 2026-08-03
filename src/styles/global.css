@@ -199,9 +199,12 @@ body[data-view='report'] .topbar .back { visibility: hidden; }
 }
 .track-cards { display: none; padding: 0 clamp(16px, 2.4vw, 22px) clamp(18px, 2.4vw, 24px); }
 
-/* expanded / collapsed states (after a track is chosen) */
+/* expanded / collapsed states (after a track is chosen) — collapsed panels reduce to
+   their letter chip: at ~100px wide a wrapped title is noise, the letter is the wayfinder. */
 .track-switch.has-selection .track-panel.is-active { flex-grow: 4; flex-basis: 0; border-color: var(--magenta); }
-.track-switch.has-selection .track-panel:not(.is-active) { flex-grow: 0; flex-basis: clamp(120px, 14%, 190px); }
+.track-switch.has-selection .track-panel:not(.is-active) { flex-grow: 0; flex-basis: clamp(80px, 9%, 130px); }
+.track-switch.has-selection .track-panel:not(.is-active) .track-title { display: none; }
+.track-switch.has-selection .track-panel:not(.is-active) .track-toggle { justify-content: center; padding: 22px 10px; }
 .track-panel.is-active .track-cards { display: block; }
 .track-panel.is-active .track-cue { display: none; }
 .track-switch.has-selection .track-panel:not(.is-active) .track-sub,
